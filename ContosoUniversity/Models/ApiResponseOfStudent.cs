@@ -2,7 +2,7 @@
 
 namespace ContosoUniversity.Models
 {
-    public class ApiResponseOfStudent: ApiResponse<Student>
+    public class ApiResponseOfStudent: ApiResponseWithData<Student>
     {
     }
 }

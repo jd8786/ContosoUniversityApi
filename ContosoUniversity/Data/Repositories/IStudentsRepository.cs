@@ -8,5 +8,11 @@ namespace ContosoUniversity.Data.Repositories
         IEnumerable<Student> GetStudents();
 
         Student GetStudentById(int studentId);
+
+        void CreateStudent(Student student);
+
+        bool UpdateStudent(int studentId, Student student);
+
+        bool DeleteStudent(int studentId);
     }
 }

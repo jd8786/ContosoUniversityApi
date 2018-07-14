@@ -3,7 +3,7 @@ using ContosoUniversity.Data.Models;
 
 namespace ContosoUniversity.Models
 {
-    public class ApiResponseOfStudents: ApiResponse<IEnumerable<Student>>
+    public class ApiResponseOfStudents: ApiResponseWithData<IEnumerable<Student>>
     {
     }
 }

@@ -1,25 +1,21 @@
 ﻿namespace ContosoUniversity.Models
 {
-    public class ApiResponse<T>
+    public class ApiResponseWithData<T>: ApiResponseBase
     {
-        public bool IsSuccess { get; set; }
-
-        public string Message { get; set; }
-
         public T Data { get; set; }
 
-        public static ApiResponse<T> Success(T data)
+        public static ApiResponseBase Success(T data)
         {
-            return new ApiResponse<T>()
+            return new ApiResponseWithData<T>()
             {
                 IsSuccess = true,
                 Data = data
             };
         }
 
-        public static ApiResponse<T> Error(T data, string message)
+        public static ApiResponseBase Error(T data, string message)
         {
-            return new ApiResponse<T>()
+            return new ApiResponseWithData<T>()
             {
                 IsSuccess = false,
                 Data = data,
