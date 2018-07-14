@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using ContosoUniversity.Models;
+using ContosoUniversity.Data.Models;
 
 namespace ContosoUniversity.Data.Repositories
 {
-    public interface IStudentRepository
+    public interface IStudentsRepository
     {
         IEnumerable<Student> GetStudents();
 

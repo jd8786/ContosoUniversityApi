@@ -1,23 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using ContosoUniversity.Models;
+using ContosoUniversity.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace ContosoUniversity.Data.Repositories
 {
-    public class StudentRepository: IStudentRepository
+    public class StudentsRepository: IStudentsRepository
     {
-        public readonly SchoolContext _context;
+        private readonly SchoolContext _context;
 
-        public StudentRepository(SchoolContext context)
+        public StudentsRepository(SchoolContext context)
         {
             _context = context;
         }
         public IEnumerable<Student> GetStudents()
         {
-            var students = _context.Students.Include(s => s.Enrollments)
+            var students = _context.Students
+                .Include(s => s.Enrollments)
                 .ThenInclude(e => e.Course)
                 .ToList();
 

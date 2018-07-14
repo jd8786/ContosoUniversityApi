@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace ContosoUniversity.Migrations
 {
-    public partial class InitialMigration : Migration
+    public partial class initMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
