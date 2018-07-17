@@ -17,8 +17,8 @@ namespace ContosoUniversity.Data.Repositories
         public IEnumerable<Student> GetStudents()
         {
             var students = _context.Students
-                .Include(s => s.Enrollments)
-                .ThenInclude(e => e.Course)
+                //.Include(s => s.Enrollments)
+                //.ThenInclude(e => e.Course)
                 .ToList();
 
             return students;
