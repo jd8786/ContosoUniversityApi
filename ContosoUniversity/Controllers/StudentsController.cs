@@ -44,7 +44,7 @@ namespace ContosoUniversity.Controllers
 
                 if (student == null)
                 {
-                    return NotFound(ApiResponseOfStudent.Error(null, "Studnent Not Found"));
+                    return NotFound(ApiResponseOfBoolean.Error("Student Not Found"));
                 }
 
                 var apiResponseOfStudent = ApiResponseOfStudent.Success(student);
@@ -62,7 +62,7 @@ namespace ContosoUniversity.Controllers
         {
             if (student == null)
             {
-                return BadRequest(ApiResponseBase.Error("Bad Request"));
+                return BadRequest(ApiResponseOfBoolean.Error("Bad Request"));
             }
 
             try
@@ -72,7 +72,7 @@ namespace ContosoUniversity.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode((int)HttpStatusCode.InternalServerError, ApiResponseBase.Error(ex.Message));
+                return StatusCode((int)HttpStatusCode.InternalServerError, ApiResponseOfBoolean.Error(ex.Message));
             }
         }
 
@@ -81,7 +81,7 @@ namespace ContosoUniversity.Controllers
         {
             if (student == null || student.StudentId != id)
             {
-                return BadRequest(ApiResponseBase.Error("Bad Request"));
+                return BadRequest(ApiResponseOfBoolean.Error("Bad Request"));
             }
 
             try
@@ -90,14 +90,14 @@ namespace ContosoUniversity.Controllers
 
                 if (!isStudentExist)
                 {
-                    return NotFound(ApiResponseBase.Error("Student Not Found"));
+                    return NotFound(ApiResponseOfBoolean.Error("Student Not Found"));
                 }
 
-                return Ok(ApiResponseBase.Success());
+                return Ok(ApiResponseOfBoolean.Success());
             }
             catch (Exception ex)
             {
-                return StatusCode((int)HttpStatusCode.InternalServerError, ApiResponseBase.Error(ex.Message));
+                return StatusCode((int)HttpStatusCode.InternalServerError, ApiResponseOfBoolean.Error(ex.Message));
             }
         }
 
@@ -110,15 +110,15 @@ namespace ContosoUniversity.Controllers
 
                 if (!isStudentExist)
                 {
-                    return NotFound(ApiResponseBase.Error("Student Not Found"));
+                    return NotFound(ApiResponseOfBoolean.Error("Student Not Found"));
                 }
 
-                return Ok(ApiResponseBase.Success());
+                return Ok(ApiResponseOfBoolean.Success());
             }
             catch (Exception ex)
             {
                 return StatusCode((int) HttpStatusCode.InternalServerError,
-                    ApiResponseBase.Error(ex.Message));
+                    ApiResponseOfBoolean.Error(ex.Message));
             }
         }
 

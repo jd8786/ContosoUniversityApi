@@ -1,27 +1,27 @@
 ﻿namespace ContosoUniversity.Models
 {
-    public class ApiResponseBase
+    public class ApiResponseOfBoolean: IApiResponse
     {
         public bool IsSuccess { get; set; }
 
         public string Message { get; set; }
 
-        public static ApiResponseBase Success()
+        public static ApiResponseOfBoolean Success(string message = "")
         {
-            return new ApiResponseBase()
+            return new ApiResponseOfBoolean
             {
                 IsSuccess = true,
+                Message = message
             };
         }
 
-        public static ApiResponseBase Error(string message)
+        public static ApiResponseOfBoolean Error(string message)
         {
-            return new ApiResponseBase ()
+            return new ApiResponseOfBoolean
             {
                 IsSuccess = false,
                 Message = message
             };
         }
-
     }
 }
