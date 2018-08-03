@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using ContosoUniversity.Data.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace ContosoUniversity.Data.Repositories
 {
@@ -47,9 +46,9 @@ namespace ContosoUniversity.Data.Repositories
             }
         }
 
-        public bool UpdateStudent(int studentId, Student student)
+        public bool UpdateStudent(Student student)
         {
-            var currrentStudent = GetStudentById(studentId);
+            var currrentStudent = GetStudentById(student.StudentId);
 
             if (currrentStudent == null)
             {

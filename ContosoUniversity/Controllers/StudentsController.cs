@@ -76,17 +76,17 @@ namespace ContosoUniversity.Controllers
             }
         }
 
-        [HttpPut("{id}")]
-        public IActionResult UpdateStudent(int id, [FromBody] Student student)
+        [HttpPut]
+        public IActionResult UpdateStudent([FromBody] Student student)
         {
-            if (student == null || student.StudentId != id)
+            if (student == null)
             {
                 return BadRequest(ApiResponseOfBoolean.Error("Bad Request"));
             }
 
             try
             {
-                var isStudentExist = _repository.UpdateStudent(id, student);
+                var isStudentExist = _repository.UpdateStudent(student);
 
                 if (!isStudentExist)
                 {

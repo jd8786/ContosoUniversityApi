@@ -11,7 +11,7 @@ namespace ContosoUniversity.Data.Repositories
 
         void CreateStudent(Student student);
 
-        bool UpdateStudent(int studentId, Student student);
+        bool UpdateStudent(Student student);
 
         bool DeleteStudent(int studentId);
     }
