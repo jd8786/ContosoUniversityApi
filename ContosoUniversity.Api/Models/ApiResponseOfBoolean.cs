@@ -1,4 +1,4 @@
-﻿namespace ContosoUniversity.Models
+﻿namespace ContosoUniversity.Api.Models
 {
     public class ApiResponseOfBoolean: IApiResponse
     {

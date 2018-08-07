@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace ContosoUniversity
+namespace ContosoUniversity.Api
 {
     public class Program
     {

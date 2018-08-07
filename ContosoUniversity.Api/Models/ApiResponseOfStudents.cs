@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using ContosoUniversity.Data.Models;
 
-namespace ContosoUniversity.Models
+namespace ContosoUniversity.Api.Models
 {
     public class ApiResponseOfStudents: IApiResponse
     {

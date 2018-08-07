@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ContosoUniversity.Controllers
+namespace ContosoUniversity.Api.Controllers
 {
     [Route("api/[controller]")]
     public class ValuesController : Controller

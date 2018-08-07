@@ -1,5 +1,8 @@
-﻿namespace ContosoUniversity.Data.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace ContosoUniversity.Data.Models
 {
+    [Table("Enrollment")]
     public class Enrollment
     {
         public int EnrollmentId { get; set; }
@@ -8,7 +11,7 @@
 
         public int StudentId { get; set; }
 
-        public Grade Grade { get; set; }
+        public Grade? Grade { get; set; }
 
         public Student Student { get; set; }
 

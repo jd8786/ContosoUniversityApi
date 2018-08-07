@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using System;
 using System.Collections.Generic;
 
-namespace ContosoUniversity.Migrations
+namespace ContosoUniversity.Data.Migrations
 {
-    public partial class initMigration : Migration
+    public partial class initialMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -15,7 +15,7 @@ namespace ContosoUniversity.Migrations
                 {
                     CourseId = table.Column<int>(nullable: false),
                     Credits = table.Column<int>(nullable: false),
-                    Title = table.Column<string>(nullable: true)
+                    Title = table.Column<string>(maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -29,8 +29,8 @@ namespace ContosoUniversity.Migrations
                     StudentId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     EnrollmentDate = table.Column<DateTime>(nullable: false),
-                    FirstMidName = table.Column<string>(nullable: true),
-                    LastName = table.Column<string>(nullable: true)
+                    FirstMidName = table.Column<string>(maxLength: 30, nullable: false),
+                    LastName = table.Column<string>(maxLength: 30, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -44,7 +44,7 @@ namespace ContosoUniversity.Migrations
                     EnrollmentId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     CourseId = table.Column<int>(nullable: false),
-                    Grade = table.Column<int>(nullable: false),
+                    Grade = table.Column<int>(nullable: true),
                     StudentId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>

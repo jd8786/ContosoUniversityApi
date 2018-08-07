@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
 using System;
 
-namespace ContosoUniversity.Migrations
+namespace ContosoUniversity.Data.Migrations
 {
     [DbContext(typeof(SchoolContext))]
-    [Migration("20180714152639_initMigration")]
-    partial class initMigration
+    [Migration("20180807002341_addedCreatedUpdatedByDate")]
+    partial class addedCreatedUpdatedByDate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -26,9 +26,21 @@ namespace ContosoUniversity.Migrations
                 {
                     b.Property<int>("CourseId");
 
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(30);
+
+                    b.Property<DateTime>("CreatedDate");
+
                     b.Property<int>("Credits");
 
-                    b.Property<string>("Title");
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(50);
+
+                    b.Property<string>("UpdatedBy");
+
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("CourseId");
 
@@ -42,7 +54,7 @@ namespace ContosoUniversity.Migrations
 
                     b.Property<int>("CourseId");
 
-                    b.Property<int>("Grade");
+                    b.Property<int?>("Grade");
 
                     b.Property<int>("StudentId");
 
@@ -60,11 +72,25 @@ namespace ContosoUniversity.Migrations
                     b.Property<int>("StudentId")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(30);
+
+                    b.Property<DateTime>("CreatedDate");
+
                     b.Property<DateTime>("EnrollmentDate");
 
-                    b.Property<string>("FirstMidName");
+                    b.Property<string>("FirstMidName")
+                        .IsRequired()
+                        .HasMaxLength(30);
 
-                    b.Property<string>("LastName");
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(30);
+
+                    b.Property<string>("UpdatedBy");
+
+                    b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("StudentId");
 

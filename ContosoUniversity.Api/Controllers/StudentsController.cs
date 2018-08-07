@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Net;
+using ContosoUniversity.Api.Models;
 using ContosoUniversity.Data.Models;
 using ContosoUniversity.Data.Repositories;
-using ContosoUniversity.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ContosoUniversity.Controllers
+namespace ContosoUniversity.Api.Controllers
 {
     [Route("api/[controller]")]
     public class StudentsController: Controller
