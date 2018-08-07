@@ -2,8 +2,6 @@
 using System.Net;
 using ContosoUniversity.Api.Models;
 using ContosoUniversity.Api.Services;
-using ContosoUniversity.Data.Models;
-using ContosoUniversity.Data.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ContosoUniversity.Api.Controllers
@@ -23,11 +21,11 @@ namespace ContosoUniversity.Api.Controllers
         {
             try
             {
-                var students = _service.GetStudents();
+                var studentInfos = _service.GetStudents();
 
-                var apiResponseOfStudents = ApiResponseOfStudents.Success(students);
+                var responseOfStudentInfos = ApiResponseOfStudentInfos.Success(studentInfos);
 
-                return Ok(apiResponseOfStudents);
+                return Ok(responseOfStudentInfos);
             }
             catch (Exception ex)
             {
@@ -36,27 +34,27 @@ namespace ContosoUniversity.Api.Controllers
             
         }
 
-        //[HttpGet("{id}", Name = "GetStudentById")]
-        //public IActionResult GetStudentById(int id)
-        //{
-        //    try
-        //    {
-        //        var student = _service.GetStudentById(id);
+        [HttpGet("{id}", Name = "GetStudentById")]
+        public IActionResult GetStudentById(int id)
+        {
+            try
+            {
+                var studentInfo = _service.GetStudentById(id);
 
-        //        if (student == null)
-        //        {
-        //            return NotFound(ApiResponseOfBoolean.Error("Student Not Found"));
-        //        }
+                if (studentInfo == null)
+                {
+                    return NotFound(ApiResponseOfBoolean.Error("Student Not Found"));
+                }
 
-        //        var apiResponseOfStudent = ApiResponseOfStudent.Success(student);
+                var responseOfStudentInfo = ApiResponseOfStudentInfo.Success(studentInfo);
 
-        //        return Ok(apiResponseOfStudent);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode((int) HttpStatusCode.InternalServerError, ex.Message);
-        //    }
-        //}
+                return Ok(responseOfStudentInfo);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int) HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
 
         //[HttpPost]
         //public IActionResult CreateStudent([FromBody] Student student)

@@ -25,5 +25,15 @@ namespace ContosoUniversity.Api.Services
 
             return studentInfos;
         }
+
+        public StudentInfo GetStudentById(int id)
+        {
+            var student = _repository.GetStudentById(id);
+
+            var studentInfo = _mapper.Map<StudentInfo>(student);
+
+            return studentInfo;
+        }
     }
 }
+
