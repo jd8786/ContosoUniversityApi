@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
+using AutoMapper;
+using ContosoUniversity.Api.Services;
 
 namespace ContosoUniversity.Api
 {
@@ -21,6 +23,8 @@ namespace ContosoUniversity.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAutoMapper();
+
             services.AddCors();
 
             services.AddMvc();
@@ -30,6 +34,8 @@ namespace ContosoUniversity.Api
             services.AddDbContext<SchoolContext>(options => options.UseSqlServer(schoolDbConnectionString));
 
             services.AddScoped<IStudentsRepository, StudentsRepository>();
+
+            services.AddScoped<IStudentService, StudentsService>();
 
             services.AddSwaggerGen(o =>
             {

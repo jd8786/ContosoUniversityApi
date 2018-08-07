@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using ContosoUniversity.Data.Models;
 
 namespace ContosoUniversity.Api.Models
 {
@@ -9,9 +8,9 @@ namespace ContosoUniversity.Api.Models
 
         public string Message { get; set; }
 
-        public IEnumerable<Student> Students { get; set; }
+        public IEnumerable<StudentInfo> Students { get; set; }
 
-        public static ApiResponseOfStudents Success(IEnumerable<Student> students, string message = "")
+        public static ApiResponseOfStudents Success(IEnumerable<StudentInfo> students, string message = "")
         {
             return new ApiResponseOfStudents
             {

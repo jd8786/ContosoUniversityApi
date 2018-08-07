@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using ContosoUniversity.Api.Models;
+using ContosoUniversity.Api.Services;
 using ContosoUniversity.Data.Models;
 using ContosoUniversity.Data.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -10,11 +11,11 @@ namespace ContosoUniversity.Api.Controllers
     [Route("api/[controller]")]
     public class StudentsController: Controller
     {
-        private readonly IStudentsRepository _repository;
+        private readonly IStudentService _service;
 
-        public StudentsController(IStudentsRepository repository)
+        public StudentsController(IStudentService service)
         {
-            _repository = repository;
+            _service = service;
         }
 
         [HttpGet]
@@ -22,7 +23,7 @@ namespace ContosoUniversity.Api.Controllers
         {
             try
             {
-                var students = _repository.GetStudents();
+                var students = _service.GetStudents();
 
                 var apiResponseOfStudents = ApiResponseOfStudents.Success(students);
 
@@ -35,92 +36,92 @@ namespace ContosoUniversity.Api.Controllers
             
         }
 
-        [HttpGet("{id}", Name = "GetStudentById")]
-        public IActionResult GetStudentById(int id)
-        {
-            try
-            {
-                var student = _repository.GetStudentById(id);
+        //[HttpGet("{id}", Name = "GetStudentById")]
+        //public IActionResult GetStudentById(int id)
+        //{
+        //    try
+        //    {
+        //        var student = _service.GetStudentById(id);
 
-                if (student == null)
-                {
-                    return NotFound(ApiResponseOfBoolean.Error("Student Not Found"));
-                }
+        //        if (student == null)
+        //        {
+        //            return NotFound(ApiResponseOfBoolean.Error("Student Not Found"));
+        //        }
 
-                var apiResponseOfStudent = ApiResponseOfStudent.Success(student);
+        //        var apiResponseOfStudent = ApiResponseOfStudent.Success(student);
 
-                return Ok(apiResponseOfStudent);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode((int) HttpStatusCode.InternalServerError, ex.Message);
-            }
-        }
+        //        return Ok(apiResponseOfStudent);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode((int) HttpStatusCode.InternalServerError, ex.Message);
+        //    }
+        //}
 
-        [HttpPost]
-        public IActionResult CreateStudent([FromBody] Student student)
-        {
-            if (student == null)
-            {
-                return BadRequest(ApiResponseOfBoolean.Error("Bad Request"));
-            }
+        //[HttpPost]
+        //public IActionResult CreateStudent([FromBody] Student student)
+        //{
+        //    if (student == null)
+        //    {
+        //        return BadRequest(ApiResponseOfBoolean.Error("Bad Request"));
+        //    }
 
-            try
-            {
-                _repository.CreateStudent(student);
-                return CreatedAtRoute("GetStudentById", new { id = student.StudentId }, student);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode((int)HttpStatusCode.InternalServerError, ApiResponseOfBoolean.Error(ex.Message));
-            }
-        }
+        //    try
+        //    {
+        //        _service.CreateStudent(student);
+        //        return CreatedAtRoute("GetStudentById", new { id = student.StudentId }, student);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode((int)HttpStatusCode.InternalServerError, ApiResponseOfBoolean.Error(ex.Message));
+        //    }
+        //}
 
-        [HttpPut]
-        public IActionResult UpdateStudent([FromBody] Student student)
-        {
-            if (student == null)
-            {
-                return BadRequest(ApiResponseOfBoolean.Error("Bad Request"));
-            }
+        //[HttpPut]
+        //public IActionResult UpdateStudent([FromBody] Student student)
+        //{
+        //    if (student == null)
+        //    {
+        //        return BadRequest(ApiResponseOfBoolean.Error("Bad Request"));
+        //    }
 
-            try
-            {
-                var isStudentExist = _repository.UpdateStudent(student);
+        //    try
+        //    {
+        //        var isStudentExist = _service.UpdateStudent(student);
 
-                if (!isStudentExist)
-                {
-                    return NotFound(ApiResponseOfBoolean.Error("Student Not Found"));
-                }
+        //        if (!isStudentExist)
+        //        {
+        //            return NotFound(ApiResponseOfBoolean.Error("Student Not Found"));
+        //        }
 
-                return Ok(ApiResponseOfBoolean.Success());
-            }
-            catch (Exception ex)
-            {
-                return StatusCode((int)HttpStatusCode.InternalServerError, ApiResponseOfBoolean.Error(ex.Message));
-            }
-        }
+        //        return Ok(ApiResponseOfBoolean.Success());
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode((int)HttpStatusCode.InternalServerError, ApiResponseOfBoolean.Error(ex.Message));
+        //    }
+        //}
 
-        [HttpDelete("{id}")]
-        public IActionResult DeleteStudent(int id)
-        {
-            try
-            {
-                var isStudentExist = _repository.DeleteStudent(id);
+        //[HttpDelete("{id}")]
+        //public IActionResult DeleteStudent(int id)
+        //{
+        //    try
+        //    {
+        //        var isStudentExist = _service.DeleteStudent(id);
 
-                if (!isStudentExist)
-                {
-                    return NotFound(ApiResponseOfBoolean.Error("Student Not Found"));
-                }
+        //        if (!isStudentExist)
+        //        {
+        //            return NotFound(ApiResponseOfBoolean.Error("Student Not Found"));
+        //        }
 
-                return Ok(ApiResponseOfBoolean.Success());
-            }
-            catch (Exception ex)
-            {
-                return StatusCode((int) HttpStatusCode.InternalServerError,
-                    ApiResponseOfBoolean.Error(ex.Message));
-            }
-        }
+        //        return Ok(ApiResponseOfBoolean.Success());
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode((int) HttpStatusCode.InternalServerError,
+        //            ApiResponseOfBoolean.Error(ex.Message));
+        //    }
+        //}
 
     }
 }
