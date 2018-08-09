@@ -12,7 +12,8 @@ namespace ContosoUniversity.Api.AutoMappers
         {
             CreateMap<Student, StudentInfo>()
                 .ForMember(m => m.StudentInfoId, opt => opt.MapFrom(src => src.StudentId))
-                .ForMember(m => m.CourseInfos, opt => opt.MapFrom(src => MapCourseInfo(src)));
+                .ForMember(m => m.CourseInfos, opt => opt.MapFrom(src => MapCourseInfo(src)))
+                .ReverseMap();
         }
 
         private static List<CourseInfo> MapCourseInfo(Student student)

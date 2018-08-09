@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using AutoMapper;
 using ContosoUniversity.Api.Models;
+using ContosoUniversity.Data.Models;
 using ContosoUniversity.Data.Repositories;
 
 namespace ContosoUniversity.Api.Services
@@ -17,7 +18,7 @@ namespace ContosoUniversity.Api.Services
 
             _mapper = mapper;
         }
-        public List<StudentInfo> GetStudents()
+        public List<StudentInfo> GetStudentInfos()
         {
             var students = _repository.GetStudents();
 
@@ -26,13 +27,32 @@ namespace ContosoUniversity.Api.Services
             return studentInfos;
         }
 
-        public StudentInfo GetStudentById(int id)
+        public StudentInfo GetStudentInfoById(int studentInfoId)
         {
-            var student = _repository.GetStudentById(id);
+            var student = _repository.GetStudentById(studentInfoId);
 
             var studentInfo = _mapper.Map<StudentInfo>(student);
 
             return studentInfo;
+        }
+
+        public void CreateStudentInfo(StudentInfo studentInfo)
+        {
+            var student = _mapper.Map<Student>(studentInfo);
+
+            _repository.CreateStudent(student);
+        }
+
+        public bool UpdateStudentInfo(StudentInfo studentInfo)
+        {
+            var student = _mapper.Map<Student>(studentInfo);
+
+            return _repository.UpdateStudent(student);
+        }
+
+        public bool DeleteStudentInfo(int studentInfoId)
+        {
+            return _repository.DeleteStudent(studentInfoId);
         }
     }
 }

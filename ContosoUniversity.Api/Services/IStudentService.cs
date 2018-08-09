@@ -5,8 +5,14 @@ namespace ContosoUniversity.Api.Services
 {
     public interface IStudentService
     {
-        List<StudentInfo> GetStudents();
+        List<StudentInfo> GetStudentInfos();
 
-        StudentInfo GetStudentById(int id);
+        StudentInfo GetStudentInfoById(int studentInfoId);
+
+        void CreateStudentInfo(StudentInfo studentInfo);
+
+        bool UpdateStudentInfo(StudentInfo studentInfo);
+
+        bool DeleteStudentInfo(int studentInfoId);
     }
 }

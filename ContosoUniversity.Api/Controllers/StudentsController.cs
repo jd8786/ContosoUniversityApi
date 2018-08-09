@@ -17,15 +17,15 @@ namespace ContosoUniversity.Api.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetStudents()
+        public IActionResult GetStudentInfos()
         {
             try
             {
-                var studentInfos = _service.GetStudents();
+                var studentInfos = _service.GetStudentInfos();
 
-                var responseOfStudentInfos = ApiResponseOfStudentInfos.Success(studentInfos);
+                var apiResponseOfStudentInfos = ApiResponseOfStudentInfos.Success(studentInfos);
 
-                return Ok(responseOfStudentInfos);
+                return Ok(apiResponseOfStudentInfos);
             }
             catch (Exception ex)
             {
@@ -34,21 +34,21 @@ namespace ContosoUniversity.Api.Controllers
             
         }
 
-        [HttpGet("{id}", Name = "GetStudentById")]
-        public IActionResult GetStudentById(int id)
+        [HttpGet("{id}", Name = "GetStudentInfoById")]
+        public IActionResult GetStudentInfoById(int id)
         {
             try
             {
-                var studentInfo = _service.GetStudentById(id);
+                var studentInfo = _service.GetStudentInfoById(id);
 
                 if (studentInfo == null)
                 {
                     return NotFound(ApiResponseOfBoolean.Error("Student Not Found"));
                 }
 
-                var responseOfStudentInfo = ApiResponseOfStudentInfo.Success(studentInfo);
+                var apiResponseOfStudentInfo = ApiResponseOfStudentInfo.Success(studentInfo);
 
-                return Ok(responseOfStudentInfo);
+                return Ok(apiResponseOfStudentInfo);
             }
             catch (Exception ex)
             {
@@ -56,70 +56,71 @@ namespace ContosoUniversity.Api.Controllers
             }
         }
 
-        //[HttpPost]
-        //public IActionResult CreateStudent([FromBody] Student student)
-        //{
-        //    if (student == null)
-        //    {
-        //        return BadRequest(ApiResponseOfBoolean.Error("Bad Request"));
-        //    }
+        [HttpPost]
+        public IActionResult CreateStudentInfo([FromBody] StudentInfo studentInfo)
+        {
+            if (studentInfo == null)
+            {
+                return BadRequest(ApiResponseOfBoolean.Error("Bad Request"));
+            }
 
-        //    try
-        //    {
-        //        _service.CreateStudent(student);
-        //        return CreatedAtRoute("GetStudentById", new { id = student.StudentId }, student);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode((int)HttpStatusCode.InternalServerError, ApiResponseOfBoolean.Error(ex.Message));
-        //    }
-        //}
+            try
+            {
+                _service.CreateStudentInfo(studentInfo);
 
-        //[HttpPut]
-        //public IActionResult UpdateStudent([FromBody] Student student)
-        //{
-        //    if (student == null)
-        //    {
-        //        return BadRequest(ApiResponseOfBoolean.Error("Bad Request"));
-        //    }
+                return CreatedAtRoute("GetStudentInfoById", new { id = studentInfo.StudentInfoId }, studentInfo);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, ApiResponseOfBoolean.Error(ex.Message));
+            }
+        }
 
-        //    try
-        //    {
-        //        var isStudentExist = _service.UpdateStudent(student);
+        [HttpPut]
+        public IActionResult UpdateStudentInfo([FromBody] StudentInfo studentInfo)
+        {
+            if (studentInfo == null)
+            {
+                return BadRequest(ApiResponseOfBoolean.Error("Bad Request"));
+            }
 
-        //        if (!isStudentExist)
-        //        {
-        //            return NotFound(ApiResponseOfBoolean.Error("Student Not Found"));
-        //        }
+            try
+            {
+                var isStudentInfoExist = _service.UpdateStudentInfo(studentInfo);
 
-        //        return Ok(ApiResponseOfBoolean.Success());
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode((int)HttpStatusCode.InternalServerError, ApiResponseOfBoolean.Error(ex.Message));
-        //    }
-        //}
+                if (!isStudentInfoExist)
+                {
+                    return NotFound(ApiResponseOfBoolean.Error("Student Not Found"));
+                }
 
-        //[HttpDelete("{id}")]
-        //public IActionResult DeleteStudent(int id)
-        //{
-        //    try
-        //    {
-        //        var isStudentExist = _service.DeleteStudent(id);
+                return Ok(ApiResponseOfBoolean.Success());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, ApiResponseOfBoolean.Error(ex.Message));
+            }
+        }
 
-        //        if (!isStudentExist)
-        //        {
-        //            return NotFound(ApiResponseOfBoolean.Error("Student Not Found"));
-        //        }
+        [HttpDelete("{id}")]
+        public IActionResult DeleteStudentInfo(int id)
+        {
+            try
+            {
+                var isStudentInfoExist = _service.DeleteStudentInfo(id);
 
-        //        return Ok(ApiResponseOfBoolean.Success());
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode((int) HttpStatusCode.InternalServerError,
-        //            ApiResponseOfBoolean.Error(ex.Message));
-        //    }
-        //}
+                if (!isStudentInfoExist)
+                {
+                    return NotFound(ApiResponseOfBoolean.Error("Student Not Found"));
+                }
+
+                return Ok(ApiResponseOfBoolean.Success());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError,
+                    ApiResponseOfBoolean.Error(ex.Message));
+            }
+        }
 
     }
 }
