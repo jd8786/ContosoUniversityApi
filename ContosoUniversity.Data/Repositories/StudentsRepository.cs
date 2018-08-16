@@ -41,9 +41,7 @@ namespace ContosoUniversity.Data.Repositories
             }
             catch
             {
-                var studentName = $"{student?.FirstMidName} {student?.LastName}".Trim() ?? string.Empty;
-
-                throw new Exception($"Student {studentName} was failed to be saved in the database");
+                throw new Exception("Student was failed to be saved in the database");
             }
         }
 
@@ -70,9 +68,7 @@ namespace ContosoUniversity.Data.Repositories
             }
             catch 
             {
-                var studentName = $"{currrentStudent.FirstMidName} {currrentStudent.LastName}".Trim() ?? string.Empty;
-
-                throw new Exception($"Student {studentName} was failed to be updated in the database");
+                throw new Exception("Student was failed to be updated in the database");
             }
 
             return true;
@@ -95,9 +91,7 @@ namespace ContosoUniversity.Data.Repositories
             }
             catch
             {
-                var studentName = $"{student.FirstMidName} {student.LastName}".Trim() ?? string.Empty;
-
-                throw new Exception($"Student {studentName} was failed to be removed in the database");
+                throw new Exception("Student was failed to be removed in the database");
             }
 
             return true;

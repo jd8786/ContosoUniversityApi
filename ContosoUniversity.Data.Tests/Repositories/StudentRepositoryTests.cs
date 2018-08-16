@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ContosoUniversity.Data.Models;
 using ContosoUniversity.Data.Repositories;
@@ -12,35 +13,41 @@ namespace ContosoUniversity.Data.Tests.Repositories
     [Trait("Category", "Unit Test: Data.Repositories.Students")]
     public class StudentRepositoryTests
     {
-        private List<Student> _students;
-
         private readonly IStudentsRepository _repository;
+
+        private readonly Mock<SchoolContext> _mockDbContext;
+
+        private readonly Mock<DbSet<Student>> _mockDbSet;
 
         public StudentRepositoryTests()
         {
             var optionsBuilder = new DbContextOptionsBuilder<SchoolContext>();
 
-            var mockDbContext = new Mock<SchoolContext>(optionsBuilder.Options);
+            _mockDbContext = new Mock<SchoolContext>(optionsBuilder.Options);
 
-            var mockSet = new Mock<DbSet<Student>>();
+            _mockDbSet = new Mock<DbSet<Student>>();
 
-            _students = new List<Student>
+            var students = new List<Student>
             {
                 new Student { StudentId = 1, LastName = "some-last-name1"},
                 new Student { StudentId = 2, LastName = "some-last-name2" },
                 new Student { StudentId = 3, LastName = "some-last-name3" }
             }; ;
 
-            var queryableStudents = _students.AsQueryable();
+            var queryableStudents = students.AsQueryable();
 
-            mockSet.As<IQueryable<Student>>().Setup(m => m.Provider).Returns(queryableStudents.Provider);
-            mockSet.As<IQueryable<Student>>().Setup(m => m.Expression).Returns(queryableStudents.Expression);
-            mockSet.As<IQueryable<Student>>().Setup(m => m.ElementType).Returns(queryableStudents.ElementType);
-            mockSet.As<IQueryable<Student>>().Setup(m => m.GetEnumerator()).Returns(queryableStudents.GetEnumerator());
+            _mockDbSet.As<IQueryable<Student>>().Setup(m => m.Provider).Returns(queryableStudents.Provider);
+            _mockDbSet.As<IQueryable<Student>>().Setup(m => m.Expression).Returns(queryableStudents.Expression);
+            _mockDbSet.As<IQueryable<Student>>().Setup(m => m.ElementType).Returns(queryableStudents.ElementType);
+            _mockDbSet.As<IQueryable<Student>>().Setup(m => m.GetEnumerator()).Returns(queryableStudents.GetEnumerator());
 
-            mockDbContext.Setup(c => c.Students).Returns(mockSet.Object);
+            _mockDbSet.Setup(dbSet => dbSet.Add(It.IsAny<Student>())).Callback((Student s) => students.Add(s));
 
-            _repository = new StudentsRepository(mockDbContext.Object);
+            _mockDbSet.Setup(dbSet => dbSet.Remove(It.IsAny<Student>())).Callback((Student s) => students.Remove(s));
+
+            _mockDbContext.Setup(c => c.Students).Returns(_mockDbSet.Object);
+
+            _repository = new StudentsRepository(_mockDbContext.Object);
         }
 
         [Fact]
@@ -62,11 +69,75 @@ namespace ContosoUniversity.Data.Tests.Repositories
         }
 
         [Fact]
-        public void ShouldReturnNullWhenIdDoesNotExist()
+        public void ShouldCreateStudent()
         {
-            var student = _repository.GetStudentById(4);
+            var student = new Student
+            {
+                StudentId = 4,
+                LastName = "some-last-name4"
+            };
 
-            student.Should().BeNull();
+            _repository.CreateStudent(student);
+
+            _mockDbSet.Verify(x => x.Add(student), Times.Exactly(1));
+
+            _mockDbContext.Verify(c => c.SaveChanges(), Times.Exactly(1));
+
+            var addedStudent = _mockDbContext.Object.Students.FirstOrDefault(s => s.StudentId == 4);
+
+            addedStudent.Should().NotBeNull();
+        }
+
+        [Fact]
+        public void ShouldThrowExceptionWhenFailingToCreateStudent()
+        {
+            _mockDbContext.Setup(c => c.SaveChanges()).Throws<Exception>();
+
+            Action action = () => _repository.CreateStudent(new Student());
+
+            action.Should().Throw<Exception>()
+                .WithMessage("Student was failed to be saved in the database");
+        }
+
+        [Fact]
+        public void ShouldReturnFalseWhenNoStudentFoundToUpdate()
+        {
+            var student = new Student {StudentId = 4};
+
+            var result = _repository.UpdateStudent(student);
+
+            result.Should().BeFalse();
+        }
+
+        [Fact]
+        public void ShouldReturnFalseWhenNoStudentFoundToDelete()
+        {
+            var result = _repository.DeleteStudent(4);
+
+            result.Should().BeFalse();
+        }
+
+        [Fact]
+        public void ShouldReturnTrueWhenStudentWasDeleted()
+        {
+            var result = _repository.DeleteStudent(3);
+
+            _mockDbSet.Verify(dbSet => dbSet.Remove(It.IsAny<Student>()), Times.Exactly(1));
+
+            _mockDbContext.Object.Students.Count().Should().Be(2);
+
+            result.Should().BeTrue();
+        }
+
+        [Fact]
+        public void ShouldThrowExceptionWhenFailingToDeleteStudent()
+        {
+            _mockDbContext.Setup(c => c.SaveChanges()).Throws<Exception>();
+
+            Action action = () => _repository.DeleteStudent(3);
+
+            action.Should().Throw<Exception>()
+                .WithMessage("Student was failed to be removed in the database");
         }
     }
 }
