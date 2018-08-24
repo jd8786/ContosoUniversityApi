@@ -60,8 +60,6 @@ namespace ContosoUniversity.Data.Repositories
 
             currrentStudent.EnrollmentDate = student.EnrollmentDate;
 
-            _context.Students.Update(currrentStudent);
-
             try
             {
                 _context.SaveChanges();

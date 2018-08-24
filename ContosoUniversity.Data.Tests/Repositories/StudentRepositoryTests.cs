@@ -69,11 +69,18 @@ namespace ContosoUniversity.Data.Tests.Repositories
         }
 
         [Fact]
+        public void ShouldReturnNullWhenIdDoesNotExist()
+        {
+            var student = _repository.GetStudentById(4);
+
+            student.Should().BeNull();
+        }
+
+        [Fact]
         public void ShouldCreateStudent()
         {
             var student = new Student
             {
-                StudentId = 4,
                 LastName = "some-last-name4"
             };
 
@@ -83,7 +90,7 @@ namespace ContosoUniversity.Data.Tests.Repositories
 
             _mockDbContext.Verify(c => c.SaveChanges(), Times.Exactly(1));
 
-            var addedStudent = _mockDbContext.Object.Students.FirstOrDefault(s => s.StudentId == 4);
+            var addedStudent = _mockDbContext.Object.Students.FirstOrDefault(s => s.LastName == "some-last-name4");
 
             addedStudent.Should().NotBeNull();
         }
@@ -110,6 +117,43 @@ namespace ContosoUniversity.Data.Tests.Repositories
         }
 
         [Fact]
+        public void ShouldReturnTrueWhenStudentFoundToUpdate()
+        {
+            var student = new Student
+                {
+                    StudentId = 3,
+                    LastName = "new-last-name",
+                    FirstMidName = "new-first-mid-name",
+                    EnrollmentDate = new DateTime(2000, 1, 2)
+                };
+
+            var result = _repository.UpdateStudent(student);
+
+            _mockDbContext.Verify(dbSet => dbSet.SaveChanges(), Times.Exactly(1));
+
+            result.Should().BeTrue();
+
+            var updatedStudent = _mockDbContext.Object.Students.First(s => s.StudentId == 3);
+
+            updatedStudent.LastName.Should().Be("new-last-name");
+
+            updatedStudent.FirstMidName.Should().Be("new-first-mid-name");
+
+            updatedStudent.EnrollmentDate.Should().Be(new DateTime(2000, 1, 2));
+        }
+
+        [Fact]
+        public void ShouldThrowExceptionWhenFailingToUpdateStudent()
+        {
+            _mockDbContext.Setup(c => c.SaveChanges()).Throws<Exception>();
+
+            Action action = () => _repository.UpdateStudent(new Student { StudentId = 1 });
+
+            action.Should().Throw<Exception>()
+                .WithMessage("Student was failed to be updated in the database");
+        }
+
+        [Fact]
         public void ShouldReturnFalseWhenNoStudentFoundToDelete()
         {
             var result = _repository.DeleteStudent(4);
@@ -124,7 +168,11 @@ namespace ContosoUniversity.Data.Tests.Repositories
 
             _mockDbSet.Verify(dbSet => dbSet.Remove(It.IsAny<Student>()), Times.Exactly(1));
 
-            _mockDbContext.Object.Students.Count().Should().Be(2);
+            _mockDbContext.Verify(dbSet => dbSet.SaveChanges(), Times.Exactly(1));
+
+            var deletedStudent = _mockDbContext.Object.Students.FirstOrDefault(s => s.StudentId == 3);
+
+            deletedStudent.Should().BeNull();
 
             result.Should().BeTrue();
         }
