@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using ContosoUniversity.Data.Models;
+﻿using ContosoUniversity.Data.Models;
 
 namespace ContosoUniversity.Api.Models
 {
