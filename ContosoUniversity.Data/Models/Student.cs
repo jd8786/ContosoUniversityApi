@@ -8,6 +8,11 @@ namespace ContosoUniversity.Data.Models
     [Table("Student")]
     public class Student
     {
+        public Student()
+        {
+            Enrollments = new List<Enrollment>();
+        }
+
         public int StudentId { get; set; }
 
         [Required, MaxLength(30)]

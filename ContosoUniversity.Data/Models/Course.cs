@@ -8,6 +8,11 @@ namespace ContosoUniversity.Data.Models
     [Table("Course")]
     public class Course
     {
+        public Course()
+        {
+            Enrollments = new List<Enrollment>();
+        }
+
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int CourseId { get; set; }
 

@@ -20,9 +20,9 @@ namespace ContosoUniversity.Api.AutoMappers
         {
             var courseInfos = new List<CourseInfo>();
 
-            var courses = student?.Enrollments?.Select(e => new { e.Course.CourseId, e.Course.Credits, e.Course.Title, e.Grade });
+            var courses = student?.Enrollments.Select(e => new { e.Course.CourseId, e.Course.Credits, e.Course.Title, e.Grade });
 
-            if (courses == null) return courseInfos;
+            if (!courses.Any()) return courseInfos;
 
             courseInfos.AddRange(courses.Select(course => new CourseInfo
             {
