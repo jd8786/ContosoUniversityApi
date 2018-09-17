@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Net;
+using System.Threading.Tasks;
 using ContosoUniversity.Api.Models;
 using ContosoUniversity.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ContosoUniversity.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/students")]
     public class StudentsController: Controller
     {
         private readonly IStudentService _service;
@@ -17,11 +18,11 @@ namespace ContosoUniversity.Api.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetStudentInfos()
+        public async Task<IActionResult> GetStudentInfosAsync()
         {
             try
             {
-                var studentInfos = _service.GetStudentInfos();
+                var studentInfos = await _service.GetStudentInfosAsync();
 
                 var apiResponseOfStudentInfos = ApiResponseOfStudentInfos.Success(studentInfos);
 
@@ -34,12 +35,12 @@ namespace ContosoUniversity.Api.Controllers
             
         }
 
-        [HttpGet("{id}", Name = "GetStudentInfoById")]
-        public IActionResult GetStudentInfoById(int id)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetStudentInfoByIdAsync(int id)
         {
             try
             {
-                var studentInfo = _service.GetStudentInfoById(id);
+                var studentInfo = await _service.GetStudentInfoByIdAsync(id);
 
                 if (studentInfo == null)
                 {
@@ -57,7 +58,7 @@ namespace ContosoUniversity.Api.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateStudentInfo([FromBody] StudentInfo studentInfo)
+        public async Task<IActionResult> PostStudentInfoAsync([FromBody] StudentInfo studentInfo)
         {
             if (studentInfo == null)
             {
@@ -66,9 +67,9 @@ namespace ContosoUniversity.Api.Controllers
 
             try
             {
-                _service.CreateStudentInfo(studentInfo);
+                var newStudentInfo = await _service.CreateStudentInfoAsync(studentInfo);
 
-                return CreatedAtRoute("GetStudentInfoById", new { id = studentInfo.StudentInfoId }, studentInfo);
+                return Ok(ApiResponseOfStudentInfo.Success(newStudentInfo));
             }
             catch (Exception ex)
             {
@@ -77,7 +78,7 @@ namespace ContosoUniversity.Api.Controllers
         }
 
         [HttpPut]
-        public IActionResult UpdateStudentInfo([FromBody] StudentInfo studentInfo)
+        public async Task<IActionResult> PutStudentInfoAsync([FromBody] StudentInfo studentInfo)
         {
             if (studentInfo == null)
             {
@@ -86,7 +87,7 @@ namespace ContosoUniversity.Api.Controllers
 
             try
             {
-                var isStudentInfoExist = _service.UpdateStudentInfo(studentInfo);
+                var isStudentInfoExist = await _service.UpdateStudentInfoAsync(studentInfo);
 
                 if (!isStudentInfoExist)
                 {
@@ -102,11 +103,11 @@ namespace ContosoUniversity.Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteStudentInfo(int id)
+        public async Task<IActionResult> DeleteStudentInfoAsync(int id)
         {
             try
             {
-                var isStudentInfoExist = _service.DeleteStudentInfo(id);
+                var isStudentInfoExist = await _service.DeleteStudentInfoAsync(id);
 
                 if (!isStudentInfoExist)
                 {

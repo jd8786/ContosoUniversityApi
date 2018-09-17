@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using ContosoUniversity.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,40 +14,42 @@ namespace ContosoUniversity.Data.Repositories
         {
             _context = context;
         }
-        public IEnumerable<Student> GetStudents()
+        public async Task<IEnumerable<Student>> GetStudentsAsync()
         {
             var students = _context.Students
                 .Include(s => s.Enrollments)
                 .ThenInclude(e => e.Course)
-                .ToList();
+                .ToListAsync();
 
-            return students;
+            return await students;
         }
 
-        public Student GetStudentById(int studentId)
+        public async Task<Student> GetStudentByIdAsync(int studentId)
         {
-            var student = GetStudents().FirstOrDefault(s => s.StudentId == studentId);
+            var student = _context.Students.FirstOrDefaultAsync(s => s.StudentId == studentId);
 
-            return student;
+            return await student;
         }
 
-        public void CreateStudent(Student student)
+        public async Task<Student> CreateAsync(Student student)
         {
-            _context.Students.Add(student);
+            await _context.Students.AddAsync(student);
 
             try
             {
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
             catch
             {
                 throw new Exception("Student was failed to be saved in the database");
             }
+
+            return student;
         }
 
-        public bool UpdateStudent(Student student)
+        public async Task<bool> UpdateAsync(Student student)
         {
-            var currrentStudent = GetStudentById(student.StudentId);
+            var currrentStudent = await GetStudentByIdAsync(student.StudentId);
 
             if (currrentStudent == null)
             {
@@ -62,7 +64,7 @@ namespace ContosoUniversity.Data.Repositories
 
             try
             {
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
             catch 
             {
@@ -72,9 +74,9 @@ namespace ContosoUniversity.Data.Repositories
             return true;
         }
 
-        public bool DeleteStudent(int studentId)
+        public async Task<bool> DeleteAsync(int studentId)
         {
-            var student = GetStudentById(studentId);
+            var student = await GetStudentByIdAsync(studentId);
 
             if (student == null)
             {
@@ -85,7 +87,7 @@ namespace ContosoUniversity.Data.Repositories
 
             try
             {
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
             catch
             {

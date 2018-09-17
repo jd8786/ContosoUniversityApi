@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using AutoMapper;
 using ContosoUniversity.Api.Models;
 using ContosoUniversity.Data.Models;
@@ -18,41 +19,39 @@ namespace ContosoUniversity.Api.Services
 
             _mapper = mapper;
         }
-        public List<StudentInfo> GetStudentInfos()
+        public async Task<List<StudentInfo>> GetStudentInfosAsync()
         {
-            var students = _repository.GetStudents();
+            var students = await _repository.GetStudentsAsync();
 
-            var studentInfos = _mapper.Map<List<StudentInfo>>(students);
-
-            return studentInfos;
+            return _mapper.Map<List<StudentInfo>>(students);
         }
 
-        public StudentInfo GetStudentInfoById(int studentInfoId)
+        public async Task<StudentInfo> GetStudentInfoByIdAsync(int studentInfoId)
         {
-            var student = _repository.GetStudentById(studentInfoId);
+            var student = await _repository.GetStudentByIdAsync(studentInfoId);
 
-            var studentInfo = _mapper.Map<StudentInfo>(student);
-
-            return studentInfo;
+            return _mapper.Map<StudentInfo>(student);
         }
 
-        public void CreateStudentInfo(StudentInfo studentInfo)
+        public async Task<StudentInfo> CreateStudentInfoAsync(StudentInfo studentInfo)
         {
             var student = _mapper.Map<Student>(studentInfo);
 
-            _repository.CreateStudent(student);
+            var newStudent = await _repository.CreateAsync(student);
+
+            return _mapper.Map<StudentInfo>(newStudent);
         }
 
-        public bool UpdateStudentInfo(StudentInfo studentInfo)
+        public async Task<bool> UpdateStudentInfoAsync(StudentInfo studentInfo)
         {
             var student = _mapper.Map<Student>(studentInfo);
 
-            return _repository.UpdateStudent(student);
+            return await _repository.UpdateAsync(student);
         }
 
-        public bool DeleteStudentInfo(int studentInfoId)
+        public async Task<bool> DeleteStudentInfoAsync(int studentInfoId)
         {
-            return _repository.DeleteStudent(studentInfoId);
+            return await _repository.DeleteAsync(studentInfoId);
         }
     }
 }

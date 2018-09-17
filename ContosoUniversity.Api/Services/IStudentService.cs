@@ -1,18 +1,19 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using ContosoUniversity.Api.Models;
 
 namespace ContosoUniversity.Api.Services
 {
     public interface IStudentService
     {
-        List<StudentInfo> GetStudentInfos();
+        Task<List<StudentInfo>> GetStudentInfosAsync();
 
-        StudentInfo GetStudentInfoById(int studentInfoId);
+        Task<StudentInfo> GetStudentInfoByIdAsync(int studentInfoId);
 
-        void CreateStudentInfo(StudentInfo studentInfo);
+        Task<StudentInfo> CreateStudentInfoAsync(StudentInfo studentInfo);
 
-        bool UpdateStudentInfo(StudentInfo studentInfo);
+        Task<bool> UpdateStudentInfoAsync(StudentInfo studentInfo);
 
-        bool DeleteStudentInfo(int studentInfoId);
+        Task<bool> DeleteStudentInfoAsync(int studentInfoId);
     }
 }

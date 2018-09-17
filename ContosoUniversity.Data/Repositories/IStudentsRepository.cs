@@ -1,18 +1,19 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using ContosoUniversity.Data.Models;
 
 namespace ContosoUniversity.Data.Repositories
 {
     public interface IStudentsRepository
     {
-        IEnumerable<Student> GetStudents();
+        Task<IEnumerable<Student>> GetStudentsAsync();
 
-        Student GetStudentById(int studentId);
+        Task<Student> GetStudentByIdAsync(int studentId);
 
-        void CreateStudent(Student student);
+        Task<Student> CreateAsync(Student student);
 
-        bool UpdateStudent(Student student);
+        Task<bool> UpdateAsync(Student student);
 
-        bool DeleteStudent(int studentId);
+        Task<bool> DeleteAsync(int studentId);
     }
 }

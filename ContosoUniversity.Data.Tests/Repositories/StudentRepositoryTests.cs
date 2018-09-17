@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using ContosoUniversity.Data.Models;
 using ContosoUniversity.Data.Repositories;
 using FluentAssertions;
@@ -51,17 +52,17 @@ namespace ContosoUniversity.Data.Tests.Repositories
         }
 
         [Fact]
-        public void ShouldReturnAllTheStudents()
+        public async Task ShouldReturnAllTheStudents()
         {
-            var students = _repository.GetStudents();
+            var students = await _repository.GetStudentsAsync();
 
             students.Count().Should().Be(3);
         }
 
         [Fact]
-        public void ShouldReturnStudentWhenIdExists()
+        public async Task ShouldReturnStudentWhenIdExists()
         {
-            var student = _repository.GetStudentById(2);
+            var student = await _repository.GetStudentByIdAsync(2);
 
             student.Should().NotBeNull();
 
@@ -69,22 +70,22 @@ namespace ContosoUniversity.Data.Tests.Repositories
         }
 
         [Fact]
-        public void ShouldReturnNullWhenIdDoesNotExist()
+        public async Task ShouldReturnNullWhenIdDoesNotExist()
         {
-            var student = _repository.GetStudentById(4);
+            var student = await _repository.GetStudentByIdAsync(4);
 
             student.Should().BeNull();
         }
 
         [Fact]
-        public void ShouldCreateStudent()
+        public async Task ShouldCreateStudent()
         {
             var student = new Student
             {
                 LastName = "some-last-name4"
             };
 
-            _repository.CreateStudent(student);
+            await _repository.CreateAsync(student);
 
             _mockDbSet.Verify(x => x.Add(student), Times.Exactly(1));
 
@@ -100,24 +101,24 @@ namespace ContosoUniversity.Data.Tests.Repositories
         {
             _mockDbContext.Setup(c => c.SaveChanges()).Throws<Exception>();
 
-            Action action = () => _repository.CreateStudent(new Student());
+            Action action = async () => await _repository.CreateAsync(new Student());
 
             action.Should().Throw<Exception>()
                 .WithMessage("Student was failed to be saved in the database");
         }
 
         [Fact]
-        public void ShouldReturnFalseWhenNoStudentFoundToUpdate()
+        public async Task ShouldReturnFalseWhenNoStudentFoundToUpdate()
         {
             var student = new Student {StudentId = 4};
 
-            var result = _repository.UpdateStudent(student);
+            var result = await _repository.UpdateAsync(student);
 
             result.Should().BeFalse();
         }
 
         [Fact]
-        public void ShouldReturnTrueWhenStudentFoundToUpdate()
+        public async Task ShouldReturnTrueWhenStudentFoundToUpdate()
         {
             var student = new Student
                 {
@@ -127,7 +128,7 @@ namespace ContosoUniversity.Data.Tests.Repositories
                     EnrollmentDate = new DateTime(2000, 1, 2)
                 };
 
-            var result = _repository.UpdateStudent(student);
+            var result = await _repository.UpdateAsync(student);
 
             _mockDbContext.Verify(dbSet => dbSet.SaveChanges(), Times.Exactly(1));
 
@@ -147,24 +148,24 @@ namespace ContosoUniversity.Data.Tests.Repositories
         {
             _mockDbContext.Setup(c => c.SaveChanges()).Throws<Exception>();
 
-            Action action = () => _repository.UpdateStudent(new Student { StudentId = 1 });
+            Action action = async () => await _repository.UpdateAsync(new Student { StudentId = 1 });
 
             action.Should().Throw<Exception>()
                 .WithMessage("Student was failed to be updated in the database");
         }
 
         [Fact]
-        public void ShouldReturnFalseWhenNoStudentFoundToDelete()
+        public async Task ShouldReturnFalseWhenNoStudentFoundToDelete()
         {
-            var result = _repository.DeleteStudent(4);
+            var result = await _repository.DeleteAsync(4);
 
             result.Should().BeFalse();
         }
 
         [Fact]
-        public void ShouldReturnTrueWhenStudentWasDeleted()
+        public async Task ShouldReturnTrueWhenStudentWasDeleted()
         {
-            var result = _repository.DeleteStudent(3);
+            var result = await _repository.DeleteAsync(3);
 
             _mockDbSet.Verify(dbSet => dbSet.Remove(It.IsAny<Student>()), Times.Exactly(1));
 
@@ -182,7 +183,7 @@ namespace ContosoUniversity.Data.Tests.Repositories
         {
             _mockDbContext.Setup(c => c.SaveChanges()).Throws<Exception>();
 
-            Action action = () => _repository.DeleteStudent(3);
+            Action action = async () => await _repository.DeleteAsync(3);
 
             action.Should().Throw<Exception>()
                 .WithMessage("Student was failed to be removed in the database");
