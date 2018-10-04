@@ -4,14 +4,16 @@ using ContosoUniversity.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace ContosoUniversity.Data.Migrations
 {
     [DbContext(typeof(SchoolContext))]
-    partial class SchoolContextModelSnapshot : ModelSnapshot
+    [Migration("20181004135916_initialMigration")]
+    partial class initialMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,13 +46,13 @@ namespace ContosoUniversity.Data.Migrations
                     b.ToTable("Course");
 
                     b.HasData(
-                        new { CourseId = 1050, CreatedBy = "ContosoUniversityUsers", CreatedDate = new DateTime(2018, 10, 4, 15, 9, 53, 490, DateTimeKind.Local), Credits = 3, Title = "Chemistry" },
-                        new { CourseId = 4022, CreatedBy = "ContosoUniversityUsers", CreatedDate = new DateTime(2018, 10, 4, 15, 9, 53, 490, DateTimeKind.Local), Credits = 3, Title = "Microeconomics" },
-                        new { CourseId = 4041, CreatedBy = "ContosoUniversityUsers", CreatedDate = new DateTime(2018, 10, 4, 15, 9, 53, 490, DateTimeKind.Local), Credits = 3, Title = "Macroeconomics" },
-                        new { CourseId = 1045, CreatedBy = "ContosoUniversityUsers", CreatedDate = new DateTime(2018, 10, 4, 15, 9, 53, 490, DateTimeKind.Local), Credits = 4, Title = "Calculus" },
-                        new { CourseId = 3141, CreatedBy = "ContosoUniversityUsers", CreatedDate = new DateTime(2018, 10, 4, 15, 9, 53, 490, DateTimeKind.Local), Credits = 4, Title = "Trigonometry" },
-                        new { CourseId = 2021, CreatedBy = "ContosoUniversityUsers", CreatedDate = new DateTime(2018, 10, 4, 15, 9, 53, 490, DateTimeKind.Local), Credits = 3, Title = "Composition" },
-                        new { CourseId = 2042, CreatedBy = "ContosoUniversityUsers", CreatedDate = new DateTime(2018, 10, 4, 15, 9, 53, 490, DateTimeKind.Local), Credits = 4, Title = "Literature" }
+                        new { CourseId = 1050, CreatedBy = "ContosoUniversityUsers", CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), Credits = 3, Title = "Chemistry" },
+                        new { CourseId = 4022, CreatedBy = "ContosoUniversityUsers", CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), Credits = 3, Title = "Microeconomics" },
+                        new { CourseId = 4041, CreatedBy = "ContosoUniversityUsers", CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), Credits = 3, Title = "Macroeconomics" },
+                        new { CourseId = 1045, CreatedBy = "ContosoUniversityUsers", CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), Credits = 4, Title = "Calculus" },
+                        new { CourseId = 3141, CreatedBy = "ContosoUniversityUsers", CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), Credits = 4, Title = "Trigonometry" },
+                        new { CourseId = 2021, CreatedBy = "ContosoUniversityUsers", CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), Credits = 3, Title = "Composition" },
+                        new { CourseId = 2042, CreatedBy = "ContosoUniversityUsers", CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), Credits = 4, Title = "Literature" }
                     );
                 });
 
@@ -125,14 +127,14 @@ namespace ContosoUniversity.Data.Migrations
                     b.ToTable("Student");
 
                     b.HasData(
-                        new { StudentId = 1, CreatedBy = "ContosoUniversityUsers", CreatedDate = new DateTime(2018, 10, 4, 15, 9, 53, 487, DateTimeKind.Local), EnrollmentDate = new DateTime(2005, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), FirstMidName = "Carson", LastName = "Alexander", OriginCountry = "USA" },
-                        new { StudentId = 2, CreatedBy = "ContosoUniversityUsers", CreatedDate = new DateTime(2018, 10, 4, 15, 9, 53, 490, DateTimeKind.Local), EnrollmentDate = new DateTime(2002, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), FirstMidName = "Meredith", LastName = "Alonso", OriginCountry = "CHINA" },
-                        new { StudentId = 3, CreatedBy = "ContosoUniversityUsers", CreatedDate = new DateTime(2018, 10, 4, 15, 9, 53, 490, DateTimeKind.Local), EnrollmentDate = new DateTime(2003, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), FirstMidName = "Arturo", LastName = "Anand", OriginCountry = "USA" },
-                        new { StudentId = 4, CreatedBy = "ContosoUniversityUsers", CreatedDate = new DateTime(2018, 10, 4, 15, 9, 53, 490, DateTimeKind.Local), EnrollmentDate = new DateTime(2002, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), FirstMidName = "Gytis", LastName = "Barzdukas", OriginCountry = "JAPAN" },
-                        new { StudentId = 5, CreatedBy = "ContosoUniversityUsers", CreatedDate = new DateTime(2018, 10, 4, 15, 9, 53, 490, DateTimeKind.Local), EnrollmentDate = new DateTime(2002, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), FirstMidName = "Yan", LastName = "Li", OriginCountry = "USA" },
-                        new { StudentId = 6, CreatedBy = "ContosoUniversityUsers", CreatedDate = new DateTime(2018, 10, 4, 15, 9, 53, 490, DateTimeKind.Local), EnrollmentDate = new DateTime(2001, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), FirstMidName = "Peggy", LastName = "Justice", OriginCountry = "ENGLAND" },
-                        new { StudentId = 7, CreatedBy = "ContosoUniversityUsers", CreatedDate = new DateTime(2018, 10, 4, 15, 9, 53, 490, DateTimeKind.Local), EnrollmentDate = new DateTime(2003, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), FirstMidName = "Laura", LastName = "Norman", OriginCountry = "FRANCE" },
-                        new { StudentId = 8, CreatedBy = "ContosoUniversityUsers", CreatedDate = new DateTime(2018, 10, 4, 15, 9, 53, 490, DateTimeKind.Local), EnrollmentDate = new DateTime(2005, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), FirstMidName = "Nino", LastName = "Olivetto", OriginCountry = "GERMANY" }
+                        new { StudentId = 1, CreatedBy = "ContosoUniversityUsers", CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), EnrollmentDate = new DateTime(2005, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), FirstMidName = "Carson", LastName = "Alexander", OriginCountry = "USA" },
+                        new { StudentId = 2, CreatedBy = "ContosoUniversityUsers", CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), EnrollmentDate = new DateTime(2002, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), FirstMidName = "Meredith", LastName = "Alonso", OriginCountry = "CHINA" },
+                        new { StudentId = 3, CreatedBy = "ContosoUniversityUsers", CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), EnrollmentDate = new DateTime(2003, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), FirstMidName = "Arturo", LastName = "Anand", OriginCountry = "USA" },
+                        new { StudentId = 4, CreatedBy = "ContosoUniversityUsers", CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), EnrollmentDate = new DateTime(2002, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), FirstMidName = "Gytis", LastName = "Barzdukas", OriginCountry = "JAPAN" },
+                        new { StudentId = 5, CreatedBy = "ContosoUniversityUsers", CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), EnrollmentDate = new DateTime(2002, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), FirstMidName = "Yan", LastName = "Li", OriginCountry = "USA" },
+                        new { StudentId = 6, CreatedBy = "ContosoUniversityUsers", CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), EnrollmentDate = new DateTime(2001, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), FirstMidName = "Peggy", LastName = "Justice", OriginCountry = "ENGLAND" },
+                        new { StudentId = 7, CreatedBy = "ContosoUniversityUsers", CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), EnrollmentDate = new DateTime(2003, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), FirstMidName = "Laura", LastName = "Norman", OriginCountry = "FRANCE" },
+                        new { StudentId = 8, CreatedBy = "ContosoUniversityUsers", CreatedDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), EnrollmentDate = new DateTime(2005, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), FirstMidName = "Nino", LastName = "Olivetto", OriginCountry = "GERMANY" }
                     );
                 });
 

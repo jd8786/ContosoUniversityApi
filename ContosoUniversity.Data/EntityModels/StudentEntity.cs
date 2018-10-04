@@ -1,18 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ContosoUniversity.Data.Models
+namespace ContosoUniversity.Data.EntityModels
 {
     [Table("Student")]
-    public class Student
+    public class StudentEntity
     {
-        public Student()
+        public StudentEntity()
         {
-            Enrollments = new List<Enrollment>();
+            Enrollments = new List<EnrollmentEntity>();
+
+            CreatedBy = "ContosoUniversityUsers";
+
+            CreatedDate = DateTime.Now;
         }
 
+        [Key]
         public int StudentId { get; set; }
 
         [Required, MaxLength(30)]
@@ -23,6 +29,9 @@ namespace ContosoUniversity.Data.Models
 
         public DateTime EnrollmentDate { get; set; }
 
+        [Required, MaxLength(50)]
+        public string OriginCountry { get; set; }
+
         [Required, MaxLength(30)]
         public string CreatedBy { get; set; }
 
@@ -32,6 +41,6 @@ namespace ContosoUniversity.Data.Models
 
         public DateTime? UpdatedDate { get; set; }
 
-        public ICollection<Enrollment> Enrollments { get; set; }
+        public virtual ICollection<EnrollmentEntity> Enrollments { get; set; }
     }
 }

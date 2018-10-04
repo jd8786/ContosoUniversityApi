@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ContosoUniversity.Data.Models;
+using ContosoUniversity.Data.EntityModels;
 using ContosoUniversity.Data.Repositories;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +18,7 @@ namespace ContosoUniversity.Data.Tests.Repositories
 
         private readonly Mock<SchoolContext> _mockDbContext;
 
-        private readonly Mock<DbSet<Student>> _mockDbSet;
+        private readonly Mock<DbSet<StudentEntity>> _mockDbSet;
 
         public StudentRepositoryTests()
         {
@@ -26,25 +26,25 @@ namespace ContosoUniversity.Data.Tests.Repositories
 
             _mockDbContext = new Mock<SchoolContext>(optionsBuilder.Options);
 
-            _mockDbSet = new Mock<DbSet<Student>>();
+            _mockDbSet = new Mock<DbSet<StudentEntity>>();
 
-            var students = new List<Student>
+            var students = new List<StudentEntity>
             {
-                new Student { StudentId = 1, LastName = "some-last-name1"},
-                new Student { StudentId = 2, LastName = "some-last-name2" },
-                new Student { StudentId = 3, LastName = "some-last-name3" }
+                new StudentEntity { StudentId = 1, LastName = "some-last-name1"},
+                new StudentEntity { StudentId = 2, LastName = "some-last-name2" },
+                new StudentEntity { StudentId = 3, LastName = "some-last-name3" }
             }; ;
 
             var queryableStudents = students.AsQueryable();
 
-            _mockDbSet.As<IQueryable<Student>>().Setup(m => m.Provider).Returns(queryableStudents.Provider);
-            _mockDbSet.As<IQueryable<Student>>().Setup(m => m.Expression).Returns(queryableStudents.Expression);
-            _mockDbSet.As<IQueryable<Student>>().Setup(m => m.ElementType).Returns(queryableStudents.ElementType);
-            _mockDbSet.As<IQueryable<Student>>().Setup(m => m.GetEnumerator()).Returns(queryableStudents.GetEnumerator());
+            _mockDbSet.As<IQueryable<StudentEntity>>().Setup(m => m.Provider).Returns(queryableStudents.Provider);
+            _mockDbSet.As<IQueryable<StudentEntity>>().Setup(m => m.Expression).Returns(queryableStudents.Expression);
+            _mockDbSet.As<IQueryable<StudentEntity>>().Setup(m => m.ElementType).Returns(queryableStudents.ElementType);
+            _mockDbSet.As<IQueryable<StudentEntity>>().Setup(m => m.GetEnumerator()).Returns(queryableStudents.GetEnumerator());
 
-            _mockDbSet.Setup(dbSet => dbSet.Add(It.IsAny<Student>())).Callback((Student s) => students.Add(s));
+            _mockDbSet.Setup(dbSet => dbSet.Add(It.IsAny<StudentEntity>())).Callback((StudentEntity s) => students.Add(s));
 
-            _mockDbSet.Setup(dbSet => dbSet.Remove(It.IsAny<Student>())).Callback((Student s) => students.Remove(s));
+            _mockDbSet.Setup(dbSet => dbSet.Remove(It.IsAny<StudentEntity>())).Callback((StudentEntity s) => students.Remove(s));
 
             _mockDbContext.Setup(c => c.Students).Returns(_mockDbSet.Object);
 
@@ -80,7 +80,7 @@ namespace ContosoUniversity.Data.Tests.Repositories
         [Fact]
         public async Task ShouldCreateStudent()
         {
-            var student = new Student
+            var student = new StudentEntity
             {
                 LastName = "some-last-name4"
             };
@@ -101,7 +101,7 @@ namespace ContosoUniversity.Data.Tests.Repositories
         {
             _mockDbContext.Setup(c => c.SaveChanges()).Throws<Exception>();
 
-            Action action = async () => await _repository.CreateAsync(new Student());
+            Action action = async () => await _repository.CreateAsync(new StudentEntity());
 
             action.Should().Throw<Exception>()
                 .WithMessage("Student was failed to be saved in the database");
@@ -110,7 +110,7 @@ namespace ContosoUniversity.Data.Tests.Repositories
         [Fact]
         public async Task ShouldReturnFalseWhenNoStudentFoundToUpdate()
         {
-            var student = new Student {StudentId = 4};
+            var student = new StudentEntity {StudentId = 4};
 
             var result = await _repository.UpdateAsync(student);
 
@@ -120,7 +120,7 @@ namespace ContosoUniversity.Data.Tests.Repositories
         [Fact]
         public async Task ShouldReturnTrueWhenStudentFoundToUpdate()
         {
-            var student = new Student
+            var student = new StudentEntity
                 {
                     StudentId = 3,
                     LastName = "new-last-name",
@@ -148,7 +148,7 @@ namespace ContosoUniversity.Data.Tests.Repositories
         {
             _mockDbContext.Setup(c => c.SaveChanges()).Throws<Exception>();
 
-            Action action = async () => await _repository.UpdateAsync(new Student { StudentId = 1 });
+            Action action = async () => await _repository.UpdateAsync(new StudentEntity { StudentId = 1 });
 
             action.Should().Throw<Exception>()
                 .WithMessage("Student was failed to be updated in the database");
@@ -167,7 +167,7 @@ namespace ContosoUniversity.Data.Tests.Repositories
         {
             var result = await _repository.DeleteAsync(3);
 
-            _mockDbSet.Verify(dbSet => dbSet.Remove(It.IsAny<Student>()), Times.Exactly(1));
+            _mockDbSet.Verify(dbSet => dbSet.Remove(It.IsAny<StudentEntity>()), Times.Exactly(1));
 
             _mockDbContext.Verify(dbSet => dbSet.SaveChanges(), Times.Exactly(1));
 

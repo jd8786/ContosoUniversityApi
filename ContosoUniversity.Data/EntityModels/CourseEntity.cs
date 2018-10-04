@@ -3,16 +3,21 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ContosoUniversity.Data.Models
+namespace ContosoUniversity.Data.EntityModels
 {
     [Table("Course")]
-    public class Course
+    public class CourseEntity
     {
-        public Course()
+        public CourseEntity()
         {
-            Enrollments = new List<Enrollment>();
+            Enrollments = new List<EnrollmentEntity>();
+
+            CreatedBy = "ContosoUniversityUsers";
+
+            CreatedDate = DateTime.Now;
         }
 
+        [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int CourseId { get; set; }
 
@@ -30,6 +35,6 @@ namespace ContosoUniversity.Data.Models
 
         public DateTime? UpdatedDate { get; set; }
 
-        public ICollection<Enrollment> Enrollments { get; set; }
+        public virtual ICollection<EnrollmentEntity> Enrollments { get; set; }
     }
 }

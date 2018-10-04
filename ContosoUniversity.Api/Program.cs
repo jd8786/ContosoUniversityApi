@@ -22,8 +22,6 @@ namespace ContosoUniversity.Api
                     var context = services.GetRequiredService<SchoolContext>();
 
                     context.Database.Migrate();
-
-                    DbInitializer.Initialize(context);
                 }
                 catch (Exception ex)
                 {

@@ -2,7 +2,7 @@
 using System.Linq;
 using AutoMapper;
 using ContosoUniversity.Api.Models;
-using ContosoUniversity.Data.Models;
+using ContosoUniversity.Data.EntityModels;
 
 namespace ContosoUniversity.Api.AutoMappers
 {
@@ -10,23 +10,23 @@ namespace ContosoUniversity.Api.AutoMappers
     {
         public StudentToStudentInfoProfile()
         {
-            CreateMap<Student, StudentInfo>()
+            CreateMap<StudentEntity, StudentInfo>()
                 .ForMember(dest => dest.StudentInfoId, opt => opt.MapFrom(src => src.StudentId))
                 .ForMember(m => m.CourseInfos, opt => opt.ResolveUsing(MapCourseInfo))
                 .ReverseMap();
         }
 
-        private static List<CourseInfo> MapCourseInfo(Student student)
+        private static List<CourseInfo> MapCourseInfo(StudentEntity student)
         {
             var courseInfos = new List<CourseInfo>();
 
-            var courses = student?.Enrollments.Select(e => new { e.Course.CourseId, e.Course.Credits, e.Course.Title, e.Grade });
+            var courses = student?.Enrollments.Select(e => new { Id = e.Course.CourseId, e.Course.Credits, e.Course.Title, e.Grade });
 
             if (!courses.Any()) return courseInfos;
 
             courseInfos.AddRange(courses.Select(course => new CourseInfo
             {
-                CourseInfoId = course.CourseId,
+                CourseInfoId = course.Id,
                 Credits = course.Credits,
                 Grade = course.Grade,
                 Title = course.Title

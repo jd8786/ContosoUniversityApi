@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using AutoMapper;
 using ContosoUniversity.Api.Models;
-using ContosoUniversity.Data.Models;
+using ContosoUniversity.Data.EntityModels;
 using ContosoUniversity.Data.Repositories;
 
 namespace ContosoUniversity.Api.Services
@@ -35,7 +35,7 @@ namespace ContosoUniversity.Api.Services
 
         public async Task<StudentInfo> CreateStudentInfoAsync(StudentInfo studentInfo)
         {
-            var student = _mapper.Map<Student>(studentInfo);
+            var student = _mapper.Map<StudentEntity>(studentInfo);
 
             var newStudent = await _repository.CreateAsync(student);
 
@@ -44,7 +44,7 @@ namespace ContosoUniversity.Api.Services
 
         public async Task<bool> UpdateStudentInfoAsync(StudentInfo studentInfo)
         {
-            var student = _mapper.Map<Student>(studentInfo);
+            var student = _mapper.Map<StudentEntity>(studentInfo);
 
             return await _repository.UpdateAsync(student);
         }

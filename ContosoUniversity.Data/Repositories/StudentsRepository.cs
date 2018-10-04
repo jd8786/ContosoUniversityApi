@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ContosoUniversity.Data.Models;
+using ContosoUniversity.Data.EntityModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace ContosoUniversity.Data.Repositories
@@ -14,7 +14,7 @@ namespace ContosoUniversity.Data.Repositories
         {
             _context = context;
         }
-        public async Task<IEnumerable<Student>> GetStudentsAsync()
+        public async Task<IEnumerable<StudentEntity>> GetStudentsAsync()
         {
             var students = _context.Students
                 .Include(s => s.Enrollments)
@@ -24,14 +24,14 @@ namespace ContosoUniversity.Data.Repositories
             return await students;
         }
 
-        public async Task<Student> GetStudentByIdAsync(int studentId)
+        public async Task<StudentEntity> GetStudentByIdAsync(int studentId)
         {
             var student = _context.Students.FirstOrDefaultAsync(s => s.StudentId == studentId);
 
             return await student;
         }
 
-        public async Task<Student> CreateAsync(Student student)
+        public async Task<StudentEntity> CreateAsync(StudentEntity student)
         {
             await _context.Students.AddAsync(student);
 
@@ -47,7 +47,7 @@ namespace ContosoUniversity.Data.Repositories
             return student;
         }
 
-        public async Task<bool> UpdateAsync(Student student)
+        public async Task<bool> UpdateAsync(StudentEntity student)
         {
             var currrentStudent = await GetStudentByIdAsync(student.StudentId);
 

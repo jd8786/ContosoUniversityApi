@@ -1,4 +1,4 @@
-﻿using ContosoUniversity.Data.Models;
+﻿using ContosoUniversity.Data.EntityModels;
 
 namespace ContosoUniversity.Api.Models
 {
