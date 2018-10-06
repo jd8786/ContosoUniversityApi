@@ -29,7 +29,8 @@ namespace ContosoUniversity.Api
                     logger.LogError(ex, "An error occurred while seeding the database.");
                 }
             }
-            BuildWebHost(args).Run();
+
+            host.Run();
         }
 
         public static IWebHost BuildWebHost(string[] args) =>

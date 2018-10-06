@@ -17,6 +17,6 @@ namespace ContosoUniversity.Data.EntityModels
 
         public StudentEntity Student { get; set; }
 
-        public CourseEntity Course{ get; set; }
+        public CourseEntity Course { get; set; }
     }
 }

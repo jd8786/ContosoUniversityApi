@@ -10,8 +10,6 @@ namespace ContosoUniversity.Data.EntityModels
     {
         public CourseEntity()
         {
-            Enrollments = new List<EnrollmentEntity>();
-
             CreatedBy = "ContosoUniversityUsers";
 
             CreatedDate = DateTime.Now;
@@ -35,6 +33,12 @@ namespace ContosoUniversity.Data.EntityModels
 
         public DateTime? UpdatedDate { get; set; }
 
+        public int DepartmentId { get; set; }
+
         public virtual ICollection<EnrollmentEntity> Enrollments { get; set; }
+
+        public virtual ICollection<CourseAssignmentEntity> CourseAssignments { get; set; }
+
+        public virtual DepartmentEntity Department { get; set; }  
     }
 }

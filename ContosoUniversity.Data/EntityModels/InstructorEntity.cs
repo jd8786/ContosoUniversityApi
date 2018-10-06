@@ -5,10 +5,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ContosoUniversity.Data.EntityModels
 {
-    [Table("Student")]
-    public class StudentEntity
+    [Table("Instructor")]
+    public class InstructorEntity
     {
-        public StudentEntity()
+        public InstructorEntity()
         {
             CreatedBy = "ContosoUniversityUsers";
 
@@ -16,7 +16,7 @@ namespace ContosoUniversity.Data.EntityModels
         }
 
         [Key]
-        public int StudentId { get; set; }
+        public int InstructorId { get; set; }
 
         [Required, MaxLength(30)]
         public string LastName { get; set; }
@@ -24,10 +24,10 @@ namespace ContosoUniversity.Data.EntityModels
         [Required, MaxLength(30)]
         public string FirstMidName { get; set; }
 
-        public DateTime EnrollmentDate { get; set; }
+        public DateTime HireDate { get; set; }
 
-        [Required, MaxLength(50)]
-        public string OriginCountry { get; set; }
+        [ForeignKey("OfficeAssignment")]
+        public int? OfficeAssignmentId { get; set; }
 
         [Required, MaxLength(30)]
         public string CreatedBy { get; set; }
@@ -38,6 +38,8 @@ namespace ContosoUniversity.Data.EntityModels
 
         public DateTime? UpdatedDate { get; set; }
 
-        public virtual ICollection<EnrollmentEntity> Enrollments { get; set; }
+        public virtual ICollection<CourseAssignmentEntity> CourseAssignments { get; set; }
+
+        public virtual OfficeAssignmentEntity OfficeAssignment { get; set; }
     }
 }
