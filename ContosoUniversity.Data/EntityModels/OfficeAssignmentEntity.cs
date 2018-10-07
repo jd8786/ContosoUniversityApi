@@ -7,13 +7,10 @@ namespace ContosoUniversity.Data.EntityModels
     public class OfficeAssignmentEntity
     {
         [Key]
-        public int OfficeAssignmentId { get; set; }
+        public int InstructorId { get; set; }
 
         [Required, MaxLength(50)]
         public string Location { get; set; }
-
-        [ForeignKey("Instructor")]
-        public int InstructorId { get; set; }
 
         public virtual InstructorEntity Instructor { get; set; }
     }

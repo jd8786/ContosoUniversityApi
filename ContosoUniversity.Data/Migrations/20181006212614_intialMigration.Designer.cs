@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ContosoUniversity.Data.Migrations
 {
     [DbContext(typeof(SchoolContext))]
-    [Migration("20181006205354_intialMigration")]
+    [Migration("20181006212614_intialMigration")]
     partial class intialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -144,34 +144,24 @@ namespace ContosoUniversity.Data.Migrations
                         .IsRequired()
                         .HasMaxLength(30);
 
-                    b.Property<int?>("OfficeAssignmentId");
-
                     b.Property<string>("UpdatedBy");
 
                     b.Property<DateTime?>("UpdatedDate");
 
                     b.HasKey("InstructorId");
 
-                    b.HasIndex("OfficeAssignmentId");
-
                     b.ToTable("Instructor");
                 });
 
             modelBuilder.Entity("ContosoUniversity.Data.EntityModels.OfficeAssignmentEntity", b =>
                 {
-                    b.Property<int>("OfficeAssignmentId")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
                     b.Property<int>("InstructorId");
 
                     b.Property<string>("Location")
                         .IsRequired()
                         .HasMaxLength(50);
 
-                    b.HasKey("OfficeAssignmentId");
-
-                    b.HasIndex("InstructorId");
+                    b.HasKey("InstructorId");
 
                     b.ToTable("OfficeAssignment");
                 });
@@ -252,18 +242,11 @@ namespace ContosoUniversity.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("ContosoUniversity.Data.EntityModels.InstructorEntity", b =>
-                {
-                    b.HasOne("ContosoUniversity.Data.EntityModels.OfficeAssignmentEntity", "OfficeAssignment")
-                        .WithMany()
-                        .HasForeignKey("OfficeAssignmentId");
-                });
-
             modelBuilder.Entity("ContosoUniversity.Data.EntityModels.OfficeAssignmentEntity", b =>
                 {
                     b.HasOne("ContosoUniversity.Data.EntityModels.InstructorEntity", "Instructor")
-                        .WithMany()
-                        .HasForeignKey("InstructorId")
+                        .WithOne("OfficeAssignment")
+                        .HasForeignKey("ContosoUniversity.Data.EntityModels.OfficeAssignmentEntity", "InstructorId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618

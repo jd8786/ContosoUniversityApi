@@ -26,9 +26,6 @@ namespace ContosoUniversity.Data.EntityModels
 
         public DateTime HireDate { get; set; }
 
-        [ForeignKey("OfficeAssignment")]
-        public int? OfficeAssignmentId { get; set; }
-
         [Required, MaxLength(30)]
         public string CreatedBy { get; set; }
 
