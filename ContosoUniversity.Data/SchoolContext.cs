@@ -228,6 +228,9 @@ namespace ContosoUniversity.Data
                     }
             };
 
+            builder.Entity<EnrollmentEntity>().Property(e => e.Grade)
+                .HasConversion(g => g.ToString(), s => (Grade)Enum.Parse(typeof(Grade), s));
+
             builder.Entity<StudentEntity>().HasData(students);
 
             builder.Entity<CourseEntity>().HasData(courses);
