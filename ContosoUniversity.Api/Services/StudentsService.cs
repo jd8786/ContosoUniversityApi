@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
 using AutoMapper;
 using ContosoUniversity.Api.Models;
 using ContosoUniversity.Data.EntityModels;
@@ -7,7 +6,7 @@ using ContosoUniversity.Data.Repositories;
 
 namespace ContosoUniversity.Api.Services
 {
-    public class StudentsService: IStudentService
+    public class StudentsService : IStudentService
     {
         private readonly IStudentsRepository _repository;
 
@@ -19,39 +18,52 @@ namespace ContosoUniversity.Api.Services
 
             _mapper = mapper;
         }
-        public async Task<List<StudentInfo>> GetStudentInfosAsync()
-        {
-            var students = await _repository.GetStudentsAsync();
 
-            return _mapper.Map<List<StudentInfo>>(students);
+        public IEnumerable<Student> GetStudents()
+        {
+            var studentEntities = _repository.GetAll();
+
+            return _mapper.Map<IEnumerable<Student>>(studentEntities);
         }
 
-        public async Task<StudentInfo> GetStudentInfoByIdAsync(int studentInfoId)
+        public Student GetStudentById(int id)
         {
-            var student = await _repository.GetStudentByIdAsync(studentInfoId);
+            var studentEntity = _repository.Get(id);
 
-            return _mapper.Map<StudentInfo>(student);
+            return _mapper.Map<Student>(studentEntity);
         }
 
-        public async Task<StudentInfo> CreateStudentInfoAsync(StudentInfo studentInfo)
+        public Student AddStudent(Student student)
         {
-            var student = _mapper.Map<StudentEntity>(studentInfo);
+            var studentEntity = _mapper.Map<StudentEntity>(student);
 
-            var newStudent = await _repository.CreateAsync(student);
+            _repository.Add(studentEntity);
 
-            return _mapper.Map<StudentInfo>(newStudent);
+            _repository.Save("Student");
+
+            return GetStudentById(studentEntity.StudentId);
         }
 
-        public async Task<bool> UpdateStudentInfoAsync(StudentInfo studentInfo)
+        public Student UpdateStudent(Student student)
         {
-            var student = _mapper.Map<StudentEntity>(studentInfo);
+            var studentEntity = _mapper.Map<StudentEntity>(student);
 
-            return await _repository.UpdateAsync(student);
+            _repository.Update(studentEntity);
+
+            _repository.Save("Student");
+
+            return GetStudentById(studentEntity.StudentId);
         }
 
-        public async Task<bool> DeleteStudentInfoAsync(int studentInfoId)
+        public bool RemoveStudent(int studentId)
         {
-            return await _repository.DeleteAsync(studentInfoId);
+            var entityStudent = _repository.Get(studentId);
+
+            _repository.Remove(entityStudent);
+
+            _repository.Save("Student");
+
+            return true;
         }
     }
 }

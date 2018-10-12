@@ -31,7 +31,9 @@ namespace ContosoUniversity.Api
 
             var schoolDbConnectionString = Configuration.GetConnectionString("schoolDbConnectionString");
 
-            services.AddDbContext<SchoolContext>(options => options.UseSqlServer(schoolDbConnectionString));
+            services.AddDbContext<SchoolContext>(options => options
+                .UseLazyLoadingProxies()
+                .UseSqlServer(schoolDbConnectionString));
 
             services.AddScoped<IStudentsRepository, StudentsRepository>();
 

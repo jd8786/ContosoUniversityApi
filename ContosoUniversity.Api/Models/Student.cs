@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace ContosoUniversity.Api.Models
 {
-    public class StudentInfo
+    public class Student
     {
-        public int StudentInfoId { get; set; }
+        public int StudentId { get; set; }
 
         public string LastName { get; set; }
 
@@ -13,6 +13,8 @@ namespace ContosoUniversity.Api.Models
 
         public DateTime EnrollmentDate { get; set; }
 
-        public List<CourseInfo> CourseInfos { get; set; }
+        public string OriginCountry { get; set; }
+
+        public IEnumerable<Enrollment> Enrollments { get; set; }
     }
 }

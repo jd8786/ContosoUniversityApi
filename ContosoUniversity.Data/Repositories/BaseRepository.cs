@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+using ContosoUniversity.Data.Exceptions;
 
 namespace ContosoUniversity.Data.Repositories
 {
-    public class BaseRepository<T> : IBaseRepository<T> where T: class
+    public class BaseRepository<T> : IBaseRepository<T> where T : class
     {
         private readonly SchoolContext _context;
 
@@ -16,54 +15,56 @@ namespace ContosoUniversity.Data.Repositories
             _context = context;
         }
 
-        public async Task<T> Get(int id)
+        public T Get(int id)
         {
-            return await _context.Set<T>().FindAsync(id);
+            return _context.Set<T>().Find(id);
         }
 
-        public async Task<IEnumerable<T>> GetAll()
+        public IEnumerable<T> GetAll()
         {
-            return await _context.Set<T>().ToListAsync();
+            return _context.Set<T>().ToList();
         }
 
-        public async Task<IEnumerable<T>> Find(Expression<Func<T, bool>> predicate)
+        public IEnumerable<T> Find(Expression<Func<T, bool>> predicate)
         {
-            return await _context.Set<T>().Where(predicate).ToListAsync();
+            return _context.Set<T>().Where(predicate).ToList();
         }
 
-        public async Task Remove(T entity)
+        public void Remove(T entity)
         {
             _context.Set<T>().Remove(entity);
-
-            await _context.SaveChangesAsync();
         }
 
-        public async Task RemoveRange(IEnumerable<T> entities)
+        public void RemoveRange(IEnumerable<T> entities)
         {
             _context.Set<T>().RemoveRange(entities);
-
-            await _context.SaveChangesAsync();
         }
 
-        public async Task Add(T entity)
+        public void Add(T entity)
         {
-            await _context.AddAsync(entity);
-
-            await _context.SaveChangesAsync();
+            _context.Add(entity);
         }
 
-        public async Task AddRange(IEnumerable<T> entities)
+        public void AddRange(IEnumerable<T> entities)
         {
-            await _context.AddRangeAsync(entities);
-
-            await _context.SaveChangesAsync();
+            _context.AddRange(entities);
         }
 
-        public async Task Update(T entity)
+        public void Update(T entity)
         {
             _context.Update(entity);
+        }
 
-            await _context.SaveChangesAsync();
+        public void Save(string entityName)
+        {
+            try
+            {
+                _context.SaveChanges();
+            }
+            catch(Exception ex)
+            {
+                throw new FailedToSaveDatabaseException($"{entityName} failed to save to the database", ex);
+            }
         }
     }
 }

@@ -20,7 +20,7 @@ namespace ContosoUniversity.Api.Tests.AutoMappers
         {
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.AddProfile(new StudentToStudentInfoProfile());
+                cfg.AddProfile(new StudentEntityToStudentProfile());
             });
 
             _mapper = config.CreateMapper();

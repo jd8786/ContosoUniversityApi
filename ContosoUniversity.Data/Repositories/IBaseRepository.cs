@@ -1,26 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace ContosoUniversity.Data.Repositories
 {
     public interface IBaseRepository<T> where T: class 
     {
-        Task<T> Get(int id);
+        T Get(int id);
 
-        Task<IEnumerable<T>> GetAll();
+        IEnumerable<T> GetAll();
 
-        Task<IEnumerable<T>> Find(Expression<Func<T, bool>> predicate);
+        IEnumerable<T> Find(Expression<Func<T, bool>> predicate);
 
-        Task Remove(T entity);
+        void Remove(T entity);
 
-        Task RemoveRange(IEnumerable<T> entities);
+        void RemoveRange(IEnumerable<T> entities);
 
-        Task Add(T entity);
+        void Add(T entity);
 
-        Task AddRange(IEnumerable<T> entities);
+        void AddRange(IEnumerable<T> entities);
 
-        Task Update(T entity);
+        void Update(T entity);
+
+        void Save(string entityName);
     }
 }

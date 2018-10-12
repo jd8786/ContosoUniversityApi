@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
-using System.Threading.Tasks;
 using ContosoUniversity.Api.Models;
 using ContosoUniversity.Api.Services;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace ContosoUniversity.Api.Controllers
 {
@@ -18,38 +19,17 @@ namespace ContosoUniversity.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetStudentInfosAsync()
+        public IActionResult GetStudents()
         {
             try
             {
-                var studentInfos = await _service.GetStudentInfosAsync();
+                var students = _service.GetStudents();
 
-                var apiResponseOfStudentInfos = ApiResponseOfStudentInfos.Success(studentInfos);
+                var apiResponse = ApiResponse<IEnumerable<Student>>.Success(students);
 
-                return Ok(apiResponseOfStudentInfos);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode((int) HttpStatusCode.InternalServerError, ex.Message);
-            }
-            
-        }
+                var jsonResponse = JsonConvert.SerializeObject(apiResponse);
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetStudentInfoByIdAsync(int id)
-        {
-            try
-            {
-                var studentInfo = await _service.GetStudentInfoByIdAsync(id);
-
-                if (studentInfo == null)
-                {
-                    return NotFound(ApiResponseOfBoolean.Error("Student Not Found"));
-                }
-
-                var apiResponseOfStudentInfo = ApiResponseOfStudentInfo.Success(studentInfo);
-
-                return Ok(apiResponseOfStudentInfo);
+                return Ok(apiResponse);
             }
             catch (Exception ex)
             {
@@ -57,71 +37,93 @@ namespace ContosoUniversity.Api.Controllers
             }
         }
 
-        [HttpPost]
-        public async Task<IActionResult> PostStudentInfoAsync([FromBody] StudentInfo studentInfo)
-        {
-            if (studentInfo == null)
-            {
-                return BadRequest(ApiResponseOfBoolean.Error("Bad Request"));
-            }
+        //[HttpGet("{id}")]
+        //public async Task<IActionResult> GetStudentInfoByIdAsync(int id)
+        //{
+        //    try
+        //    {
+        //        var studentInfo = await _service.GetStudentInfoByIdAsync(id);
 
-            try
-            {
-                var newStudentInfo = await _service.CreateStudentInfoAsync(studentInfo);
+        //        if (studentInfo == null)
+        //        {
+        //            return NotFound(ApiResponseOfBoolean.Error("Student Not Found"));
+        //        }
 
-                return Ok(ApiResponseOfStudentInfo.Success(newStudentInfo));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode((int)HttpStatusCode.InternalServerError, ApiResponseOfBoolean.Error(ex.Message));
-            }
-        }
+        //        var apiResponseOfStudentInfo = ApiResponseOfStudent.Success(studentInfo);
 
-        [HttpPut]
-        public async Task<IActionResult> PutStudentInfoAsync([FromBody] StudentInfo studentInfo)
-        {
-            if (studentInfo == null)
-            {
-                return BadRequest(ApiResponseOfBoolean.Error("Bad Request"));
-            }
+        //        return Ok(apiResponseOfStudentInfo);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode((int) HttpStatusCode.InternalServerError, ex.Message);
+        //    }
+        //}
 
-            try
-            {
-                var isStudentInfoExist = await _service.UpdateStudentInfoAsync(studentInfo);
+        //[HttpPost]
+        //public async Task<IActionResult> PostStudentInfoAsync([FromBody] StudentInfo studentInfo)
+        //{
+        //    if (studentInfo == null)
+        //    {
+        //        return BadRequest(ApiResponseOfBoolean.Error("Bad Request"));
+        //    }
 
-                if (!isStudentInfoExist)
-                {
-                    return NotFound(ApiResponseOfBoolean.Error("Student Not Found"));
-                }
+        //    try
+        //    {
+        //        var newStudentInfo = await _service.CreateStudentInfoAsync(studentInfo);
 
-                return Ok(ApiResponseOfBoolean.Success());
-            }
-            catch (Exception ex)
-            {
-                return StatusCode((int)HttpStatusCode.InternalServerError, ApiResponseOfBoolean.Error(ex.Message));
-            }
-        }
+        //        return Ok(ApiResponseOfStudent.Success(newStudentInfo));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode((int)HttpStatusCode.InternalServerError, ApiResponseOfBoolean.Error(ex.Message));
+        //    }
+        //}
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteStudentInfoAsync(int id)
-        {
-            try
-            {
-                var isStudentInfoExist = await _service.DeleteStudentInfoAsync(id);
+        //[HttpPut]
+        //public async Task<IActionResult> PutStudentInfoAsync([FromBody] StudentInfo studentInfo)
+        //{
+        //    if (studentInfo == null)
+        //    {
+        //        return BadRequest(ApiResponseOfBoolean.Error("Bad Request"));
+        //    }
 
-                if (!isStudentInfoExist)
-                {
-                    return NotFound(ApiResponseOfBoolean.Error("Student Not Found"));
-                }
+        //    try
+        //    {
+        //        var isStudentInfoExist = await _service.UpdateStudentInfoAsync(studentInfo);
 
-                return Ok(ApiResponseOfBoolean.Success());
-            }
-            catch (Exception ex)
-            {
-                return StatusCode((int)HttpStatusCode.InternalServerError,
-                    ApiResponseOfBoolean.Error(ex.Message));
-            }
-        }
+        //        if (!isStudentInfoExist)
+        //        {
+        //            return NotFound(ApiResponseOfBoolean.Error("Student Not Found"));
+        //        }
+
+        //        return Ok(ApiResponseOfBoolean.Success());
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode((int)HttpStatusCode.InternalServerError, ApiResponseOfBoolean.Error(ex.Message));
+        //    }
+        //}
+
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteStudentInfoAsync(int id)
+        //{
+        //    try
+        //    {
+        //        var isStudentInfoExist = await _service.DeleteStudentInfoAsync(id);
+
+        //        if (!isStudentInfoExist)
+        //        {
+        //            return NotFound(ApiResponseOfBoolean.Error("Student Not Found"));
+        //        }
+
+        //        return Ok(ApiResponseOfBoolean.Success());
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode((int)HttpStatusCode.InternalServerError,
+        //            ApiResponseOfBoolean.Error(ex.Message));
+        //    }
+        //}
 
     }
 }
