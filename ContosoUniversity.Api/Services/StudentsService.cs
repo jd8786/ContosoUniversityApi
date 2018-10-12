@@ -2,6 +2,7 @@
 using AutoMapper;
 using ContosoUniversity.Api.Models;
 using ContosoUniversity.Data.EntityModels;
+using ContosoUniversity.Data.Exceptions;
 using ContosoUniversity.Data.Repositories;
 
 namespace ContosoUniversity.Api.Services
@@ -30,11 +31,26 @@ namespace ContosoUniversity.Api.Services
         {
             var studentEntity = _repository.Get(id);
 
+            if (studentEntity == null)
+            {
+                throw new NotFoundException("Student was not found");
+            }
+
             return _mapper.Map<Student>(studentEntity);
         }
 
         public Student AddStudent(Student student)
         {
+            if (student == null)
+            {
+                throw new InvalidStudentException("Student must be provided");
+            }
+
+            if (student.StudentId != 0)
+            {
+                throw new InvalidStudentException("Student Id has to be 0");
+            }
+
             var studentEntity = _mapper.Map<StudentEntity>(student);
 
             _repository.Add(studentEntity);

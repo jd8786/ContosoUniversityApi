@@ -8,7 +8,12 @@ namespace ContosoUniversity.Api.AutoMappers
     {
         public StudentEntityToStudentProfile()
         {
-            CreateMap<StudentEntity, Student>();
+            CreateMap<StudentEntity, Student>()
+                .ReverseMap()
+                .ForMember(dest => dest.CreatedBy, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedDate, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedBy, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedDate, opt => opt.Ignore());
         }
     }
 }

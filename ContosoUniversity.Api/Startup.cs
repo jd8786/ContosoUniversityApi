@@ -27,7 +27,9 @@ namespace ContosoUniversity.Api
 
             services.AddCors();
 
-            services.AddMvc();
+            services.AddMvc()
+                .AddJsonOptions(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            );
 
             var schoolDbConnectionString = Configuration.GetConnectionString("schoolDbConnectionString");
 
