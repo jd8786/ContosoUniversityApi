@@ -39,7 +39,9 @@ namespace ContosoUniversity.Api
 
             services.AddScoped<IStudentsRepository, StudentsRepository>();
 
-            services.AddScoped<IStudentService, StudentsService>();
+            services.AddScoped<ICoursesRepository, CoursesRepository>();
+
+            services.AddScoped<IStudentsService, StudentsesService>();
 
             services.AddSwaggerGen(o =>
             {

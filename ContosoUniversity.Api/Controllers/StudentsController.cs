@@ -5,15 +5,16 @@ using ContosoUniversity.Api.Models;
 using ContosoUniversity.Api.Services;
 using ContosoUniversity.Data.Exceptions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.KeyVault.Models;
 
 namespace ContosoUniversity.Api.Controllers
 {
     [Route("api/students")]
     public class StudentsController: Controller
     {
-        private readonly IStudentService _service;
+        private readonly IStudentsService _service;
 
-        public StudentsController(IStudentService service)
+        public StudentsController(IStudentsService service)
         {
             _service = service;
         }
@@ -71,6 +72,10 @@ namespace ContosoUniversity.Api.Controllers
                 return Ok(ApiResponse<Student>.Success(newStudent));
             }
             catch (InvalidStudentException ex)
+            {
+                return BadRequest(ApiResponse<bool>.Error($"{ex.Message}"));
+            }
+            catch (InvalidCourseException ex)
             {
                 return BadRequest(ApiResponse<bool>.Error($"{ex.Message}"));
             }
