@@ -25,14 +25,14 @@ namespace ContosoUniversity.Api.Services
             _mapper = mapper;
         }
 
-        public IEnumerable<Student> GetStudents()
+        public IEnumerable<Student> GetAll()
         {
             var studentEntities = _studentsRepository.GetAll();
 
             return _mapper.Map<IEnumerable<Student>>(studentEntities);
         }
 
-        public Student GetStudentById(int id)
+        public Student Get(int id)
         {
             var studentEntity = _studentsRepository.Get(id);
 
@@ -44,7 +44,7 @@ namespace ContosoUniversity.Api.Services
             return _mapper.Map<Student>(studentEntity);
         }
 
-        public Student AddStudent(Student student)
+        public Student Add(Student student)
         {
             if (student == null)
             {
@@ -56,7 +56,11 @@ namespace ContosoUniversity.Api.Services
                 throw new InvalidStudentException("Student Id has to be 0");
             }
 
-            ValidateEnrollments(student);
+            if (student.Enrollments != null && student.Enrollments.Any())
+            {
+                throw new InvalidStudentException("Enrollment cannot be done before student is added");
+            }
+            //ValidateEnrollments(student);
 
             var studentEntity = _mapper.Map<StudentEntity>(student);
 
@@ -64,12 +68,10 @@ namespace ContosoUniversity.Api.Services
 
             _studentsRepository.Save("Student");
 
-            var newStudentId = studentEntity.StudentId;
-
-            return GetStudentById(studentEntity.StudentId);
+            return Get(studentEntity.StudentId);
         }
 
-        public Student UpdateStudent(Student student)
+        public Student Update(Student student)
         {
             var studentEntity = _mapper.Map<StudentEntity>(student);
 
@@ -77,10 +79,10 @@ namespace ContosoUniversity.Api.Services
 
             _studentsRepository.Save("Student");
 
-            return GetStudentById(studentEntity.StudentId);
+            return Get(studentEntity.StudentId);
         }
 
-        public bool RemoveStudent(int studentId)
+        public bool Remove(int studentId)
         {
             var entityStudent = _studentsRepository.Get(studentId);
 
@@ -91,31 +93,31 @@ namespace ContosoUniversity.Api.Services
             return true;
         }
 
-        private void ValidateEnrollments(Student student)
-        {
-            if (student.Enrollments == null || !student.Enrollments.Any()) return;
+        //private void ValidateEnrollments(Student student)
+        //{
+        //    if (student.Enrollments == null || !student.Enrollments.Any()) return;
 
-            var isNewStudent = student.Enrollments.All(e => e.StudentId == 0);
+        //    var isNewStudent = student.Enrollments.All(e => e.StudentId == 0);
 
-            if (!isNewStudent)
-            {
-                throw new InvalidStudentException(
-                    "Student in the enrollment must be the same as the new student");
-            }
+        //    if (!isNewStudent)
+        //    {
+        //        throw new InvalidStudentException(
+        //            "Student in the enrollment must be the new student");
+        //    }
 
-            var courses = _coursesRepository.GetAll();
+        //    var courses = _coursesRepository.GetAll();
 
-            foreach (var enrollment in student.Enrollments)
-            {
-                if (courses.Any(c => c.CourseId != enrollment.CourseId))
-                {
-                    throw new InvalidCourseException(
-                        "One or more chosen course(s) doesnot exist in the database");
-                }
-            }
+        //    foreach (var enrollment in student.Enrollments)
+        //    {
+        //        var isCourseExisting = courses.FirstOrDefault(c => c.CourseId == enrollment.CourseId) != null;
 
-            student.Enrollments = null;
-        }
+        //        if (!isCourseExisting)
+        //        {
+        //            throw new InvalidCourseException(
+        //                "One or more chosen course(s) doesnot exist in the database");
+        //        }
+        //    }
+        //}
     }
 }
 

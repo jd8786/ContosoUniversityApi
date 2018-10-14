@@ -8,7 +8,7 @@ namespace ContosoUniversity.Data.Repositories
 {
     public class BaseRepository<T> : IBaseRepository<T> where T : class
     {
-        private readonly SchoolContext _context;
+        protected readonly SchoolContext _context;
 
         public BaseRepository(SchoolContext context)
         {

@@ -26,7 +26,7 @@ namespace ContosoUniversity.Api.Controllers
         {
             try
             {
-                var students = _service.GetStudents();
+                var students = _service.GetAll();
 
                 var apiResponse = ApiResponse<IEnumerable<Student>>.Success(students);
 
@@ -46,7 +46,7 @@ namespace ContosoUniversity.Api.Controllers
         {
             try
             {
-                var student = _service.GetStudentById(id);
+                var student = _service.Get(id);
 
                 var apiResponse = ApiResponse<Student>.Success(student);
 
@@ -67,7 +67,7 @@ namespace ContosoUniversity.Api.Controllers
         {
             try
             {
-                var newStudent = _service.AddStudent(student);
+                var newStudent = _service.Add(student);
 
                 return Ok(ApiResponse<Student>.Success(newStudent));
             }
