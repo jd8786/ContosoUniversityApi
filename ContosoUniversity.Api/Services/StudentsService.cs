@@ -60,7 +60,6 @@ namespace ContosoUniversity.Api.Services
             {
                 throw new InvalidStudentException("Enrollment cannot be done before student is added");
             }
-            //ValidateEnrollments(student);
 
             var studentEntity = _mapper.Map<StudentEntity>(student);
 
@@ -92,32 +91,6 @@ namespace ContosoUniversity.Api.Services
 
             return true;
         }
-
-        //private void ValidateEnrollments(Student student)
-        //{
-        //    if (student.Enrollments == null || !student.Enrollments.Any()) return;
-
-        //    var isNewStudent = student.Enrollments.All(e => e.StudentId == 0);
-
-        //    if (!isNewStudent)
-        //    {
-        //        throw new InvalidStudentException(
-        //            "Student in the enrollment must be the new student");
-        //    }
-
-        //    var courses = _coursesRepository.GetAll();
-
-        //    foreach (var enrollment in student.Enrollments)
-        //    {
-        //        var isCourseExisting = courses.FirstOrDefault(c => c.CourseId == enrollment.CourseId) != null;
-
-        //        if (!isCourseExisting)
-        //        {
-        //            throw new InvalidCourseException(
-        //                "One or more chosen course(s) doesnot exist in the database");
-        //        }
-        //    }
-        //}
     }
 }
 
