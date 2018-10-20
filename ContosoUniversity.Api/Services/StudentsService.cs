@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using AutoMapper;
 using ContosoUniversity.Api.Models;
 using ContosoUniversity.Data.EntityModels;
@@ -83,6 +84,8 @@ namespace ContosoUniversity.Api.Services
                 throw new InvalidStudentException("Student Id cannot be 0");
             }
 
+            student.Enrollments?.ToList().ForEach(e => ((EnrollmentsService) _enrollmentsService).ValidateEnrollment(e));
+
             var existingStudent = Get(student.StudentId);
 
             existingStudent.Enrollments = student.Enrollments;
@@ -106,7 +109,9 @@ namespace ContosoUniversity.Api.Services
 
         public bool Remove(int studentId)
         {
-            var entityStudent = _studentsRepository.Get(studentId);
+            var student = Get(studentId);
+
+            var entityStudent = _mapper.Map<StudentEntity>(student);
 
             _studentsRepository.Remove(entityStudent);
 

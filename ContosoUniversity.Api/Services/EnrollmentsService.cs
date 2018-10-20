@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using ContosoUniversity.Api.Models;
@@ -64,7 +63,7 @@ namespace ContosoUniversity.Api.Services
 
             var validEnrollments = new List<Enrollment>();
 
-            var exceptions = new List<Exception>();
+            var exceptions = new List<InvalidEnrollmentException>();
 
             foreach (var enrollment in enrollments)
             {
@@ -74,7 +73,7 @@ namespace ContosoUniversity.Api.Services
 
                     validEnrollments.Add(enrollment);
                 }
-                catch (Exception ex)
+                catch (InvalidEnrollmentException ex)
                 {
                     exceptions.Add(ex);
                 }
@@ -114,7 +113,7 @@ namespace ContosoUniversity.Api.Services
             return true;
         }
 
-        private static void ThrowExceptionWithNewMessage(List<EnrollmentEntity> validEnrollmentEnitities, List<Exception> exceptions)
+        private static void ThrowExceptionWithNewMessage(List<EnrollmentEntity> validEnrollmentEnitities, List<InvalidEnrollmentException> exceptions)
         {
             var idMessage = string.Empty;
 
@@ -134,7 +133,7 @@ namespace ContosoUniversity.Api.Services
             throw new InvalidEnrollmentException($"{joinedExceptionMessage}{idMessage}");
         }
 
-        private void ValidateEnrollment(Enrollment enrollment)
+        public void ValidateEnrollment(Enrollment enrollment)
         {
             if (enrollment == null)
             {
@@ -164,7 +163,7 @@ namespace ContosoUniversity.Api.Services
 
             if (!isStudentExisting)
             {
-                throw new InvalidStudentException($"Student provided with Id {enrollment.StudentId} doesnot exist in the database");
+                throw new InvalidEnrollmentException($"Student provided with Id {enrollment.StudentId} doesnot exist in the database");
             }
         }
 
@@ -176,7 +175,7 @@ namespace ContosoUniversity.Api.Services
 
             if (!isCourseExisting)
             {
-                throw new InvalidCourseException($"Course provided with id {enrollment.CourseId} doesnot exist in the database");
+                throw new InvalidEnrollmentException($"Course provided with id {enrollment.CourseId} doesnot exist in the database");
             }
         }
     }

@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace ContosoUniversity.Api.Controllers
 {
     [Route("api/students")]
-    public class StudentsController: Controller
+    public class StudentsController : Controller
     {
         private readonly IStudentsService _service;
 
@@ -33,7 +33,7 @@ namespace ContosoUniversity.Api.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode((int) HttpStatusCode.InternalServerError, ex.Message);
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
             }
         }
 
@@ -53,7 +53,7 @@ namespace ContosoUniversity.Api.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ApiResponse<bool>.Error($"{ex.Message}"));
+                return NotFound(ApiResponse<bool>.Error(ex.Message));
             }
             catch (Exception ex)
             {
@@ -62,6 +62,9 @@ namespace ContosoUniversity.Api.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(ApiResponse<Student>), 200)]
+        [ProducesResponseType(typeof(ApiResponse<bool>), 400)]
+        [ProducesResponseType(typeof(ApiResponse<bool>), 500)]
         public IActionResult PostStudent([FromBody] Student student)
         {
             try
@@ -72,11 +75,11 @@ namespace ContosoUniversity.Api.Controllers
             }
             catch (InvalidStudentException ex)
             {
-                return BadRequest(ApiResponse<bool>.Error($"{ex.Message}"));
+                return BadRequest(ApiResponse<bool>.Error(ex.Message));
             }
             catch (InvalidEnrollmentException ex)
             {
-                return BadRequest(ApiResponse<bool>.Error($"{ex.Message}"));
+                return BadRequest(ApiResponse<bool>.Error(ex.Message));
             }
             catch (Exception ex)
             {
@@ -84,51 +87,51 @@ namespace ContosoUniversity.Api.Controllers
             }
         }
 
-        //[HttpPut]
-        //public async IActionResult PutStudent([FromBody] Student student)
-        //{
-        //    if (student == null)
-        //    {
-        //        return BadRequest(ApiResponse<bool>.Error("Bad Request"));
-        //    }
+        [HttpPut]
+        public IActionResult PutStudent([FromBody] Student student)
+        {
+            try
+            {
+                var updatedStudent = _service.Update(student);
 
-        //    try
-        //    {
-        //        var isStudentInfoExist = await _service.UpdateStudentInfoAsync(student);
+                return Ok(ApiResponse<Student>.Success(updatedStudent));
+            }
+            catch (InvalidStudentException ex)
+            {
+                return BadRequest(ApiResponse<bool>.Error(ex.Message));
+            }
+            catch (InvalidEnrollmentException ex)
+            {
+                return BadRequest(ApiResponse<bool>.Error(ex.Message));
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ApiResponse<bool>.Error(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, ApiResponse<bool>.Error(ex.Message));
+            }
+        }
 
-        //        if (!isStudentInfoExist)
-        //        {
-        //            return NotFound(ApiResponseOfBoolean.Error("Student Not Found"));
-        //        }
+        [HttpDelete("{id}")]
+        public IActionResult DeleteStudent(int id)
+        {
+            try
+            {
+                _service.Remove(id);
 
-        //        return Ok(ApiResponseOfBoolean.Success());
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode((int)HttpStatusCode.InternalServerError, ApiResponseOfBoolean.Error(ex.Message));
-        //    }
-        //}
-
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> DeleteStudentInfoAsync(int id)
-        //{
-        //    try
-        //    {
-        //        var isStudentInfoExist = await _service.DeleteStudentInfoAsync(id);
-
-        //        if (!isStudentInfoExist)
-        //        {
-        //            return NotFound(ApiResponseOfBoolean.Error("Student Not Found"));
-        //        }
-
-        //        return Ok(ApiResponseOfBoolean.Success());
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode((int)HttpStatusCode.InternalServerError,
-        //            ApiResponseOfBoolean.Error(ex.Message));
-        //    }
-        //}
+                return Ok(ApiResponse<bool>.Success(true));
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ApiResponse<bool>.Error(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, ApiResponse<bool>.Error(ex.Message));
+            }
+        }
 
     }
 }
