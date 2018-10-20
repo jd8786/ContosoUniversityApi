@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using AutoMapper;
 using ContosoUniversity.Api.Models;
 using ContosoUniversity.Data.EntityModels;
@@ -7,7 +9,7 @@ using ContosoUniversity.Data.Repositories;
 
 namespace ContosoUniversity.Api.Services
 {
-    public class EnrollmentsService: IEnrollmentsService
+    public class EnrollmentsService : IEnrollmentsService
     {
         private readonly IEnrollmentsRepository _enrollmentsRepository;
 
@@ -34,7 +36,7 @@ namespace ContosoUniversity.Api.Services
 
             if (enrollmentEntity == null)
             {
-                throw new NotFoundException("Enrollment was not found");
+                throw new NotFoundException($"Enrollment with id {id} was not found");
             }
 
             return _mapper.Map<Enrollment>(enrollmentEntity);
@@ -42,39 +44,7 @@ namespace ContosoUniversity.Api.Services
 
         public Enrollment Add(Enrollment enrollment)
         {
-            if (enrollment == null)
-            {
-                throw new InvalidEnrollmentException("Enrollment must be provided");
-            }
-
-            if (enrollment.StudentId == 0 || enrollment.CourseId == 0)
-            {
-                throw new InvalidEnrollmentException("Student and course must be provided");
-            }
-
-            var students = _studentsRepository.GetAll().ToList();
-
-            var courses = _coursesRepository.GetAll().ToList();
-
-            foreach (var student in students)
-            {
-                var isStudentExisting = students.Any(s => s.StudentId == student.StudentId);
-
-                if (!isStudentExisting)
-                {
-                    throw new InvalidStudentException("Student provided doesnot exist in the database");
-                }
-            }
-
-            foreach (var course in courses)
-            {
-                var isCourseExisting = courses.Any(c => c.CourseId == course.CourseId);
-
-                if (!isCourseExisting)
-                {
-                    throw new InvalidCourseException("Course provided doesnot exist in the database");
-                }
-            }
+            ValidateEnrollment(enrollment);
 
             var enrollmentEntity = _mapper.Map<EnrollmentEntity>(enrollment);
 
@@ -83,6 +53,131 @@ namespace ContosoUniversity.Api.Services
             _enrollmentsRepository.Save("Enrollment");
 
             return Get(enrollmentEntity.EnrollmentId);
+        }
+
+        public IEnumerable<Enrollment> AddRange(IEnumerable<Enrollment> enrollments)
+        {
+            if (enrollments == null)
+            {
+                throw new InvalidEnrollmentException("Enrollments must be provided");
+            }
+
+            var validEnrollments = new List<Enrollment>();
+
+            var exceptions = new List<Exception>();
+
+            foreach (var enrollment in enrollments)
+            {
+                try
+                {
+                    ValidateEnrollment(enrollment);
+
+                    validEnrollments.Add(enrollment);
+                }
+                catch (Exception ex)
+                {
+                    exceptions.Add(ex);
+                }
+            }
+
+            var validEnrollmentEnitities = new List<EnrollmentEntity>();
+
+            if (validEnrollments.Any())
+            {
+                validEnrollmentEnitities = _mapper.Map<IEnumerable<EnrollmentEntity>>(validEnrollments).ToList();
+
+                _enrollmentsRepository.AddRange(validEnrollmentEnitities);
+
+                _enrollmentsRepository.Save("Enrollments");
+            }
+
+            if (exceptions.Any())
+            {
+                ThrowExceptionWithNewMessage(validEnrollmentEnitities, exceptions);
+            }
+
+            return _mapper.Map<IEnumerable<Enrollment>>(validEnrollmentEnitities);
+        }
+
+        public bool Remove(int enrollmentId)
+        {
+            var enrollment = Get(enrollmentId);
+
+            ValidateEnrollment(enrollment);
+
+            var enrollmentEntity = _mapper.Map<EnrollmentEntity>(enrollment);
+
+            _enrollmentsRepository.Remove(enrollmentEntity);
+
+            _enrollmentsRepository.Save("Enrollment");
+
+            return true;
+        }
+
+        private static void ThrowExceptionWithNewMessage(List<EnrollmentEntity> validEnrollmentEnitities, List<Exception> exceptions)
+        {
+            var idMessage = string.Empty;
+
+            if (validEnrollmentEnitities.Any())
+            {
+                var enrollmentIds = validEnrollmentEnitities.Select(ve => ve.EnrollmentId).ToList();
+
+                idMessage = enrollmentIds.Any()
+                    ? $"; enrollment(s) with id {string.Join(",", enrollmentIds)} was(were) saved to database"
+                    : string.Empty;
+            }
+
+            var exceptionMessages = exceptions.Select(e => e.Message);
+
+            var joinedExceptionMessage = string.Join(",", exceptionMessages);
+
+            throw new InvalidEnrollmentException($"{joinedExceptionMessage}{idMessage}");
+        }
+
+        private void ValidateEnrollment(Enrollment enrollment)
+        {
+            if (enrollment == null)
+            {
+                throw new InvalidEnrollmentException("Enrollment must be provided");
+            }
+
+            if (enrollment.EnrollmentId != 0)
+            {
+                throw new InvalidEnrollmentException("Enrollment Id must be 0");
+            }
+
+            if (enrollment.StudentId == 0 || enrollment.CourseId == 0)
+            {
+                throw new InvalidEnrollmentException("Student and course must be provided");
+            }
+
+            ValidateStudent(enrollment);
+
+            ValidateCourse(enrollment);
+        }
+
+        private void ValidateStudent(Enrollment enrollment)
+        {
+            var students = _studentsRepository.GetAll().ToList();
+
+            var isStudentExisting = students.Any(s => s.StudentId == enrollment.StudentId);
+
+            if (!isStudentExisting)
+            {
+                throw new InvalidStudentException($"Student provided with Id {enrollment.StudentId} doesnot exist in the database");
+            }
+        }
+
+        private void ValidateCourse(Enrollment enrollment)
+        {
+            var courses = _coursesRepository.GetAll().ToList();
+
+            var isCourseExisting = courses.Any(c => c.CourseId == enrollment.CourseId);
+
+            if (!isCourseExisting)
+            {
+                throw new InvalidCourseException($"Course provided with id {enrollment.CourseId} doesnot exist in the database");
+            }
         }
     }
 }

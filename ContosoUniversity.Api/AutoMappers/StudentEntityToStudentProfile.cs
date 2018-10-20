@@ -10,7 +10,6 @@ namespace ContosoUniversity.Api.AutoMappers
         {
             CreateMap<StudentEntity, Student>()
                 .ReverseMap()
-                .ForMember(dest => dest.Enrollments, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedBy, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedDate, opt => opt.Ignore())
                 .ForMember(dest => dest.UpdatedBy, opt => opt.Ignore())

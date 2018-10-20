@@ -5,7 +5,6 @@ using ContosoUniversity.Api.Models;
 using ContosoUniversity.Api.Services;
 using ContosoUniversity.Data.Exceptions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.KeyVault.Models;
 
 namespace ContosoUniversity.Api.Controllers
 {
@@ -75,7 +74,7 @@ namespace ContosoUniversity.Api.Controllers
             {
                 return BadRequest(ApiResponse<bool>.Error($"{ex.Message}"));
             }
-            catch (InvalidCourseException ex)
+            catch (InvalidEnrollmentException ex)
             {
                 return BadRequest(ApiResponse<bool>.Error($"{ex.Message}"));
             }
@@ -86,16 +85,16 @@ namespace ContosoUniversity.Api.Controllers
         }
 
         //[HttpPut]
-        //public async Task<IActionResult> PutStudentInfoAsync([FromBody] StudentInfo studentInfo)
+        //public async IActionResult PutStudent([FromBody] Student student)
         //{
-        //    if (studentInfo == null)
+        //    if (student == null)
         //    {
-        //        return BadRequest(ApiResponseOfBoolean.Error("Bad Request"));
+        //        return BadRequest(ApiResponse<bool>.Error("Bad Request"));
         //    }
 
         //    try
         //    {
-        //        var isStudentInfoExist = await _service.UpdateStudentInfoAsync(studentInfo);
+        //        var isStudentInfoExist = await _service.UpdateStudentInfoAsync(student);
 
         //        if (!isStudentInfoExist)
         //        {

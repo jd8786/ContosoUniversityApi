@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using AutoMapper;
 using ContosoUniversity.Api.Models;
 using ContosoUniversity.Data.EntityModels;
@@ -12,15 +11,15 @@ namespace ContosoUniversity.Api.Services
     {
         private readonly IStudentsRepository _studentsRepository;
 
-        private readonly ICoursesRepository _coursesRepository;
+        private readonly IEnrollmentsService _enrollmentsService;
 
         private readonly IMapper _mapper;
 
-        public StudentsesService(IStudentsRepository studentsRepository, ICoursesRepository coursesRepository, IMapper mapper)
+        public StudentsesService(IStudentsRepository studentsRepository, IEnrollmentsService enrollmentsService, IMapper mapper)
         {
             _studentsRepository = studentsRepository;
 
-            _coursesRepository = coursesRepository;
+            _enrollmentsService = enrollmentsService;
 
             _mapper = mapper;
         }
@@ -38,7 +37,7 @@ namespace ContosoUniversity.Api.Services
 
             if (studentEntity == null)
             {
-                throw new NotFoundException("Student was not found");
+                throw new NotFoundException($"Student with id {id} was not found");
             }
 
             return _mapper.Map<Student>(studentEntity);
@@ -53,26 +52,50 @@ namespace ContosoUniversity.Api.Services
 
             if (student.StudentId != 0)
             {
-                throw new InvalidStudentException("Student Id has to be 0");
-            }
-
-            if (student.Enrollments != null && student.Enrollments.Any())
-            {
-                throw new InvalidStudentException("Enrollment cannot be done before student is added");
+                throw new InvalidStudentException("Student Id must be 0");
             }
 
             var studentEntity = _mapper.Map<StudentEntity>(student);
 
+            studentEntity.Enrollments = null;
+
             _studentsRepository.Add(studentEntity);
 
             _studentsRepository.Save("Student");
+
+            if (student.Enrollments != null)
+            {
+               _enrollmentsService.AddRange(student.Enrollments);
+            }
 
             return Get(studentEntity.StudentId);
         }
 
         public Student Update(Student student)
         {
-            var studentEntity = _mapper.Map<StudentEntity>(student);
+            if (student == null)
+            {
+                throw new InvalidStudentException("Student must be provided");
+            }
+
+            if (student.StudentId == 0)
+            {
+                throw new InvalidStudentException("Student Id cannot be 0");
+            }
+
+            var existingStudent = Get(student.StudentId);
+
+            existingStudent.Enrollments = student.Enrollments;
+
+            existingStudent.EnrollmentDate = student.EnrollmentDate;
+
+            existingStudent.FirstMidName = student.FirstMidName;
+
+            existingStudent.LastName = student.LastName;
+
+            existingStudent.OriginCountry = student.OriginCountry;
+
+            var studentEntity = _mapper.Map<StudentEntity>(existingStudent);
 
             _studentsRepository.Update(studentEntity);
 

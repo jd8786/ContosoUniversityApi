@@ -1,4 +1,5 @@
-﻿using ContosoUniversity.Api.Models;
+﻿using System.Collections.Generic;
+using ContosoUniversity.Api.Models;
 
 namespace ContosoUniversity.Api.Services
 {
@@ -7,5 +8,9 @@ namespace ContosoUniversity.Api.Services
         Enrollment Get(int id);
 
         Enrollment Add(Enrollment enrollment);
+
+        IEnumerable<Enrollment> AddRange(IEnumerable<Enrollment> enrollments);
+
+        bool Remove(int enrollmentId);
     }
 }
