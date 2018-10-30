@@ -88,6 +88,10 @@ namespace ContosoUniversity.Api.Controllers
         }
 
         [HttpPut]
+        [ProducesResponseType(typeof(ApiResponse<Student>), 200)]
+        [ProducesResponseType(typeof(ApiResponse<bool>), 400)]
+        [ProducesResponseType(typeof(ApiResponse<bool>), 404)]
+        [ProducesResponseType(typeof(ApiResponse<bool>), 500)]
         public IActionResult PutStudent([FromBody] Student student)
         {
             try
@@ -115,6 +119,9 @@ namespace ContosoUniversity.Api.Controllers
         }
 
         [HttpDelete("{id}")]
+        [ProducesResponseType(typeof(ApiResponse<bool>), 200)]
+        [ProducesResponseType(typeof(ApiResponse<bool>), 404)]
+        [ProducesResponseType(typeof(ApiResponse<bool>), 500)]
         public IActionResult DeleteStudent(int id)
         {
             try
