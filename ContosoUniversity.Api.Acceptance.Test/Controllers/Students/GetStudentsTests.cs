@@ -1,47 +1,36 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
-using AutoMapper;
-using ContosoUniversity.Data;
+using ContosoUniversity.Api.Models;
 using FluentAssertions;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.InMemory.Storage.Internal;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
+using Newtonsoft.Json;
 using Xunit;
 
 namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
 {
-    public class GetStudentsTests: IClassFixture<WebApplicationFactory<Startup>>
+    public class GetStudentsTests: IClassFixture<CustomWebApplicationFactory<Startup>>
     {
         private readonly HttpClient _client;
 
-        public GetStudentsTests(WebApplicationFactory<Startup> factory)
+        public GetStudentsTests(CustomWebApplicationFactory<Startup> factory)
         {
-            _client = factory.WithWebHostBuilder(bulider => bulider.ConfigureServices(services => { // Create a new service provider.
-                var serviceProvider = new ServiceCollection()
-                    .AddEntityFrameworkInMemoryDatabase()
-                    .BuildServiceProvider();
-
-                // Add a database context (ApplicationDbContext) using an in-memory 
-                // database for testing.
-                services.AddDbContext<SchoolContext>(options =>
-                {
-                    options.UseInMemoryDatabase("InMemoryDbForTesting");
-                    options.UseInternalServiceProvider(serviceProvider);
-                });
-
-                // Build the service provider.
-                var sp = services.BuildServiceProvider();
-            })).CreateClient();
+            _client = factory.CreateDefaultClient();
         }
 
         [Fact]
         public async void ShouldReturnOkWhenRetrievingAllStudents()
         {
-            var response = await _client.GetAsync("api/students");
+            var apiResponse = await _client.GetAsync("api/students");
 
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            apiResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            var content = await apiResponse.Content.ReadAsStringAsync();
+
+            var apiResponseOfStudents = JsonConvert.DeserializeObject<ApiResponse<IEnumerable<Student>>>(content);
+
+            apiResponseOfStudents.Data.Count().Should().Be(8);
         }
     }
 }
