@@ -10,6 +10,7 @@ using Xunit;
 
 namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
 {
+    [Trait("Category", "Acceptance Test: Get Students")]
     public class GetStudentsTests: IClassFixture<CustomWebApplicationFactory<Startup>>
     {
         private readonly HttpClient _client;
