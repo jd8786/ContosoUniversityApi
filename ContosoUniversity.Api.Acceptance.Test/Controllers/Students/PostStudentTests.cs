@@ -1,37 +1,81 @@
-﻿using ContosoUniversity.Api.Models;
+﻿using AutoFixture;
+using ContosoUniversity.Api.Acceptance.Test.Fixtures;
+using ContosoUniversity.Api.Models;
 using FluentAssertions;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 using Xunit;
 
 namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
 {
-    [Trait("Category", "Acceptance Test: Get Student By Id")]
-    public class GetStudentByIdTests: IClassFixture<CustomWebApplicationFactory<Startup>>
+    [Trait("Category", "Acceptance Test: Post Student")]
+    public class PostStudentTests : IClassFixture<AcceptanceTestFixture>
     {
-        private readonly HttpClient _client;
+        private readonly AcceptanceTestFixture _fixture;
 
-        public GetStudentByIdTests(CustomWebApplicationFactory<Startup> factory)
+        private readonly Fixture _autoFixture;
+
+        public PostStudentTests(AcceptanceTestFixture fixture)
         {
-            _client = factory.CreateDefaultClient();
+            _fixture = fixture;
+            _fixture.ResetDatabase();
+            _autoFixture = new Fixture();
         }
 
         [Fact]
-        public async void ShouldReturnOkWhenRetrievingStudentById()
+        public async void ShouldReturnOkWhenPostStudentWithoutCourseSelected()
         {
-            var apiResponse = await _client.GetAsync("api/students/3");
+            var student = _autoFixture.Build<Student>()
+                .With(s => s.LastName, "some-last-name")
+                .With(s => s.FirstMidName, "some-first-mid-name")
+                .With(s => s.OriginCountry, "some-origin-country")
+                .Without(s => s.Enrollments)
+                .Without(s => s.StudentId)
+                .Create();
+
+            var studentJson = JsonConvert.SerializeObject(student);
+
+            var content = new StringContent(studentJson, Encoding.UTF8, "application/json");
+
+            var apiResponse = await _fixture.HttpClient.PostAsync("api/students", content);
 
             apiResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var content = await apiResponse.Content.ReadAsStringAsync();
+            var dbContext = _fixture.SchoolContext;
 
-            var responseOfStudent = JsonConvert.DeserializeObject<ApiResponse<Student>>(content);
+            var dbStudent = dbContext.Students.First(s => s.LastName == "some-last-name");
 
-            responseOfStudent.Data.StudentId.Should().Be(3);
-            responseOfStudent.Data.LastName.Should().Be("Anand");
-            responseOfStudent.Data.FirstMidName.Should().Be("Arturo");
-            responseOfStudent.Data.OriginCountry.Should().Be("TURKEY");
+            dbContext.Enrollments.Any(e => e.StudentId == dbStudent.StudentId).Should().BeFalse();
+        }
+
+        [Fact]
+        public async void ShouldReturnOkWhenPostStudentWithCoursesSelected()
+        {
+            var student = _autoFixture.Build<Student>()
+                .With(s => s.LastName, "some-last-name")
+                .With(s => s.FirstMidName, "some-first-mid-name")
+                .With(s => s.OriginCountry, "some-origin-country")
+                .With(s => s.Enrollments, new List<Enrollment> { new Enrollment { CourseId = 1050 }, new Enrollment { CourseId = 4022 } })
+                .Without(s => s.StudentId)
+                .Create();
+
+            var studentJson = JsonConvert.SerializeObject(student);
+
+            var content = new StringContent(studentJson, Encoding.UTF8, "application/json");
+
+            var apiResponse = await _fixture.HttpClient.PostAsync("api/students", content);
+
+            apiResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            var dbContext = _fixture.SchoolContext;
+
+            var dbStudent = dbContext.Students.First(s => s.LastName == "some-last-name");
+
+            dbContext.Enrollments.Count(e => e.StudentId == dbStudent.StudentId).Should().Be(2);
         }
     }
 }

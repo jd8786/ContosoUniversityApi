@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using ContosoUniversity.Api.Models;
@@ -14,11 +15,15 @@ namespace ContosoUniversity.Api.Services
 
         private readonly IEnrollmentsService _enrollmentsService;
 
+        private readonly ICoursesRepository _coursesRepository;
+
         private readonly IMapper _mapper;
 
-        public StudentsesService(IStudentsRepository studentsRepository, IEnrollmentsService enrollmentsService, IMapper mapper)
+        public StudentsesService(IStudentsRepository studentsRepository, IEnrollmentsService enrollmentsService, ICoursesRepository coursesRepository, IMapper mapper)
         {
             _studentsRepository = studentsRepository;
+
+            _coursesRepository = coursesRepository;
 
             _enrollmentsService = enrollmentsService;
 
@@ -58,16 +63,24 @@ namespace ContosoUniversity.Api.Services
 
             var studentEntity = _mapper.Map<StudentEntity>(student);
 
-            studentEntity.Enrollments = null;
+            var courseIds = studentEntity.Enrollments.Select(e => e.CourseId).ToList();
+
+            if (courseIds.Any())
+            {
+                foreach (var courseId in courseIds)
+                {
+                    var courseEntity = _coursesRepository.Get(courseId);
+
+                    if (courseEntity == null)
+                    {
+                        throw new NotFoundException($"Course provided with Id {courseId} doesnot exist in the database");
+                    }
+                }
+            }
 
             _studentsRepository.Add(studentEntity);
 
             _studentsRepository.Save("Student");
-
-            if (student.Enrollments != null)
-            {
-               _enrollmentsService.AddRange(student.Enrollments);
-            }
 
             return Get(studentEntity.StudentId);
         }

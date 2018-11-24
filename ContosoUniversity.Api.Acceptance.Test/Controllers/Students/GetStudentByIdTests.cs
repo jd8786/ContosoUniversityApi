@@ -1,26 +1,26 @@
-﻿using ContosoUniversity.Api.Models;
+﻿using ContosoUniversity.Api.Acceptance.Test.Fixtures;
+using ContosoUniversity.Api.Models;
 using FluentAssertions;
 using Newtonsoft.Json;
 using System.Net;
-using System.Net.Http;
 using Xunit;
 
 namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
 {
     [Trait("Category", "Acceptance Test: Get Student By Id")]
-    public class GetStudentByIdTests: IClassFixture<CustomWebApplicationFactory<Startup>>
+    public class GetStudentByIdTests: IClassFixture<AcceptanceTestFixture>
     {
-        private readonly HttpClient _client;
+        private readonly AcceptanceTestFixture _fixture;
 
-        public GetStudentByIdTests(CustomWebApplicationFactory<Startup> factory)
+        public GetStudentByIdTests(AcceptanceTestFixture fixture)
         {
-            _client = factory.CreateDefaultClient();
+            _fixture = fixture;
         }
 
         [Fact]
         public async void ShouldReturnOkWhenRetrievingStudentById()
         {
-            var apiResponse = await _client.GetAsync("api/students/3");
+            var apiResponse = await _fixture.HttpClient.GetAsync("api/students/3");
 
             apiResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 

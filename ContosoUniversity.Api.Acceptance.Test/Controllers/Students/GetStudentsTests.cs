@@ -1,29 +1,28 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
+﻿using ContosoUniversity.Api.Acceptance.Test.Fixtures;
 using ContosoUniversity.Api.Models;
 using FluentAssertions;
-using Microsoft.Extensions.Localization;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using Xunit;
 
 namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
 {
     [Trait("Category", "Acceptance Test: Get Students")]
-    public class GetStudentsTests: IClassFixture<CustomWebApplicationFactory<Startup>>
+    public class GetStudentsTests: IClassFixture<AcceptanceTestFixture>
     {
-        private readonly HttpClient _client;
+        private readonly AcceptanceTestFixture _fixture;
 
-        public GetStudentsTests(CustomWebApplicationFactory<Startup> factory)
+        public GetStudentsTests(AcceptanceTestFixture fixture)
         {
-            _client = factory.CreateDefaultClient();
+            _fixture = fixture;
         }
 
         [Fact]
         public async void ShouldReturnOkWhenRetrievingAllStudents()
         {
-            var apiResponse = await _client.GetAsync("api/students");
+            var apiResponse = await _fixture.HttpClient.GetAsync("api/students");
 
             apiResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
