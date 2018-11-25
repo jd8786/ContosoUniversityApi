@@ -9,14 +9,16 @@ using Xunit;
 
 namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
 {
+    [Collection("Sequential")]
     [Trait("Category", "Acceptance Test: Get Students")]
-    public class GetStudentsTests: IClassFixture<AcceptanceTestFixture>
+    public class GetStudentsTests
     {
         private readonly AcceptanceTestFixture _fixture;
 
         public GetStudentsTests(AcceptanceTestFixture fixture)
         {
             _fixture = fixture;
+            _fixture.ResetDatabase();
         }
 
         [Fact]
@@ -30,7 +32,7 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
 
             var apiResponseOfStudents = JsonConvert.DeserializeObject<ApiResponse<IEnumerable<Student>>>(content);
 
-            apiResponseOfStudents.Data.Count().Should().Be(8);
+            apiResponseOfStudents.Data.Count().Should().Be(2);
         }
     }
 }

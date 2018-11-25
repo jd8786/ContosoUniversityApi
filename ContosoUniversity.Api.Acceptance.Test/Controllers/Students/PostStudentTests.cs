@@ -12,8 +12,9 @@ using Xunit;
 
 namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
 {
+    [Collection("Sequential")]
     [Trait("Category", "Acceptance Test: Post Student")]
-    public class PostStudentTests : IClassFixture<AcceptanceTestFixture>
+    public class PostStudentTests
     {
         private readonly AcceptanceTestFixture _fixture;
 

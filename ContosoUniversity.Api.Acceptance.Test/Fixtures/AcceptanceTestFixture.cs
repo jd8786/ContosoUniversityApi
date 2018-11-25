@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using ContosoUniversity.Data;
+﻿using ContosoUniversity.Data;
+using ContosoUniversity.Data.EntityModels;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
-using ContosoUniversity.Data.EntityModels;
-using Microsoft.EntityFrameworkCore;
 
 namespace ContosoUniversity.Api.Acceptance.Test.Fixtures
 {
-    public class AcceptanceTestFixture
+    public class AcceptanceTestFixture: IDisposable
     {
         public readonly WebApplicationFactory<Startup> Factory;
 
@@ -112,7 +111,7 @@ namespace ContosoUniversity.Api.Acceptance.Test.Fixtures
                     },
                 };
 
-                context.Instructors.AddRange(instructors);
+                context.Departments.AddRange(departments);
 
                 var courses = new List<CourseEntity>
                 {
@@ -148,7 +147,7 @@ namespace ContosoUniversity.Api.Acceptance.Test.Fixtures
                     }
                 };
 
-                context.AddRange(officeAssignments);
+                context.OfficeAssignments.AddRange(officeAssignments);
 
                 var courseInstructors = new List<CourseAssignmentEntity>
                 {
@@ -186,6 +185,13 @@ namespace ContosoUniversity.Api.Acceptance.Test.Fixtures
 
                 context.SaveChanges();
             }
+        }
+
+        public void Dispose()
+        {
+            SchoolContext?.Dispose();
+            HttpClient?.Dispose();
+            Factory?.Dispose();
         }
     }
 }

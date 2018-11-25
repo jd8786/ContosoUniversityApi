@@ -1,4 +1,5 @@
-﻿using ContosoUniversity.Api.Acceptance.Test.Fixtures;
+﻿using System.Linq;
+using ContosoUniversity.Api.Acceptance.Test.Fixtures;
 using ContosoUniversity.Api.Models;
 using FluentAssertions;
 using Newtonsoft.Json;
@@ -7,20 +8,26 @@ using Xunit;
 
 namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
 {
+    [Collection("Sequential")]
     [Trait("Category", "Acceptance Test: Get Student By Id")]
-    public class GetStudentByIdTests: IClassFixture<AcceptanceTestFixture>
+    public class GetStudentByIdTests
     {
         private readonly AcceptanceTestFixture _fixture;
 
         public GetStudentByIdTests(AcceptanceTestFixture fixture)
         {
             _fixture = fixture;
+            _fixture.ResetDatabase();
         }
 
         [Fact]
         public async void ShouldReturnOkWhenRetrievingStudentById()
         {
-            var apiResponse = await _fixture.HttpClient.GetAsync("api/students/3");
+            var student = _fixture.SchoolContext.Students.First(s => s.LastName == "test-last-name1");
+
+            var studentId = student.StudentId;
+
+            var apiResponse = await _fixture.HttpClient.GetAsync($"api/students/{studentId}");
 
             apiResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
@@ -28,10 +35,10 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
 
             var responseOfStudent = JsonConvert.DeserializeObject<ApiResponse<Student>>(content);
 
-            responseOfStudent.Data.StudentId.Should().Be(3);
-            responseOfStudent.Data.LastName.Should().Be("Anand");
-            responseOfStudent.Data.FirstMidName.Should().Be("Arturo");
-            responseOfStudent.Data.OriginCountry.Should().Be("TURKEY");
+            responseOfStudent.Data.StudentId.Should().Be(studentId);
+            responseOfStudent.Data.LastName.Should().Be("test-last-name1");
+            responseOfStudent.Data.FirstMidName.Should().Be("test-first-mid-name1");
+            responseOfStudent.Data.OriginCountry.Should().Be("test-country1");
         }
     }
 }
