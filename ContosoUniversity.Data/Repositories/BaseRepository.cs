@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using ContosoUniversity.Data.Exceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace ContosoUniversity.Data.Repositories
 {
@@ -17,7 +18,11 @@ namespace ContosoUniversity.Data.Repositories
 
         public T Get(int id)
         {
-            return _context.Set<T>().Find(id);
+            var entity = _context.Set<T>().Find(id);
+
+            _context.Entry(entity).State = EntityState.Detached;
+
+            return entity;
         }
 
         public IEnumerable<T> GetAll()

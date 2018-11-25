@@ -189,6 +189,7 @@ namespace ContosoUniversity.Api.Acceptance.Test.Fixtures
 
         public void Dispose()
         {
+            CleanDatabase();
             SchoolContext?.Dispose();
             HttpClient?.Dispose();
             Factory?.Dispose();
