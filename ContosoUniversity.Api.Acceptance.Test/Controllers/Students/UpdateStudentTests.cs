@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using FluentAssertions.Common;
 using Xunit;
 
 namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
@@ -27,7 +28,7 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
         }
 
         [Fact]
-        public async void ShouldReturnOkWhenUpdateStudent()
+        public async void ShouldReturnOkWhenUpdateStudentWithoutSelectedCourses()
         {
             var existingStudent = _fixture.SchoolContext.Students.First(s => s.LastName == "test-last-name1");
 
@@ -56,6 +57,8 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
             dbStudent.LastName.Should().Be("some-last-name");
             dbStudent.FirstMidName.Should().Be("some-first-mid-name");
             dbStudent.OriginCountry.Should().Be("some-origin-country");
+            dbStudent.Enrollments.Count.Should().Be(0);
+            //dbStudent.Enrollments.Count(x => existingStudent.Enrollments.Select(e => e.CourseId).Contains(x.CourseId)).Should().Be(1);
         }
     }
 }

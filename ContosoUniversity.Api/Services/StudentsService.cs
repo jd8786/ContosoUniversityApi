@@ -97,11 +97,18 @@ namespace ContosoUniversity.Api.Services
                 throw new InvalidStudentException("Student Id cannot be 0");
             }
 
-            //student.Enrollments?.ToList().ForEach(e => ((EnrollmentsService) _enrollmentsService).ValidateEnrollment(e));
-
             var existingStudent = Get(student.StudentId);
 
-            existingStudent.Enrollments = student.Enrollments;
+            student.Enrollments = student.Enrollments ?? new List<Enrollment>();
+
+            if (!Equals(existingStudent.Enrollments, student.Enrollments))
+            {
+                var existingEnrollments = _enrollmentsService.FindByStudentId(student.StudentId);
+
+                _enrollmentsService.RemoveRange(existingEnrollments);
+
+                _enrollmentsService.AddRange(student.Enrollments);
+            }
 
             existingStudent.EnrollmentDate = student.EnrollmentDate;
 

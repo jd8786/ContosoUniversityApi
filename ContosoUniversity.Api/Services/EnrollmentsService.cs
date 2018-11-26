@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using AutoMapper;
+﻿using AutoMapper;
 using ContosoUniversity.Api.Models;
 using ContosoUniversity.Data.EntityModels;
 using ContosoUniversity.Data.Exceptions;
 using ContosoUniversity.Data.Repositories;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ContosoUniversity.Api.Services
 {
@@ -41,6 +41,15 @@ namespace ContosoUniversity.Api.Services
             return _mapper.Map<Enrollment>(enrollmentEntity);
         }
 
+        public IEnumerable<Enrollment> FindByStudentId(int studentId)
+        {
+            var enrollmentEntities = _enrollmentsRepository.Find(e => e.StudentId == studentId);
+
+            var enrollments = _mapper.Map<IEnumerable<Enrollment>>(enrollmentEntities);
+
+            return enrollments;
+        }
+
         public Enrollment Add(Enrollment enrollment)
         {
             ValidateEnrollment(enrollment);
@@ -61,48 +70,26 @@ namespace ContosoUniversity.Api.Services
                 throw new InvalidEnrollmentException("Enrollments must be provided");
             }
 
-            var validEnrollments = new List<Enrollment>();
-
-            var exceptions = new List<InvalidEnrollmentException>();
-
             foreach (var enrollment in enrollments)
             {
-                try
-                {
-                    ValidateEnrollment(enrollment);
-
-                    validEnrollments.Add(enrollment);
-                }
-                catch (InvalidEnrollmentException ex)
-                {
-                    exceptions.Add(ex);
-                }
+                ValidateEnrollment(enrollment);
             }
 
-            var validEnrollmentEnitities = new List<EnrollmentEntity>();
+            var enrollmentEnitities = _mapper.Map<IEnumerable<EnrollmentEntity>>(enrollments).ToList();
 
-            if (validEnrollments.Any())
+            if (enrollmentEnitities.Any())
             {
-                validEnrollmentEnitities = _mapper.Map<IEnumerable<EnrollmentEntity>>(validEnrollments).ToList();
-
-                _enrollmentsRepository.AddRange(validEnrollmentEnitities);
+                _enrollmentsRepository.AddRange(enrollmentEnitities);
 
                 _enrollmentsRepository.Save("Enrollments");
             }
 
-            if (exceptions.Any())
-            {
-                ThrowExceptionWithNewMessage(validEnrollmentEnitities, exceptions);
-            }
-
-            return _mapper.Map<IEnumerable<Enrollment>>(validEnrollmentEnitities);
+            return _mapper.Map<IEnumerable<Enrollment>>(enrollmentEnitities);
         }
 
         public bool Remove(int enrollmentId)
         {
             var enrollment = Get(enrollmentId);
-
-            ValidateEnrollment(enrollment);
 
             var enrollmentEntity = _mapper.Map<EnrollmentEntity>(enrollment);
 
@@ -113,24 +100,15 @@ namespace ContosoUniversity.Api.Services
             return true;
         }
 
-        private static void ThrowExceptionWithNewMessage(List<EnrollmentEntity> validEnrollmentEnitities, List<InvalidEnrollmentException> exceptions)
+        public bool RemoveRange(IEnumerable<Enrollment> enrollments)
         {
-            var idMessage = string.Empty;
+            var enrollmentEntities = _mapper.Map<IEnumerable<EnrollmentEntity>>(enrollments);
 
-            if (validEnrollmentEnitities.Any())
-            {
-                var enrollmentIds = validEnrollmentEnitities.Select(ve => ve.EnrollmentId).ToList();
+            _enrollmentsRepository.RemoveRange(enrollmentEntities);
 
-                idMessage = enrollmentIds.Any()
-                    ? $"; enrollment(s) with id {string.Join(",", enrollmentIds)} was(were) saved to database"
-                    : string.Empty;
-            }
+            _enrollmentsRepository.Save("Enrollments");
 
-            var exceptionMessages = exceptions.Select(e => e.Message);
-
-            var joinedExceptionMessage = string.Join(",", exceptionMessages);
-
-            throw new InvalidEnrollmentException($"{joinedExceptionMessage}{idMessage}");
+            return true;
         }
 
         public void ValidateEnrollment(Enrollment enrollment)

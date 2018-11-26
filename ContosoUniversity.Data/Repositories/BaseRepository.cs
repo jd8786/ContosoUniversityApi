@@ -9,62 +9,62 @@ namespace ContosoUniversity.Data.Repositories
 {
     public class BaseRepository<T> : IBaseRepository<T> where T : class
     {
-        protected readonly SchoolContext _context;
+        protected readonly SchoolContext Context;
 
         public BaseRepository(SchoolContext context)
         {
-            _context = context;
+            Context = context;
         }
 
         public T Get(int id)
         {
-            var entity = _context.Set<T>().Find(id);
+            var entity = Context.Set<T>().Find(id);
 
-            _context.Entry(entity).State = EntityState.Detached;
+            Context.Entry(entity).State = EntityState.Detached;
 
             return entity;
         }
 
         public IEnumerable<T> GetAll()
         {
-            return _context.Set<T>().ToList();
+            return Context.Set<T>().ToList();
         }
 
         public IEnumerable<T> Find(Expression<Func<T, bool>> predicate)
         {
-            return _context.Set<T>().Where(predicate).ToList();
+            return Context.Set<T>().Where(predicate).AsNoTracking().ToList();
         }
 
         public void Remove(T entity)
         {
-            _context.Set<T>().Remove(entity);
+            Context.Set<T>().Remove(entity);
         }
 
         public void RemoveRange(IEnumerable<T> entities)
         {
-            _context.Set<T>().RemoveRange(entities);
+            Context.Set<T>().RemoveRange(entities);
         }
 
         public void Add(T entity)
         {
-            _context.Add(entity);
+            Context.Add(entity);
         }
 
         public void AddRange(IEnumerable<T> entities)
         {
-            _context.AddRange(entities);
+            Context.AddRange(entities);
         }
 
         public void Update(T entity)
         {
-            _context.Update(entity);
+            Context.Update(entity);
         }
 
         public void Save(string entityName)
         {
             try
             {
-                _context.SaveChanges();
+                Context.SaveChanges();
             }
             catch(Exception ex)
             {
