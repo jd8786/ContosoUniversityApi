@@ -35,7 +35,7 @@ namespace ContosoUniversity.Api
 
             services.AddDbContext<SchoolContext>(options => options
                 .UseLazyLoadingProxies()
-                .UseSqlServer(schoolDbConnectionString));
+                .UseSqlServer(schoolDbConnectionString), ServiceLifetime.Transient);
 
             services.AddScoped<IStudentsRepository, StudentsRepository>();
 

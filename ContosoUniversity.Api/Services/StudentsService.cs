@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using AutoMapper;
+﻿using AutoMapper;
 using ContosoUniversity.Api.Models;
 using ContosoUniversity.Data.EntityModels;
 using ContosoUniversity.Data.Exceptions;
 using ContosoUniversity.Data.Repositories;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ContosoUniversity.Api.Services
 {
@@ -119,6 +118,8 @@ namespace ContosoUniversity.Api.Services
             existingStudent.OriginCountry = student.OriginCountry;
 
             var studentEntity = _mapper.Map<StudentEntity>(existingStudent);
+
+            studentEntity.Enrollments = null;
 
             _studentsRepository.Update(studentEntity);
 

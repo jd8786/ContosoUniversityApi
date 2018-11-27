@@ -165,7 +165,7 @@ namespace ContosoUniversity.Api.Acceptance.Test.Fixtures
 
                 context.CourseAssignments.AddRange(courseInstructors);
 
-                var enrollments = new EnrollmentEntity[]
+                var enrollments = new List<EnrollmentEntity>
                 {
                     new EnrollmentEntity
                     {

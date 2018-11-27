@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using ContosoUniversity.Data.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace ContosoUniversity.Data.Repositories
 {
@@ -18,21 +19,17 @@ namespace ContosoUniversity.Data.Repositories
 
         public T Get(int id)
         {
-            var entity = Context.Set<T>().Find(id);
-
-            Context.Entry(entity).State = EntityState.Detached;
-
-            return entity;
+            return Context.Set<T>().Find(id);
         }
 
         public IEnumerable<T> GetAll()
         {
-            return Context.Set<T>().ToList();
+            return Context.Set<T>().AsNoTracking().ToList();
         }
 
         public IEnumerable<T> Find(Expression<Func<T, bool>> predicate)
         {
-            return Context.Set<T>().Where(predicate).AsNoTracking().ToList();
+            return Context.Set<T>().AsNoTracking().Where(predicate).ToList();
         }
 
         public void Remove(T entity)
