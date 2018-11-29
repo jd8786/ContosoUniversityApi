@@ -5,6 +5,7 @@ using ContosoUniversity.Data.Exceptions;
 using ContosoUniversity.Data.Repositories;
 using System.Collections.Generic;
 using System.Linq;
+using ContosoUniversity.Api.Validators;
 
 namespace ContosoUniversity.Api.Services
 {
@@ -12,19 +13,19 @@ namespace ContosoUniversity.Api.Services
     {
         private readonly IEnrollmentsRepository _enrollmentsRepository;
 
-        private readonly IStudentsRepository _studentsRepository;
-
         private readonly ICoursesRepository _coursesRepository;
+
+        private readonly IEnrollmentValidator _enrollmentValidator;
 
         private readonly IMapper _mapper;
 
-        public EnrollmentsService(IEnrollmentsRepository enrollmentsRepository, IStudentsRepository studentsRepository, ICoursesRepository coursesRepository, IMapper mapper)
+        public EnrollmentsService(IEnrollmentsRepository enrollmentsRepository, ICoursesRepository coursesRepository, IEnrollmentValidator enrollmentValidator, IMapper mapper)
         {
             _enrollmentsRepository = enrollmentsRepository;
 
-            _studentsRepository = studentsRepository;
-
             _coursesRepository = coursesRepository;
+
+            _enrollmentValidator = enrollmentValidator;
 
             _mapper = mapper;
         }
@@ -43,7 +44,7 @@ namespace ContosoUniversity.Api.Services
 
         public Enrollment Add(Enrollment enrollment)
         {
-            ValidateEnrollment(enrollment);
+            _enrollmentValidator.ValidatePostEnrollment(enrollment);
 
             var enrollmentEntity = _mapper.Map<EnrollmentEntity>(enrollment);
 
@@ -63,7 +64,7 @@ namespace ContosoUniversity.Api.Services
 
             foreach (var enrollment in enrollments)
             {
-                ValidateEnrollment(enrollment);
+                _enrollmentValidator.ValidatePostEnrollment(enrollment);
             }
 
             var enrollmentEnitities = _mapper.Map<IEnumerable<EnrollmentEntity>>(enrollments).ToList();
@@ -137,52 +138,6 @@ namespace ContosoUniversity.Api.Services
             _enrollmentsRepository.Save("Enrollments");
 
             return true;
-        }
-
-        public void ValidateEnrollment(Enrollment enrollment)
-        {
-            if (enrollment == null)
-            {
-                throw new InvalidEnrollmentException("Enrollment must be provided");
-            }
-
-            if (enrollment.EnrollmentId != 0)
-            {
-                throw new InvalidEnrollmentException("Enrollment Id must be 0");
-            }
-
-            if (enrollment.StudentId == 0 || enrollment.CourseId == 0)
-            {
-                throw new InvalidEnrollmentException("Student and course must be provided");
-            }
-
-            ValidateStudent(enrollment);
-
-            ValidateCourse(enrollment);
-        }
-
-        private void ValidateStudent(Enrollment enrollment)
-        {
-            var students = _studentsRepository.GetAll().ToList();
-
-            var isStudentExisting = students.Any(s => s.StudentId == enrollment.StudentId);
-
-            if (!isStudentExisting)
-            {
-                throw new InvalidEnrollmentException($"Student provided with Id {enrollment.StudentId} doesnot exist in the database");
-            }
-        }
-
-        private void ValidateCourse(Enrollment enrollment)
-        {
-            var courses = _coursesRepository.GetAll().ToList();
-
-            var isCourseExisting = courses.Any(c => c.CourseId == enrollment.CourseId);
-
-            if (!isCourseExisting)
-            {
-                throw new InvalidEnrollmentException($"Course provided with id {enrollment.CourseId} doesnot exist in the database");
-            }
         }
     }
 }

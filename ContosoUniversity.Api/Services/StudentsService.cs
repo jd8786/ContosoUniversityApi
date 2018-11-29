@@ -1,12 +1,12 @@
-﻿using System.Collections;
-using AutoMapper;
+﻿using AutoMapper;
+using Castle.Core.Internal;
 using ContosoUniversity.Api.Models;
 using ContosoUniversity.Data.EntityModels;
 using ContosoUniversity.Data.Exceptions;
 using ContosoUniversity.Data.Repositories;
 using System.Collections.Generic;
 using System.Linq;
-using Castle.Core.Internal;
+using ContosoUniversity.Api.Validators;
 
 namespace ContosoUniversity.Api.Services
 {
@@ -16,17 +16,17 @@ namespace ContosoUniversity.Api.Services
 
         private readonly IEnrollmentsService _enrollmentsService;
 
-        private readonly ICoursesRepository _coursesRepository;
+        private readonly ICourseValidator _courseValidator;
 
         private readonly IMapper _mapper;
 
-        public StudentsesService(IStudentsRepository studentsRepository, IEnrollmentsService enrollmentsService, ICoursesRepository coursesRepository, IMapper mapper)
+        public StudentsesService(IStudentsRepository studentsRepository, IEnrollmentsService enrollmentsService, ICourseValidator courseValidator, IMapper mapper)
         {
             _studentsRepository = studentsRepository;
 
-            _coursesRepository = coursesRepository;
-
             _enrollmentsService = enrollmentsService;
+
+            _courseValidator = courseValidator;
 
             _mapper = mapper;
         }
@@ -66,7 +66,10 @@ namespace ContosoUniversity.Api.Services
 
             var courseIds = studentEntity.Enrollments.Select(e => e.CourseId).ToList();
 
-            courseIds.ForEach(ValidateCourse);
+            if (courseIds.Any())
+            {
+                courseIds.ForEach(_courseValidator.Validate);
+            }
 
             _studentsRepository.Add(studentEntity);
 
@@ -93,7 +96,7 @@ namespace ContosoUniversity.Api.Services
 
             if (!student.Enrollments.IsNullOrEmpty())
             {
-                student.Enrollments.ToList().ForEach(e => ValidateCourse(e.CourseId));
+                student.Enrollments.ToList().ForEach(e => _courseValidator.Validate(e.CourseId));
 
                 courseIds = student.Enrollments.Select(e => e.CourseId).ToList();
             }
@@ -128,18 +131,6 @@ namespace ContosoUniversity.Api.Services
             _studentsRepository.Save("Student");
 
             return true;
-        }
-
-        private void ValidateCourse(int courseId)
-        {
-            var courses = _coursesRepository.GetAll().ToList();
-
-            var isCourseExisting = courses.Any(c => c.CourseId == courseId);
-
-            if (!isCourseExisting)
-            {
-                throw new InvalidCourseException($"Course provided with id {courseId} doesnot exist in the database");
-            }
         }
     }
 }

@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
 using AutoMapper;
 using ContosoUniversity.Api.Services;
+using ContosoUniversity.Api.Validators;
 
 namespace ContosoUniversity.Api
 {
@@ -46,6 +47,12 @@ namespace ContosoUniversity.Api
             services.AddScoped<IStudentsService, StudentsesService>();
 
             services.AddScoped<IEnrollmentsService, EnrollmentsService>();
+
+            services.AddSingleton<ICourseValidator>();
+
+            services.AddSingleton<IStudentValidator>();
+
+            services.AddSingleton<IEnrollmentValidator>();
 
             services.AddSwaggerGen(o =>
             {
