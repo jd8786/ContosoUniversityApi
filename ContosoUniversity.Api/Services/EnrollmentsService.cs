@@ -41,15 +41,6 @@ namespace ContosoUniversity.Api.Services
             return _mapper.Map<Enrollment>(enrollmentEntity);
         }
 
-        public IEnumerable<Enrollment> FindByStudentId(int studentId)
-        {
-            var enrollmentEntities = _enrollmentsRepository.Find(e => e.StudentId == studentId);
-
-            var enrollments = _mapper.Map<IEnumerable<Enrollment>>(enrollmentEntities);
-
-            return enrollments;
-        }
-
         public Enrollment Add(Enrollment enrollment)
         {
             ValidateEnrollment(enrollment);
@@ -77,14 +68,51 @@ namespace ContosoUniversity.Api.Services
 
             var enrollmentEnitities = _mapper.Map<IEnumerable<EnrollmentEntity>>(enrollments).ToList();
 
-            if (enrollmentEnitities.Any())
-            {
-                _enrollmentsRepository.AddRange(enrollmentEnitities);
+            if (!enrollmentEnitities.Any()) return _mapper.Map<IEnumerable<Enrollment>>(enrollmentEnitities);
 
-                _enrollmentsRepository.Save("Enrollments");
-            }
+            _enrollmentsRepository.AddRange(enrollmentEnitities);
+
+            _enrollmentsRepository.Save("Enrollments");
 
             return _mapper.Map<IEnumerable<Enrollment>>(enrollmentEnitities);
+        }
+
+        public IEnumerable<Enrollment> Update(int studentId, List<int> courseIds)
+        {
+            var newCourseIds = courseIds ?? new List<int>();
+
+            var existingCourseIds = _enrollmentsRepository.Find(e => e.StudentId == studentId)
+                .Select(x => x.CourseId).ToList();
+
+            var dbCourseIds = _coursesRepository.GetAll().Select(c => c.CourseId);
+
+            foreach (var dbCourseId in dbCourseIds)
+            {
+                if (newCourseIds.Contains(dbCourseId))
+                {
+                    if (existingCourseIds.Contains(dbCourseId)) continue;
+
+                    var newEnrollment = new EnrollmentEntity
+                    {
+                        CourseId = dbCourseId,
+                        StudentId = studentId
+                    };
+
+                    _enrollmentsRepository.Add(newEnrollment);
+                }
+                else
+                {
+                    if (!existingCourseIds.Contains(dbCourseId)) continue;
+
+                    var removedEnrollment = _enrollmentsRepository.Find(e => e.CourseId == dbCourseId && e.StudentId == studentId).First();
+
+                    _enrollmentsRepository.Remove(removedEnrollment);
+                }
+            }
+
+            _enrollmentsRepository.Save("Enrollments");
+
+            return _mapper.Map<IEnumerable<Enrollment>>(_enrollmentsRepository.Find(e => e.StudentId == studentId));
         }
 
         public bool Remove(int enrollmentId)
@@ -158,3 +186,4 @@ namespace ContosoUniversity.Api.Services
         }
     }
 }
+

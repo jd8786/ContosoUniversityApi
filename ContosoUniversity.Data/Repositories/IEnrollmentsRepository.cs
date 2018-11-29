@@ -1,4 +1,5 @@
-﻿using ContosoUniversity.Data.EntityModels;
+﻿using System.Collections.Generic;
+using ContosoUniversity.Data.EntityModels;
 
 namespace ContosoUniversity.Data.Repositories
 {

@@ -7,11 +7,11 @@ namespace ContosoUniversity.Api.Services
     {
         Enrollment Get(int id);
 
-        IEnumerable<Enrollment> FindByStudentId(int studentId);
-
         Enrollment Add(Enrollment enrollment);
 
         IEnumerable<Enrollment> AddRange(IEnumerable<Enrollment> enrollments);
+
+        IEnumerable<Enrollment> Update(int studentId, List<int> courseIds);
 
         bool Remove(int enrollmentId);
 

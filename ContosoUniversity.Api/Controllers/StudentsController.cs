@@ -65,7 +65,7 @@ namespace ContosoUniversity.Api.Controllers
         [ProducesResponseType(typeof(ApiResponse<Student>), 200)]
         [ProducesResponseType(typeof(ApiResponse<bool>), 400)]
         [ProducesResponseType(typeof(ApiResponse<bool>), 500)]
-        public IActionResult PostStudent([FromBody] Student student)
+        public IActionResult PostStudent([FromBody] Student student, [FromBody]List<string> courses)
         {
             try
             {

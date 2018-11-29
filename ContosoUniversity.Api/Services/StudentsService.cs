@@ -1,10 +1,12 @@
-﻿using AutoMapper;
+﻿using System.Collections;
+using AutoMapper;
 using ContosoUniversity.Api.Models;
 using ContosoUniversity.Data.EntityModels;
 using ContosoUniversity.Data.Exceptions;
 using ContosoUniversity.Data.Repositories;
 using System.Collections.Generic;
 using System.Linq;
+using Castle.Core.Internal;
 
 namespace ContosoUniversity.Api.Services
 {
@@ -64,18 +66,7 @@ namespace ContosoUniversity.Api.Services
 
             var courseIds = studentEntity.Enrollments.Select(e => e.CourseId).ToList();
 
-            if (courseIds.Any())
-            {
-                foreach (var courseId in courseIds)
-                {
-                    var courseEntity = _coursesRepository.Get(courseId);
-
-                    if (courseEntity == null)
-                    {
-                        throw new NotFoundException($"Course provided with Id {courseId} doesnot exist in the database");
-                    }
-                }
-            }
+            courseIds.ForEach(ValidateCourse);
 
             _studentsRepository.Add(studentEntity);
 
@@ -98,16 +89,16 @@ namespace ContosoUniversity.Api.Services
 
             var existingStudent = Get(student.StudentId);
 
-            student.Enrollments = student.Enrollments ?? new List<Enrollment>();
+            var courseIds = new List<int>();
 
-            if (!Equals(existingStudent.Enrollments, student.Enrollments))
+            if (!student.Enrollments.IsNullOrEmpty())
             {
-                var existingEnrollments = _enrollmentsService.FindByStudentId(student.StudentId);
+                student.Enrollments.ToList().ForEach(e => ValidateCourse(e.CourseId));
 
-                _enrollmentsService.RemoveRange(existingEnrollments);
-
-                _enrollmentsService.AddRange(student.Enrollments);
+                courseIds = student.Enrollments.Select(e => e.CourseId).ToList();
             }
+
+            _enrollmentsService.Update(student.StudentId, courseIds);
 
             existingStudent.EnrollmentDate = student.EnrollmentDate;
 
@@ -118,8 +109,6 @@ namespace ContosoUniversity.Api.Services
             existingStudent.OriginCountry = student.OriginCountry;
 
             var studentEntity = _mapper.Map<StudentEntity>(existingStudent);
-
-            studentEntity.Enrollments = null;
 
             _studentsRepository.Update(studentEntity);
 
@@ -139,6 +128,18 @@ namespace ContosoUniversity.Api.Services
             _studentsRepository.Save("Student");
 
             return true;
+        }
+
+        private void ValidateCourse(int courseId)
+        {
+            var courses = _coursesRepository.GetAll().ToList();
+
+            var isCourseExisting = courses.Any(c => c.CourseId == courseId);
+
+            if (!isCourseExisting)
+            {
+                throw new InvalidCourseException($"Course provided with id {courseId} doesnot exist in the database");
+            }
         }
     }
 }
