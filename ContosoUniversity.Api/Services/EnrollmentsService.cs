@@ -32,7 +32,7 @@ namespace ContosoUniversity.Api.Services
 
         public Enrollment Get(int id)
         {
-            var enrollmentEntity = _enrollmentsRepository.Get(id);
+            var enrollmentEntity = _enrollmentsRepository.GetAll().FirstOrDefault(e => e.EnrollmentId == id);
 
             if (enrollmentEntity == null)
             {
@@ -82,7 +82,7 @@ namespace ContosoUniversity.Api.Services
         {
             var newCourseIds = courseIds ?? new List<int>();
 
-            var existingCourseIds = _enrollmentsRepository.Find(e => e.StudentId == studentId)
+            var existingCourseIds = _enrollmentsRepository.GetAll().Where(e => e.StudentId == studentId)
                 .Select(x => x.CourseId).ToList();
 
             var dbCourseIds = _coursesRepository.GetAll().Select(c => c.CourseId);
@@ -105,7 +105,7 @@ namespace ContosoUniversity.Api.Services
                 {
                     if (!existingCourseIds.Contains(dbCourseId)) continue;
 
-                    var removedEnrollment = _enrollmentsRepository.Find(e => e.CourseId == dbCourseId && e.StudentId == studentId).First();
+                    var removedEnrollment = _enrollmentsRepository.GetAll().First(e => e.CourseId == dbCourseId && e.StudentId == studentId);
 
                     _enrollmentsRepository.Remove(removedEnrollment);
                 }
@@ -113,7 +113,7 @@ namespace ContosoUniversity.Api.Services
 
             _enrollmentsRepository.Save("Enrollments");
 
-            return _mapper.Map<IEnumerable<Enrollment>>(_enrollmentsRepository.Find(e => e.StudentId == studentId));
+            return _mapper.Map<IEnumerable<Enrollment>>(_enrollmentsRepository.GetAll().Where(e => e.StudentId == studentId));
         }
 
         public bool Remove(int enrollmentId)

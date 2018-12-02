@@ -38,8 +38,8 @@ namespace ContosoUniversity.Data.EntityModels
 
         public DateTime? UpdatedDate { get; set; }
 
-        public virtual InstructorEntity Administrator { get; set; }
+        public InstructorEntity Administrator { get; set; } = new InstructorEntity();
 
-        public virtual ICollection<CourseEntity> Courses { get; set; }
+        public ICollection<CourseEntity> Courses { get; set; } = new List<CourseEntity>();
     }
 }

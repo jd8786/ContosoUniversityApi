@@ -1,4 +1,7 @@
-﻿using ContosoUniversity.Data.EntityModels;
+﻿using System.Collections.Generic;
+using System.Linq;
+using ContosoUniversity.Data.EntityModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace ContosoUniversity.Data.Repositories
 {
@@ -6,6 +9,14 @@ namespace ContosoUniversity.Data.Repositories
     {
         public StudentsRepository(SchoolContext context) : base(context)
         {
+        }
+
+        public override IEnumerable<StudentEntity> GetAll()
+        {
+            return Context.Students.AsNoTracking()
+                .Include(s => s.Enrollments)
+                .ThenInclude(e => e.Course)
+                .ToList();
         }
     }
 }

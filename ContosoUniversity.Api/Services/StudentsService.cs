@@ -40,7 +40,7 @@ namespace ContosoUniversity.Api.Services
 
         public Student Get(int id)
         {
-            var studentEntity = _studentsRepository.Get(id);
+            var studentEntity = _studentsRepository.GetAll().FirstOrDefault(s => s.StudentId == id);
 
             if (studentEntity == null)
             {
@@ -102,6 +102,8 @@ namespace ContosoUniversity.Api.Services
             }
 
             _enrollmentsService.Update(student.StudentId, courseIds);
+
+            existingStudent.Enrollments = new List<Enrollment>();
 
             existingStudent.EnrollmentDate = student.EnrollmentDate;
 

@@ -13,8 +13,8 @@ namespace ContosoUniversity.Data.EntityModels
 
         public int InstructorId { get; set; }
 
-        public virtual CourseEntity Course { get; set; }
+        public CourseEntity Course { get; set; } = new CourseEntity();
 
-        public virtual InstructorEntity Instructor { get; set; }
+        public InstructorEntity Instructor { get; set; } = new InstructorEntity();
     }
 }

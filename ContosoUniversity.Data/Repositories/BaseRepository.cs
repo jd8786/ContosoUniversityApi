@@ -1,10 +1,8 @@
-﻿using System;
+﻿using ContosoUniversity.Data.Exceptions;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using ContosoUniversity.Data.Exceptions;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 
 namespace ContosoUniversity.Data.Repositories
 {
@@ -17,19 +15,9 @@ namespace ContosoUniversity.Data.Repositories
             Context = context;
         }
 
-        public T Get(int id)
-        {
-            return Context.Set<T>().Find(id);
-        }
-
-        public IEnumerable<T> GetAll()
+        public virtual IEnumerable<T> GetAll()
         {
             return Context.Set<T>().AsNoTracking().ToList();
-        }
-
-        public IEnumerable<T> Find(Expression<Func<T, bool>> predicate)
-        {
-            return Context.Set<T>().AsNoTracking().Where(predicate).ToList();
         }
 
         public void Remove(T entity)

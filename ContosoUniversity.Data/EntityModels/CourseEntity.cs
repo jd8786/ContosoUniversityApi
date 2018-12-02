@@ -35,10 +35,10 @@ namespace ContosoUniversity.Data.EntityModels
 
         public int DepartmentId { get; set; }
 
-        public virtual ICollection<EnrollmentEntity> Enrollments { get; set; }
+        public ICollection<EnrollmentEntity> Enrollments { get; set; } = new List<EnrollmentEntity>();
 
-        public virtual ICollection<CourseAssignmentEntity> CourseAssignments { get; set; }
+        public ICollection<CourseAssignmentEntity> CourseAssignments { get; set; } = new List<CourseAssignmentEntity>();
 
-        public virtual DepartmentEntity Department { get; set; }  
+        public DepartmentEntity Department { get; set; } = new DepartmentEntity();
     }
 }

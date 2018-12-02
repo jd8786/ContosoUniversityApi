@@ -35,7 +35,6 @@ namespace ContosoUniversity.Api
             var schoolDbConnectionString = Configuration.GetConnectionString("schoolDbConnectionString");
 
             services.AddDbContext<SchoolContext>(options => options
-                .UseLazyLoadingProxies()
                 .UseSqlServer(schoolDbConnectionString), ServiceLifetime.Transient);
 
             services.AddScoped<IStudentsRepository, StudentsRepository>();
@@ -48,11 +47,11 @@ namespace ContosoUniversity.Api
 
             services.AddScoped<IEnrollmentsService, EnrollmentsService>();
 
-            services.AddSingleton<ICourseValidator>();
+            services.AddScoped<ICourseValidator, CourseValidator>();
 
-            services.AddSingleton<IStudentValidator>();
+            services.AddScoped<IStudentValidator, StudentValidator>();
 
-            services.AddSingleton<IEnrollmentValidator>();
+            services.AddScoped<IEnrollmentValidator, EnrollmentValidator>();
 
             services.AddSwaggerGen(o =>
             {

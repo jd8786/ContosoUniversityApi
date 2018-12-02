@@ -35,8 +35,8 @@ namespace ContosoUniversity.Data.EntityModels
 
         public DateTime? UpdatedDate { get; set; }
 
-        public virtual ICollection<CourseAssignmentEntity> CourseAssignments { get; set; }
+        public ICollection<CourseAssignmentEntity> CourseAssignments { get; set; } = new List<CourseAssignmentEntity>();
 
-        public virtual OfficeAssignmentEntity OfficeAssignment { get; set; }
+        public OfficeAssignmentEntity OfficeAssignment { get; set; } = new OfficeAssignmentEntity();
     }
 }
