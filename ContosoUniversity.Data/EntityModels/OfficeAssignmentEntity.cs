@@ -12,6 +12,6 @@ namespace ContosoUniversity.Data.EntityModels
         [Required, MaxLength(50)]
         public string Location { get; set; }
 
-        public InstructorEntity Instructor { get; set; } = new InstructorEntity();
+        public virtual InstructorEntity Instructor { get; set; }
     }
 }

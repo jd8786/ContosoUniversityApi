@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
@@ -29,7 +30,11 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
         [Fact]
         public async void ShouldReturnOkWhenUpdateStudentWithoutSelectedCourses()
         {
-            var existingStudent = _fixture.SchoolContext.Students.First(s => s.LastName == "test-last-name1");
+            var existingStudent = _fixture.SchoolContext.Students
+                .Include(s => s.Enrollments)
+                .First(s => s.LastName == "test-last-name1");
+
+            existingStudent.Enrollments.Count.Should().Be(1);
 
             var studentId = existingStudent.StudentId;
 
@@ -56,7 +61,7 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
             dbStudent.LastName.Should().Be("some-last-name");
             dbStudent.FirstMidName.Should().Be("some-first-mid-name");
             dbStudent.OriginCountry.Should().Be("some-origin-country");
-            dbStudent.Enrollments.Count.Should().Be(0);
+            dbStudent.Enrollments.Should().BeNull();
         }
     }
 }

@@ -15,8 +15,8 @@ namespace ContosoUniversity.Data.EntityModels
 
         public Grade? Grade { get; set; }
 
-        public StudentEntity Student { get; set; } = new StudentEntity();
+        public virtual StudentEntity Student { get; set; }
 
-        public CourseEntity Course { get; set; } = new CourseEntity();
+        public virtual CourseEntity Course { get; set; }
     }
 }

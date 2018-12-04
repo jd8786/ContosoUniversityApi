@@ -38,6 +38,6 @@ namespace ContosoUniversity.Data.EntityModels
 
         public DateTime? UpdatedDate { get; set; }
 
-        public ICollection<EnrollmentEntity> Enrollments { get; set; } = new List<EnrollmentEntity>();
+        public virtual ICollection<EnrollmentEntity> Enrollments { get; set; }
     }
 }
