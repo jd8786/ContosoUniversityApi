@@ -18,5 +18,10 @@ namespace ContosoUniversity.Data.Repositories
                 .Include(e => e.Student)
                 .ToList();
         }
+
+        public IEnumerable<EnrollmentEntity> GetByStudentId(int studentId)
+        {
+            return GetAll().Where(e => e.StudentId == studentId);
+        }
     }
 }

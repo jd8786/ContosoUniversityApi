@@ -11,7 +11,7 @@ namespace ContosoUniversity.Api.Services
 
         IEnumerable<Enrollment> AddRange(IEnumerable<Enrollment> enrollments);
 
-        IEnumerable<Enrollment> Update(int studentId, List<int> courseIds);
+        IEnumerable<Enrollment> Update(int studentId, IEnumerable<Enrollment> enrollments);
 
         bool Remove(int enrollmentId);
 

@@ -5,6 +5,7 @@ using ContosoUniversity.Data.Exceptions;
 using ContosoUniversity.Data.Repositories;
 using System.Collections.Generic;
 using System.Linq;
+using Castle.Core.Internal;
 using ContosoUniversity.Api.Validators;
 
 namespace ContosoUniversity.Api.Services
@@ -78,9 +79,14 @@ namespace ContosoUniversity.Api.Services
             return _mapper.Map<IEnumerable<Enrollment>>(enrollmentEnitities);
         }
 
-        public IEnumerable<Enrollment> Update(int studentId, List<int> courseIds)
+        public IEnumerable<Enrollment> Update(int studentId, IEnumerable<Enrollment> enrollments)
         {
-            var newCourseIds = courseIds ?? new List<int>();
+            if (!enrollments.IsNullOrEmpty())
+            {
+                enrollments.ToList().ForEach(e => _enrollmentValidator.ValidatePutEnrollment(e));
+            }
+
+            var newCourseIds = enrollments == null ? new List<int>() : enrollments.Select(e => e.CourseId).ToList(); 
 
             var existingCourseIds = _enrollmentsRepository.GetAll().Where(e => e.StudentId == studentId)
                 .Select(x => x.CourseId).ToList();
@@ -91,15 +97,23 @@ namespace ContosoUniversity.Api.Services
             {
                 if (newCourseIds.Contains(dbCourseId))
                 {
-                    if (existingCourseIds.Contains(dbCourseId)) continue;
+                    var addedEnrollment =
+                        enrollments.First(e => e.StudentId == studentId && e.CourseId == dbCourseId);
 
-                    var newEnrollment = new EnrollmentEntity
+                    if (existingCourseIds.Contains(dbCourseId))
                     {
-                        CourseId = dbCourseId,
-                        StudentId = studentId
-                    };
+                        var existingEnrollment = _enrollmentsRepository.GetAll()
+                            .First(e => e.StudentId == studentId && e.CourseId == dbCourseId);
 
-                    _enrollmentsRepository.Add(newEnrollment);
+                        if (existingEnrollment.Grade != addedEnrollment.Grade)
+                        {
+                            existingEnrollment.Grade = addedEnrollment.Grade;
+                        }
+
+                        continue;
+                    }
+
+                    _enrollmentsRepository.Add(_mapper.Map<EnrollmentEntity>(addedEnrollment));
                 }
                 else
                 {

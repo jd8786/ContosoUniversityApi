@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using Castle.Core.Internal;
 using ContosoUniversity.Api.Models;
 using ContosoUniversity.Api.Services;
 using ContosoUniversity.Data.Exceptions;
@@ -11,11 +12,14 @@ namespace ContosoUniversity.Api.Controllers
     [Route("api/students")]
     public class StudentsController : Controller
     {
-        private readonly IStudentsService _service;
+        private readonly IStudentsService _studentsService;
 
-        public StudentsController(IStudentsService service)
+        private readonly IEnrollmentsService _enrollmentsService;
+
+        public StudentsController(IStudentsService studentsService, IEnrollmentsService enrollmentsService)
         {
-            _service = service;
+            _studentsService = studentsService;
+            _enrollmentsService = enrollmentsService;
         }
 
         [HttpGet]
@@ -25,7 +29,7 @@ namespace ContosoUniversity.Api.Controllers
         {
             try
             {
-                var students = _service.GetAll();
+                var students = _studentsService.GetAll();
 
                 var apiResponse = ApiResponse<IEnumerable<Student>>.Success(students);
 
@@ -45,7 +49,7 @@ namespace ContosoUniversity.Api.Controllers
         {
             try
             {
-                var student = _service.Get(id);
+                var student = _studentsService.Get(id);
 
                 var apiResponse = ApiResponse<Student>.Success(student);
 
@@ -65,11 +69,23 @@ namespace ContosoUniversity.Api.Controllers
         [ProducesResponseType(typeof(ApiResponse<Student>), 200)]
         [ProducesResponseType(typeof(ApiResponse<bool>), 400)]
         [ProducesResponseType(typeof(ApiResponse<bool>), 500)]
-        public IActionResult PostStudent([FromBody] Student student, [FromBody]List<string> courses)
+        public IActionResult PostStudent([FromBody] Student student)
         {
             try
             {
-                var newStudent = _service.Add(student);
+                var addedStudent = _studentsService.Add(student);
+
+                if (!student.Enrollments.IsNullOrEmpty())
+                {
+                    foreach (var studentEnrollment in student.Enrollments)
+                    {
+                        studentEnrollment.StudentId = addedStudent.StudentId;
+                    }
+
+                    _enrollmentsService.AddRange(student.Enrollments);
+                }
+
+                var newStudent = _studentsService.Get(addedStudent.StudentId);
 
                 return Ok(ApiResponse<Student>.Success(newStudent));
             }
@@ -96,7 +112,9 @@ namespace ContosoUniversity.Api.Controllers
         {
             try
             {
-                var updatedStudent = _service.Update(student);
+                _enrollmentsService.Update(student.StudentId, student.Enrollments);
+
+                var updatedStudent = _studentsService.Update(student);
 
                 return Ok(ApiResponse<Student>.Success(updatedStudent));
             }
@@ -126,7 +144,7 @@ namespace ContosoUniversity.Api.Controllers
         {
             try
             {
-                _service.Remove(id);
+                _studentsService.Remove(id);
 
                 return Ok(ApiResponse<bool>.Success(true));
             }

@@ -36,5 +36,22 @@ namespace ContosoUniversity.Api.Validators
 
             _courseValidator.Validate(enrollment.CourseId);
         }
+
+        public void ValidatePutEnrollment(Enrollment enrollment)
+        {
+            if (enrollment == null)
+            {
+                throw new InvalidEnrollmentException("Enrollment must be provided");
+            }
+
+            if (enrollment.StudentId == 0 || enrollment.CourseId == 0)
+            {
+                throw new InvalidEnrollmentException("Student and course must be provided");
+            }
+
+            _studentValidator.Validate(enrollment.StudentId);
+
+            _courseValidator.Validate(enrollment.CourseId);
+        }
     }
 }

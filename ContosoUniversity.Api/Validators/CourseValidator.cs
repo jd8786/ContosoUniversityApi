@@ -1,6 +1,7 @@
 ﻿using ContosoUniversity.Data.Exceptions;
 using ContosoUniversity.Data.Repositories;
 using System.Linq;
+using ContosoUniversity.Api.Models;
 
 namespace ContosoUniversity.Api.Validators
 {
@@ -22,6 +23,32 @@ namespace ContosoUniversity.Api.Validators
             if (!isCourseExisting)
             {
                 throw new InvalidCourseException($"Course provided with id {courseId} doesnot exist in the database");
+            }
+        }
+
+        public void ValidatePostCourse(Course course)
+        {
+            if (course == null)
+            {
+                throw new InvalidCourseException("Course must be provided");
+            }
+
+            if (course.CourseId != 0)
+            {
+                throw new InvalidCourseException("Course Id must be 0");
+            }
+        }
+
+        public void ValidatePutCourse(Course course)
+        {
+            if (course == null)
+            {
+                throw new InvalidCourseException("Course must be provided");
+            }
+
+            if (course.CourseId == 0)
+            {
+                throw new InvalidCourseException("Course Id cannot be 0");
             }
         }
     }

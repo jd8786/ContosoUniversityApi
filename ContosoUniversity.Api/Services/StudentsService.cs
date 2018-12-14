@@ -1,12 +1,10 @@
 ﻿using AutoMapper;
-using Castle.Core.Internal;
 using ContosoUniversity.Api.Models;
+using ContosoUniversity.Api.Validators;
 using ContosoUniversity.Data.EntityModels;
-using ContosoUniversity.Data.Exceptions;
 using ContosoUniversity.Data.Repositories;
 using System.Collections.Generic;
 using System.Linq;
-using ContosoUniversity.Api.Validators;
 
 namespace ContosoUniversity.Api.Services
 {
@@ -14,19 +12,19 @@ namespace ContosoUniversity.Api.Services
     {
         private readonly IStudentsRepository _studentsRepository;
 
-        private readonly IEnrollmentsService _enrollmentsService;
+        private readonly IEnrollmentsRepository _enrollmentsRepository;
 
-        private readonly ICourseValidator _courseValidator;
+        private readonly IStudentValidator _studentValidator;
 
         private readonly IMapper _mapper;
 
-        public StudentsesService(IStudentsRepository studentsRepository, IEnrollmentsService enrollmentsService, ICourseValidator courseValidator, IMapper mapper)
+        public StudentsesService(IStudentsRepository studentsRepository, IEnrollmentsRepository enrollmentsRepository, IStudentValidator studentValidator, IMapper mapper)
         {
             _studentsRepository = studentsRepository;
 
-            _enrollmentsService = enrollmentsService;
+            _enrollmentsRepository = enrollmentsRepository;
 
-            _courseValidator = courseValidator;
+            _studentValidator = studentValidator;
 
             _mapper = mapper;
         }
@@ -40,36 +38,20 @@ namespace ContosoUniversity.Api.Services
 
         public Student Get(int id)
         {
-            var studentEntity = _studentsRepository.GetAll().FirstOrDefault(s => s.StudentId == id);
+            _studentValidator.Validate(id);
 
-            if (studentEntity == null)
-            {
-                throw new NotFoundException($"Student with id {id} was not found");
-            }
+            var studentEntity = _studentsRepository.GetAll().FirstOrDefault(s => s.StudentId == id);
 
             return _mapper.Map<Student>(studentEntity);
         }
 
         public Student Add(Student student)
         {
-            if (student == null)
-            {
-                throw new InvalidStudentException("Student must be provided");
-            }
-
-            if (student.StudentId != 0)
-            {
-                throw new InvalidStudentException("Student Id must be 0");
-            }
+            _studentValidator.ValidatePostStudent(student);
 
             var studentEntity = _mapper.Map<StudentEntity>(student);
 
-            var courseIds = studentEntity.Enrollments.Select(e => e.CourseId).ToList();
-
-            if (courseIds.Any())
-            {
-                courseIds.ForEach(_courseValidator.Validate);
-            }
+            studentEntity.Enrollments = null;
 
             _studentsRepository.Add(studentEntity);
 
@@ -80,30 +62,11 @@ namespace ContosoUniversity.Api.Services
 
         public Student Update(Student student)
         {
-            if (student == null)
-            {
-                throw new InvalidStudentException("Student must be provided");
-            }
-
-            if (student.StudentId == 0)
-            {
-                throw new InvalidStudentException("Student Id cannot be 0");
-            }
+            _studentValidator.ValidatePutStudent(student);
 
             var existingStudent = Get(student.StudentId);
 
-            var courseIds = new List<int>();
-
-            if (!student.Enrollments.IsNullOrEmpty())
-            {
-                student.Enrollments.ToList().ForEach(e => _courseValidator.Validate(e.CourseId));
-
-                courseIds = student.Enrollments.Select(e => e.CourseId).ToList();
-            }
-
-            _enrollmentsService.Update(student.StudentId, courseIds);
-
-            existingStudent.Enrollments = new List<Enrollment>();
+            existingStudent.Enrollments = _mapper.Map<IEnumerable<Enrollment>>(_enrollmentsRepository.GetByStudentId(student.StudentId));
 
             existingStudent.EnrollmentDate = student.EnrollmentDate;
 

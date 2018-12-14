@@ -5,5 +5,6 @@ namespace ContosoUniversity.Data.Repositories
 {
     public interface IEnrollmentsRepository: IBaseRepository<EnrollmentEntity>
     {
+        IEnumerable<EnrollmentEntity> GetByStudentId(int studentId);
     }
 }
