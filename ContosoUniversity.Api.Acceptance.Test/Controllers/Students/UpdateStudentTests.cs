@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using AutoFixture;
 using ContosoUniversity.Api.Acceptance.Test.Fixtures;
 using ContosoUniversity.Api.Models;
@@ -32,44 +33,7 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
         }
 
         [Fact]
-        public async void ShouldReturnOkWhenUpdateStudentWithoutSelectedCourses()
-        {
-            var existingStudent = _fixture.SchoolContext.Students
-                .Include(s => s.Enrollments)
-                .First(s => s.LastName == "test-last-name1");
-
-            existingStudent.Enrollments.Count.Should().Be(1);
-
-            var studentId = existingStudent.StudentId;
-
-            var student = _autoFixture.Build<Student>()
-                .With(s => s.StudentId, studentId)
-                .With(s => s.LastName, "some-last-name")
-                .With(s => s.FirstMidName, "some-first-mid-name")
-                .With(s => s.OriginCountry, "some-origin-country")
-                .Without(s => s.Enrollments)
-                .Create();
-
-            var studentJson = JsonConvert.SerializeObject(student);
-
-            var content = new StringContent(studentJson, Encoding.UTF8, "application/json");
-
-            var apiResponse = await _fixture.HttpClient.PutAsync("api/students", content);
-
-            apiResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var dbContext = _fixture.SchoolContext;
-
-            var dbStudent = dbContext.Students.Include(s => s.Enrollments).First(s => s.StudentId == studentId);
-
-            dbStudent.LastName.Should().Be("some-last-name");
-            dbStudent.FirstMidName.Should().Be("some-first-mid-name");
-            dbStudent.OriginCountry.Should().Be("some-origin-country");
-            dbStudent.Enrollments.Should().BeEmpty(); 
-        }
-
-        [Fact]
-        public async void ShouldReturnOkWhenUpdateStudentWithTheSameSelectedCourses()
+        public async void ShouldReturnOkWhenOnlyUpdateStudentProperties()
         {
             var existingStudent = _fixture.SchoolContext.Students
                 .Include(s => s.Enrollments)
@@ -81,8 +45,6 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
 
             var enrollments = mapper.Map<IEnumerable<Enrollment>>(existingStudent.Enrollments).ToList();
 
-            enrollments.Count.Should().Be(1);
-
             var studentId = existingStudent.StudentId;
 
             var student = _autoFixture.Build<Student>()
@@ -90,7 +52,7 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
                 .With(s => s.LastName, "some-last-name")
                 .With(s => s.FirstMidName, "some-first-mid-name")
                 .With(s => s.OriginCountry, "some-origin-country")
-                .With(s => s.EnrollmentDate, existingStudent.EnrollmentDate)
+                .With(s => s.EnrollmentDate, new DateTime(2018, 1, 1))
                 .With(s => s.Enrollments, enrollments)
                 .Create();
 
@@ -109,11 +71,86 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
             dbStudent.LastName.Should().Be("some-last-name");
             dbStudent.FirstMidName.Should().Be("some-first-mid-name");
             dbStudent.OriginCountry.Should().Be("some-origin-country");
-            dbStudent.Enrollments.Count(e => e.EnrollmentId == existingStudent.Enrollments.ToList()[0].EnrollmentId).Should().Be(1);
+            dbStudent.EnrollmentDate.Should().Be(new DateTime(2018, 1, 1));
         }
 
         [Fact]
-        public async void ShouldReturnOkWhenUpdateStudentWithTheSameSelectedCoursesButDifferentGrade()
+        public async void ShouldReturnOkWhenOnlyUpdateStudentEnrollments()
+        {
+            var existingStudent = _fixture.SchoolContext.Students
+                .Include(s => s.Enrollments)
+                .First(s => s.LastName == "test-last-name1");
+
+            existingStudent.Enrollments.First().CourseId.Should().Be(1050);
+
+            var studentId = existingStudent.StudentId;
+
+            var student = _autoFixture.Build<Student>()
+                .With(s => s.StudentId, studentId)
+                .With(s => s.LastName, existingStudent.LastName)
+                .With(s => s.FirstMidName, existingStudent.FirstMidName)
+                .With(s => s.OriginCountry, existingStudent.OriginCountry)
+                .With(s => s.EnrollmentDate, existingStudent.EnrollmentDate)
+                .With(s => s.Enrollments, new List<Enrollment> { new Enrollment { StudentId = studentId, CourseId = 4022 } })
+                .Create();
+
+            var studentJson = JsonConvert.SerializeObject(student);
+
+            var content = new StringContent(studentJson, Encoding.UTF8, "application/json");
+
+            var apiResponse = await _fixture.HttpClient.PutAsync("api/students", content);
+
+            apiResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            var dbContext = _fixture.SchoolContext;
+
+            var dbStudent = dbContext.Students.Include(s => s.Enrollments).First(s => s.StudentId == studentId);
+
+            dbStudent.Enrollments.First().CourseId.Should().Be(4022);
+            dbStudent.Enrollments.Any(e => e.CourseId == 1050).Should().BeFalse();
+        }
+
+        [Fact]
+        public async void ShouldReturnOkWhenUpdateStudentPropertiesAndEnrollments()
+        {
+            var existingStudent = _fixture.SchoolContext.Students
+                .Include(s => s.Enrollments)
+                .First(s => s.LastName == "test-last-name1");
+
+            existingStudent.Enrollments.First().CourseId.Should().Be(1050);
+
+            var studentId = existingStudent.StudentId;
+
+            var student = _autoFixture.Build<Student>()
+                .With(s => s.StudentId, studentId)
+                .With(s => s.LastName, "some-last-name")
+                .With(s => s.FirstMidName, "some-first-mid-name")
+                .With(s => s.OriginCountry, "some-origin-country")
+                .With(s => s.EnrollmentDate, new DateTime(2018, 1, 1))
+                .Without(s => s.Enrollments)
+                .Create();
+
+            var studentJson = JsonConvert.SerializeObject(student);
+
+            var content = new StringContent(studentJson, Encoding.UTF8, "application/json");
+
+            var apiResponse = await _fixture.HttpClient.PutAsync("api/students", content);
+
+            apiResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            var dbContext = _fixture.SchoolContext;
+
+            var dbStudent = dbContext.Students.Include(s => s.Enrollments).First(s => s.StudentId == studentId);
+
+            dbStudent.LastName.Should().Be("some-last-name");
+            dbStudent.FirstMidName.Should().Be("some-first-mid-name");
+            dbStudent.OriginCountry.Should().Be("some-origin-country");
+            dbStudent.EnrollmentDate.Should().Be(new DateTime(2018, 1, 1));
+            dbStudent.Enrollments.Should().BeEmpty();
+        }
+
+        [Fact]
+        public async void ShouldReturnOkWhenUpdateStudentEnrollmentGrade()
         {
             var existingStudent = _fixture.SchoolContext.Students
                 .Include(s => s.Enrollments)
@@ -144,79 +181,6 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
             var dbStudent = dbContext.Students.Include(s => s.Enrollments).First(s => s.StudentId == studentId);
 
             dbStudent.Enrollments.First().Grade.Should().Be(Grade.B);
-        }
-
-        [Fact]
-        public async void ShouldReturnOkWhenUpdateStudentWithDifferentSelectedCourses()
-        {
-            var existingStudent = _fixture.SchoolContext.Students
-                .Include(s => s.Enrollments)
-                .First(s => s.LastName == "test-last-name1");
-
-            existingStudent.Enrollments.First().CourseId.Should().Be(1050);
-
-            var mapperConfig = new MapperConfiguration(cfg => cfg.AddProfile(new StudentEntityToStudentProfile()));
-
-            var mapper = mapperConfig.CreateMapper();
-
-            var student = mapper.Map<Student>(existingStudent);
-
-            student.Enrollments =
-                new List<Enrollment> {new Enrollment {StudentId = student.StudentId, CourseId = 4022}};
-
-            var studentJson = JsonConvert.SerializeObject(student);
-
-            var content = new StringContent(studentJson, Encoding.UTF8, "application/json");
-
-            var apiResponse = await _fixture.HttpClient.PutAsync("api/students", content);
-
-            apiResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var dbContext = _fixture.SchoolContext;
-
-            var studentId = existingStudent.StudentId;
-
-            var dbStudent = dbContext.Students.Include(s => s.Enrollments).First(s => s.StudentId == studentId);
-
-            dbStudent.Enrollments.First().CourseId.Should().Be(4022);
-        }
-
-        [Fact]
-        public async void ShouldReturnOkWhenUpdateStudentWithNewSelectedCourses()
-        {
-            var existingStudent = _fixture.SchoolContext.Students
-                .Include(s => s.Enrollments)
-                .First(s => s.LastName == "test-last-name1");
-
-            existingStudent.Enrollments.Count.Should().Be(1);
-
-            var mapperConfig = new MapperConfiguration(cfg => cfg.AddProfile(new StudentEntityToStudentProfile()));
-
-            var mapper = mapperConfig.CreateMapper();
-
-            var student = mapper.Map<Student>(existingStudent);
-
-            student.Enrollments = new List<Enrollment>
-            {
-                new Enrollment {StudentId = existingStudent.StudentId, CourseId = 4022},
-                mapper.Map<Enrollment>(existingStudent.Enrollments.First())
-            };
-        
-            var studentJson = JsonConvert.SerializeObject(student);
-
-            var content = new StringContent(studentJson, Encoding.UTF8, "application/json");
-
-            var apiResponse = await _fixture.HttpClient.PutAsync("api/students", content);
-
-            apiResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var dbContext = _fixture.SchoolContext;
-
-            var studentId = existingStudent.StudentId;
-
-            var dbStudent = dbContext.Students.Include(s => s.Enrollments).First(s => s.StudentId == studentId);
-
-            dbStudent.Enrollments.Count.Should().Be(2);
         }
     }
 }

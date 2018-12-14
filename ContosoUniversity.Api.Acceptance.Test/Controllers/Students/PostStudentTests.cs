@@ -28,7 +28,7 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
         }
 
         [Fact]
-        public async void ShouldReturnOkWhenPostStudentWithoutCourseSelected()
+        public async void ShouldReturnOkWhenPostStudentWithoutEnrollments()
         {
             var student = _autoFixture.Build<Student>()
                 .With(s => s.LastName, "some-last-name")
@@ -54,7 +54,7 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
         }
 
         [Fact]
-        public async void ShouldReturnOkWhenPostStudentWithCoursesSelected()
+        public async void ShouldReturnOkWhenPostStudentWithEnrollments()
         {
             var student = _autoFixture.Build<Student>()
                 .With(s => s.LastName, "some-last-name")
