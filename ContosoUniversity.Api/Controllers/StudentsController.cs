@@ -68,6 +68,7 @@ namespace ContosoUniversity.Api.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(ApiResponse<Student>), 200)]
         [ProducesResponseType(typeof(ApiResponse<bool>), 400)]
+        [ProducesResponseType(typeof(ApiResponse<bool>), 404)]
         [ProducesResponseType(typeof(ApiResponse<bool>), 500)]
         public IActionResult PostStudent([FromBody] Student student)
         {
@@ -97,6 +98,14 @@ namespace ContosoUniversity.Api.Controllers
             {
                 return BadRequest(ApiResponse<bool>.Error(ex.Message));
             }
+            catch (InvalidEnrollmentException ex)
+            {
+                return BadRequest(ApiResponse<bool>.Error(ex.Message));
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ApiResponse<bool>.Error(ex.Message));
+            }
             catch (Exception ex)
             {
                 return StatusCode((int)HttpStatusCode.InternalServerError, ApiResponse<bool>.Error(ex.Message));
@@ -112,9 +121,9 @@ namespace ContosoUniversity.Api.Controllers
         {
             try
             {
-                _enrollmentsService.Update(student.StudentId, student.Enrollments);
-
                 var updatedStudent = _studentsService.Update(student);
+
+                _enrollmentsService.Update(student.StudentId, student.Enrollments);
 
                 return Ok(ApiResponse<Student>.Success(updatedStudent));
             }
@@ -123,6 +132,10 @@ namespace ContosoUniversity.Api.Controllers
                 return BadRequest(ApiResponse<bool>.Error(ex.Message));
             }
             catch (InvalidCourseException ex)
+            {
+                return BadRequest(ApiResponse<bool>.Error(ex.Message));
+            }
+            catch (InvalidEnrollmentException ex)
             {
                 return BadRequest(ApiResponse<bool>.Error(ex.Message));
             }

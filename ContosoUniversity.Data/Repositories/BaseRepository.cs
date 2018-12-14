@@ -8,7 +8,7 @@ namespace ContosoUniversity.Data.Repositories
 {
     public class BaseRepository<T> : IBaseRepository<T> where T : class
     {
-        protected readonly SchoolContext Context;
+        public readonly SchoolContext Context;
 
         public BaseRepository(SchoolContext context)
         {
@@ -32,17 +32,17 @@ namespace ContosoUniversity.Data.Repositories
 
         public void Add(T entity)
         {
-            Context.Add(entity);
+            Context.Set<T>().Add(entity);
         }
 
         public void AddRange(IEnumerable<T> entities)
         {
-            Context.AddRange(entities);
+            Context.Set<T>().AddRange(entities);
         }
 
         public void Update(T entity)
         {
-            Context.Update(entity);
+            Context.Set<T>().Update(entity);
         }
 
         public void Save(string entityName)

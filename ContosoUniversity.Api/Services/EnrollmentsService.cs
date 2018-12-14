@@ -105,12 +105,24 @@ namespace ContosoUniversity.Api.Services
                         var existingEnrollment = _enrollmentsRepository.GetAll()
                             .First(e => e.StudentId == studentId && e.CourseId == dbCourseId);
 
+                        if (addedEnrollment.EnrollmentId != existingEnrollment.EnrollmentId)
+                        {
+                            throw new InvalidEnrollmentException("Enrollment Id is invalid");
+                        }
+
                         if (existingEnrollment.Grade != addedEnrollment.Grade)
                         {
                             existingEnrollment.Grade = addedEnrollment.Grade;
+
+                            _enrollmentsRepository.Update(existingEnrollment);
                         }
 
                         continue;
+                    }
+
+                    if (addedEnrollment.EnrollmentId != 0)
+                    {
+                        throw new InvalidEnrollmentException("Enrollment Id must be 0");
                     }
 
                     _enrollmentsRepository.Add(_mapper.Map<EnrollmentEntity>(addedEnrollment));

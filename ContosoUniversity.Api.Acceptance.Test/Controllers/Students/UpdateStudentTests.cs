@@ -143,7 +143,7 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
 
             var dbStudent = dbContext.Students.Include(s => s.Enrollments).First(s => s.StudentId == studentId);
 
-            dbStudent.Enrollments.First(e => e.EnrollmentId == existingStudent.Enrollments.First().EnrollmentId).Grade.Should().Be(Grade.B);
+            dbStudent.Enrollments.First().Grade.Should().Be(Grade.B);
         }
 
         [Fact]
@@ -161,7 +161,8 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
 
             var student = mapper.Map<Student>(existingStudent);
 
-            student.Enrollments.First().CourseId = 4022;
+            student.Enrollments =
+                new List<Enrollment> {new Enrollment {StudentId = student.StudentId, CourseId = 4022}};
 
             var studentJson = JsonConvert.SerializeObject(student);
 
@@ -177,8 +178,7 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
 
             var dbStudent = dbContext.Students.Include(s => s.Enrollments).First(s => s.StudentId == studentId);
 
-            dbStudent.Enrollments.First(e => e.EnrollmentId == existingStudent.Enrollments.First().EnrollmentId)
-                .CourseId.Should().Be(4022);
+            dbStudent.Enrollments.First().CourseId.Should().Be(4022);
         }
 
         [Fact]
