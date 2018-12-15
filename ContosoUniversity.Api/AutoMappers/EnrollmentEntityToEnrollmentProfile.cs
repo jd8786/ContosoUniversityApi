@@ -9,9 +9,7 @@ namespace ContosoUniversity.Api.AutoMappers
         public EnrollmentEntityToEnrollmentProfile()
         {
             CreateMap<EnrollmentEntity, Enrollment>()
-                .ReverseMap()
-                .ForMember(dest => dest.Course, opt => opt.Ignore())
-                .ForMember(dest => dest.Student, opt => opt.Ignore());
+                .ReverseMap();
         }
     }
 }
