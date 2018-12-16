@@ -10,7 +10,7 @@ using Xunit;
 namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
 {
     [Collection("Sequential")]
-    [Trait("Category", "Acceptance Test: Get Students")]
+    [Trait("Category", "Acceptance Test: Api.Controllers.Students.GetStudents")]
     public class GetStudentsTests
     {
         private readonly AcceptanceTestFixture _fixture;

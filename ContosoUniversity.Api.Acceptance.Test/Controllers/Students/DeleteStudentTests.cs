@@ -9,7 +9,7 @@ using Xunit;
 namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
 {
     [Collection("Sequential")]
-    [Trait("Category", "Acceptance Test: Delete Student")]
+    [Trait("Category", "Acceptance Test: Api.Controllers.Students.DeleteStudent")]
     public class DeleteStudentTests
     {
         private readonly AcceptanceTestFixture _fixture;
