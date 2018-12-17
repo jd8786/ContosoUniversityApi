@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using ContosoUniversity.Api.Controllers;
+﻿using ContosoUniversity.Api.Controllers;
 using ContosoUniversity.Api.Models;
 using ContosoUniversity.Api.Services;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace ContosoUniversity.Api.Test.Controllers.Students
@@ -18,15 +16,12 @@ namespace ContosoUniversity.Api.Test.Controllers.Students
     {
         private readonly Mock<IStudentsService> _studentService;
 
-        private readonly Mock<IEnrollmentsService> _enrollmentService;
-
         private readonly StudentsController _controller;
 
         public GetStudentsTests()
         {
             _studentService = new Mock<IStudentsService>();
-            _enrollmentService = new Mock<IEnrollmentsService>();
-            _controller = new StudentsController(_studentService.Object, _enrollmentService.Object);
+            _controller = new StudentsController(_studentService.Object, null);
         }
 
         [Fact]
