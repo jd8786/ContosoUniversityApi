@@ -94,10 +94,6 @@ namespace ContosoUniversity.Api.Controllers
             {
                 return BadRequest(ApiResponse<bool>.Error(ex.Message));
             }
-            catch (InvalidCourseException ex)
-            {
-                return BadRequest(ApiResponse<bool>.Error(ex.Message));
-            }
             catch (InvalidEnrollmentException ex)
             {
                 return BadRequest(ApiResponse<bool>.Error(ex.Message));

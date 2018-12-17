@@ -22,7 +22,7 @@ namespace ContosoUniversity.Api.Validators
 
             if (!isCourseExisting)
             {
-                throw new InvalidCourseException($"Course provided with id {courseId} doesnot exist in the database");
+                throw new NotFoundException($"Course provided with id {courseId} doesnot exist in the database");
             }
         }
 

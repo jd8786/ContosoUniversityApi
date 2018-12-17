@@ -22,7 +22,7 @@ namespace ContosoUniversity.Api.Validators
 
             if (!isStudentExisting)
             {
-                throw new InvalidStudentException($"Student provided with Id {studentId} doesnot exist in the database");
+                throw new NotFoundException($"Student provided with Id {studentId} doesnot exist in the database");
             }
         }
 
