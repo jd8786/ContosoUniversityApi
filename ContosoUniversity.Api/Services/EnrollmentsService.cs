@@ -31,31 +31,6 @@ namespace ContosoUniversity.Api.Services
             _mapper = mapper;
         }
 
-        public Enrollment Get(int id)
-        {
-            var enrollmentEntity = _enrollmentsRepository.GetAll().FirstOrDefault(e => e.EnrollmentId == id);
-
-            if (enrollmentEntity == null)
-            {
-                throw new NotFoundException($"Enrollment with id {id} was not found");
-            }
-
-            return _mapper.Map<Enrollment>(enrollmentEntity);
-        }
-
-        public Enrollment Add(Enrollment enrollment)
-        {
-            _enrollmentValidator.ValidatePostEnrollment(enrollment);
-
-            var enrollmentEntity = _mapper.Map<EnrollmentEntity>(enrollment);
-
-            _enrollmentsRepository.Add(enrollmentEntity);
-
-            _enrollmentsRepository.Save("Enrollment");
-
-            return Get(enrollmentEntity.EnrollmentId);
-        }
-
         public IEnumerable<Enrollment> AddRange(IEnumerable<Enrollment> enrollments)
         {
             if (enrollments == null)
@@ -63,14 +38,14 @@ namespace ContosoUniversity.Api.Services
                 throw new InvalidEnrollmentException("Enrollments must be provided");
             }
 
+            if (!enrollments.Any()) return new List<Enrollment>();
+
             foreach (var enrollment in enrollments)
             {
                 _enrollmentValidator.ValidatePostEnrollment(enrollment);
             }
 
-            var enrollmentEnitities = _mapper.Map<IEnumerable<EnrollmentEntity>>(enrollments).ToList();
-
-            if (!enrollmentEnitities.Any()) return _mapper.Map<IEnumerable<Enrollment>>(enrollmentEnitities);
+            var enrollmentEnitities = _mapper.Map<IEnumerable<EnrollmentEntity>>(enrollments);
 
             _enrollmentsRepository.AddRange(enrollmentEnitities);
 
@@ -102,20 +77,7 @@ namespace ContosoUniversity.Api.Services
 
                     if (existingCourseIds.Contains(dbCourseId))
                     {
-                        var existingEnrollment = _enrollmentsRepository.GetAll()
-                            .First(e => e.StudentId == studentId && e.CourseId == dbCourseId);
-
-                        if (addedEnrollment.EnrollmentId != existingEnrollment.EnrollmentId)
-                        {
-                            throw new InvalidEnrollmentException("Enrollment Id is invalid");
-                        }
-
-                        if (existingEnrollment.Grade != addedEnrollment.Grade)
-                        {
-                            existingEnrollment.Grade = addedEnrollment.Grade;
-
-                            _enrollmentsRepository.Update(existingEnrollment);
-                        }
+                        _enrollmentsRepository.UpdateEnrollmentGrade(studentId, dbCourseId, _mapper.Map<EnrollmentEntity>(addedEnrollment));
 
                         continue;
                     }
@@ -139,31 +101,9 @@ namespace ContosoUniversity.Api.Services
 
             _enrollmentsRepository.Save("Enrollments");
 
-            return _mapper.Map<IEnumerable<Enrollment>>(_enrollmentsRepository.GetAll().Where(e => e.StudentId == studentId));
-        }
+            var updatedEnrollmentEntities = _enrollmentsRepository.GetAll().Where(e => e.StudentId == studentId);
 
-        public bool Remove(int enrollmentId)
-        {
-            var enrollment = Get(enrollmentId);
-
-            var enrollmentEntity = _mapper.Map<EnrollmentEntity>(enrollment);
-
-            _enrollmentsRepository.Remove(enrollmentEntity);
-
-            _enrollmentsRepository.Save("Enrollment");
-
-            return true;
-        }
-
-        public bool RemoveRange(IEnumerable<Enrollment> enrollments)
-        {
-            var enrollmentEntities = _mapper.Map<IEnumerable<EnrollmentEntity>>(enrollments);
-
-            _enrollmentsRepository.RemoveRange(enrollmentEntities);
-
-            _enrollmentsRepository.Save("Enrollments");
-
-            return true;
+            return _mapper.Map<IEnumerable<Enrollment>>(updatedEnrollmentEntities);
         }
     }
 }
