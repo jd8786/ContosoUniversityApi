@@ -12,7 +12,7 @@ using Xunit;
 namespace ContosoUniversity.Data.Test.Repositories
 {
     [Trait("Category", "Unit Test: Data.Repositories.Students")]
-    public class StudentRepositoryTests: IClassFixture<UnitTestFixture>, IDisposable
+    public class StudentRepositoryTests : IClassFixture<UnitTestFixture>, IDisposable
     {
         private readonly IStudentsRepository _repository;
         private readonly UnitTestFixture _fixture;
@@ -46,7 +46,7 @@ namespace ContosoUniversity.Data.Test.Repositories
         [Fact]
         public void ShouldRemoveStudentWhenCallingRemove()
         {
-            var student = new StudentEntity {StudentId = 1};
+            var student = new StudentEntity { StudentId = 1 };
 
             _repository.Remove(student);
 
@@ -55,42 +55,60 @@ namespace ContosoUniversity.Data.Test.Repositories
             _fixture.Context.Students.Any(s => s.StudentId == 1).Should().BeFalse();
         }
 
-        //[Fact]
-        //public void ShouldReturnStudentWhenIdExists()
-        //{
-        //    var student = _repository.Get(2);
+        [Fact]
+        public void ShouldRemoveAListOfStudentsWhenCallingRemoveArrange()
+        {
+            var students = new List<StudentEntity>
+            {
+                new StudentEntity { StudentId = 1 },
+                new StudentEntity { StudentId = 2 }
+            };
 
-        //    student.Should().NotBeNull();
+            _repository.RemoveRange(students);
 
-        //    student.LastName.Should().Be("some-last-name2");
-        //}
+            _repository.Save();
 
-        //[Fact]
-        //public void ShouldReturnNullWhenIdDoesNotExist()
-        //{
-        //    var student = await _repository.GetStudentByIdAsync(4);
+            _fixture.Context.Students.Any().Should().BeFalse();
+        }
 
-        //    student.Should().BeNull();
-        //}
+        [Fact]
+        public void ShouldCreateStudentWhenCallingAdd()
+        {
+            var student = new StudentEntity
+            {
+                StudentId = 3,
+                LastName = "some-last-name"
+            };
 
-        //[Fact]
-        //public async Task ShouldCreateStudent()
-        //{
-        //    var student = new StudentEntity
-        //    {
-        //        LastName = "some-last-name4"
-        //    };
+             _repository.Add(student);
 
-        //    await _repository.CreateAsync(student);
+            _repository.Save();
 
-        //    _mockDbSet.Verify(x => x.Add(student), Times.Exactly(1));
+            _fixture.Context.Students.Count(s => s.StudentId == 3).Should().Be(1);
+        }
 
-        //    _mockDbContext.Verify(c => c.SaveChanges(), Times.Exactly(1));
+        [Fact]
+        public void ShouldCreateAListOfStudentsWhenCallingAddRange()
+        {
+            var student1 = new StudentEntity
+            {
+                StudentId = 3,
+                LastName = "some-last-name1"
+            };
 
-        //    var addedStudent = _mockDbContext.Object.Students.FirstOrDefault(s => s.LastName == "some-last-name4");
+            var student2 = new StudentEntity
+            {
+                StudentId = 4,
+                LastName = "some-last-name2"
+            };
 
-        //    addedStudent.Should().NotBeNull();
-        //}
+            _repository.AddRange(new List<StudentEntity>{ student1, student2});
+
+            _repository.Save();
+
+            _fixture.Context.Students.Count(s => s.StudentId == 3).Should().Be(1);
+            _fixture.Context.Students.Count(s => s.StudentId == 4).Should().Be(1);
+        }
 
         //[Fact]
         //public void ShouldThrowExceptionWhenFailingToCreateStudent()
