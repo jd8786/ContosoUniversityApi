@@ -78,7 +78,7 @@ namespace ContosoUniversity.Api.Test.Services
 
             _enrollmentsRepository.Verify(e => e.AddRange(enrollmentEntities), Times.Exactly(1));
 
-            _enrollmentsRepository.Verify(e => e.Save("Enrollments"), Times.Exactly(1));
+            _enrollmentsRepository.Verify(e => e.Save(), Times.Exactly(1));
 
             addedEnrollments.Should().BeEquivalentTo(enrollments);
         }
@@ -132,7 +132,7 @@ namespace ContosoUniversity.Api.Test.Services
 
             _enrollmentsRepository.Verify(e => e.Remove(enrollmentEntities[2]), Times.Exactly(1));
 
-            _enrollmentsRepository.Verify(e => e.Save("Enrollments"), Times.Exactly(1));
+            _enrollmentsRepository.Verify(e => e.Save(), Times.Exactly(1));
 
             updatedEnrollments.Should().BeEquivalentTo(new List<Enrollment>());
         }

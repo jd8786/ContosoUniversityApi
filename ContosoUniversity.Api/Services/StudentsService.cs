@@ -55,7 +55,7 @@ namespace ContosoUniversity.Api.Services
 
             _studentsRepository.Add(studentEntity);
 
-            _studentsRepository.Save("Student");
+            _studentsRepository.Save();
 
             return Get(studentEntity.StudentId);
         }
@@ -80,7 +80,7 @@ namespace ContosoUniversity.Api.Services
 
             _studentsRepository.Update(studentEntity);
 
-            _studentsRepository.Save("Student");
+            _studentsRepository.Save();
 
             return Get(studentEntity.StudentId);
         }
@@ -93,7 +93,7 @@ namespace ContosoUniversity.Api.Services
 
             _studentsRepository.Remove(entityStudent);
 
-            _studentsRepository.Save("Student");
+            _studentsRepository.Save();
 
             return true;
         }

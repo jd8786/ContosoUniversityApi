@@ -49,7 +49,7 @@ namespace ContosoUniversity.Api.Services
 
             _enrollmentsRepository.AddRange(enrollmentEnitities);
 
-            _enrollmentsRepository.Save("Enrollments");
+            _enrollmentsRepository.Save();
 
             return _mapper.Map<IEnumerable<Enrollment>>(enrollmentEnitities);
         }
@@ -99,7 +99,7 @@ namespace ContosoUniversity.Api.Services
                 }
             }
 
-            _enrollmentsRepository.Save("Enrollments");
+            _enrollmentsRepository.Save();
 
             var updatedEnrollmentEntities = _enrollmentsRepository.GetAll().Where(e => e.StudentId == studentId);
 

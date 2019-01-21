@@ -103,7 +103,7 @@ namespace ContosoUniversity.Api.Test.Services
 
             _studentsRepository.Verify(s => s.Add(mappedStudent), Times.Exactly(1));
 
-            _studentsRepository.Verify(s => s.Save("Student"), Times.Exactly(1));
+            _studentsRepository.Verify(s => s.Save(), Times.Exactly(1));
 
             returnedStudent.Should().BeEquivalentTo(_students[0]);
         }
@@ -139,7 +139,7 @@ namespace ContosoUniversity.Api.Test.Services
 
             _studentsRepository.Verify(s => s.Update(_studentEntities[0]), Times.Exactly(1));
 
-            _studentsRepository.Verify(s => s.Save("Student"), Times.Exactly(1));
+            _studentsRepository.Verify(s => s.Save(), Times.Exactly(1));
 
             returnedStudent.Should().BeEquivalentTo(_students[0]);
         }
@@ -153,7 +153,7 @@ namespace ContosoUniversity.Api.Test.Services
 
             _studentsRepository.Verify(s => s.Remove(_studentEntities[0]), Times.Exactly(1));
 
-            _studentsRepository.Verify(s => s.Save("Student"), Times.Exactly(1));
+            _studentsRepository.Verify(s => s.Save(), Times.Exactly(1));
 
             isRemoved.Should().BeTrue();
         }

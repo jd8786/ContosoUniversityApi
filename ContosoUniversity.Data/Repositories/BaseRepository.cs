@@ -45,16 +45,9 @@ namespace ContosoUniversity.Data.Repositories
             Context.Set<T>().Update(entity);
         }
 
-        public void Save(string entityName)
+        public void Save()
         {
-            try
-            {
-                Context.SaveChanges();
-            }
-            catch(Exception ex)
-            {
-                throw new FailedToSaveDatabaseException($"{entityName} failed to save to the database", ex);
-            }
+            Context.SaveChanges();
         }
     }
 }

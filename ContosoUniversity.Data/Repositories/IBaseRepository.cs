@@ -16,6 +16,6 @@ namespace ContosoUniversity.Data.Repositories
 
         void Update(T entity);
 
-        void Save(string entityName);
+        void Save();
     }
 }
