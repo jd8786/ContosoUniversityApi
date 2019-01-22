@@ -12,19 +12,19 @@ namespace ContosoUniversity.Api.Services
     {
         private readonly IStudentsRepository _studentsRepository;
 
-        private readonly IEnrollmentsRepository _enrollmentsRepository;
-
         private readonly IStudentValidator _studentValidator;
+
+        private readonly ICourseValidator _courseValidator;
 
         private readonly IMapper _mapper;
 
-        public StudentsesService(IStudentsRepository studentsRepository, IEnrollmentsRepository enrollmentsRepository, IStudentValidator studentValidator, IMapper mapper)
+        public StudentsesService(IStudentsRepository studentsRepository, IStudentValidator studentValidator, ICourseValidator courseValidator,  IMapper mapper)
         {
             _studentsRepository = studentsRepository;
 
-            _enrollmentsRepository = enrollmentsRepository;
-
             _studentValidator = studentValidator;
+
+            _courseValidator = courseValidator;
 
             _mapper = mapper;
         }
@@ -49,9 +49,15 @@ namespace ContosoUniversity.Api.Services
         {
             _studentValidator.ValidatePostStudent(student);
 
-            var studentEntity = _mapper.Map<StudentEntity>(student);
+            if (student.Courses != null && student.Courses.Any())
+            {
+                foreach (var course in student.Courses)
+                {
+                    _courseValidator.Validate(course.CourseId);
+                }
+            }
 
-            studentEntity.Enrollments = null;
+            var studentEntity = _mapper.Map<StudentEntity>(student);
 
             _studentsRepository.Add(studentEntity);
 
@@ -64,19 +70,15 @@ namespace ContosoUniversity.Api.Services
         {
             _studentValidator.ValidatePutStudent(student);
 
-            var existingStudent = Get(student.StudentId);
+            if (student.Courses != null && student.Courses.Any())
+            {
+                foreach (var course in student.Courses)
+                {
+                    _courseValidator.Validate(course.CourseId);
+                }
+            }
 
-            existingStudent.Enrollments = _mapper.Map<IEnumerable<Enrollment>>(_enrollmentsRepository.GetByStudentId(student.StudentId));
-
-            existingStudent.EnrollmentDate = student.EnrollmentDate;
-
-            existingStudent.FirstMidName = student.FirstMidName;
-
-            existingStudent.LastName = student.LastName;
-
-            existingStudent.OriginCountry = student.OriginCountry;
-
-            var studentEntity = _mapper.Map<StudentEntity>(existingStudent);
+            var studentEntity = _mapper.Map<StudentEntity>(student);
 
             _studentsRepository.Update(studentEntity);
 

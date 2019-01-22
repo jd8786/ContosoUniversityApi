@@ -14,12 +14,9 @@ namespace ContosoUniversity.Api.Controllers
     {
         private readonly IStudentsService _studentsService;
 
-        private readonly IEnrollmentsService _enrollmentsService;
-
-        public StudentsController(IStudentsService studentsService, IEnrollmentsService enrollmentsService)
+        public StudentsController(IStudentsService studentsService)
         {
             _studentsService = studentsService;
-            _enrollmentsService = enrollmentsService;
         }
 
         [HttpGet]
@@ -74,19 +71,7 @@ namespace ContosoUniversity.Api.Controllers
         {
             try
             {
-                var addedStudent = _studentsService.Add(student);
-
-                if (!student.Enrollments.IsNullOrEmpty())
-                {
-                    foreach (var studentEnrollment in student.Enrollments)
-                    {
-                        studentEnrollment.StudentId = addedStudent.StudentId;
-                    }
-
-                    _enrollmentsService.AddRange(student.Enrollments);
-                }
-
-                var newStudent = _studentsService.Get(addedStudent.StudentId);
+                var newStudent = _studentsService.Add(student);
 
                 return Ok(ApiResponse<Student>.Success(newStudent));
             }
@@ -118,8 +103,6 @@ namespace ContosoUniversity.Api.Controllers
             try
             {
                 var updatedStudent = _studentsService.Update(student);
-
-                _enrollmentsService.Update(student.StudentId, student.Enrollments);
 
                 return Ok(ApiResponse<Student>.Success(updatedStudent));
             }

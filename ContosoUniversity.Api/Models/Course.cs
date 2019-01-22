@@ -12,7 +12,5 @@ namespace ContosoUniversity.Api.Models
         public int Credits { get; set; }
 
         public Grade? Grade { get; set; }
-
-        public IEnumerable<Enrollment> Enrollments;
     }
 }

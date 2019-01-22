@@ -21,7 +21,7 @@ namespace ContosoUniversity.Api.Test.Controllers.Students
         public DeleteStudentTests()
         {
             _studentService = new Mock<IStudentsService>();
-            _controller = new StudentsController(_studentService.Object, null);
+            _controller = new StudentsController(_studentService.Object);
         }
 
         [Fact]

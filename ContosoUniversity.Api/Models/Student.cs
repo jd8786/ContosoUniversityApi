@@ -15,6 +15,6 @@ namespace ContosoUniversity.Api.Models
 
         public string OriginCountry { get; set; }
 
-        public IEnumerable<Enrollment> Enrollments { get; set; }
+        public IEnumerable<Course> Courses { get; set; }
     }
 }

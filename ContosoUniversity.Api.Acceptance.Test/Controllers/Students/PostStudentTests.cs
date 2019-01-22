@@ -34,7 +34,7 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
                 .With(s => s.LastName, "some-last-name")
                 .With(s => s.FirstMidName, "some-first-mid-name")
                 .With(s => s.OriginCountry, "some-origin-country")
-                .Without(s => s.Enrollments)
+                .Without(s => s.Courses)
                 .Without(s => s.StudentId)
                 .Create();
 
@@ -60,7 +60,7 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
                 .With(s => s.LastName, "some-last-name")
                 .With(s => s.FirstMidName, "some-first-mid-name")
                 .With(s => s.OriginCountry, "some-origin-country")
-                .With(s => s.Enrollments, new List<Enrollment> { new Enrollment { CourseId = 1050 }, new Enrollment { CourseId = 4022 } })
+                .With(s => s.Courses, new List<Course> { new Course { CourseId = 1050 }, new Course { CourseId = 4022 } })
                 .Without(s => s.StudentId)
                 .Create();
 

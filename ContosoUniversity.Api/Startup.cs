@@ -45,13 +45,9 @@ namespace ContosoUniversity.Api
 
             services.AddScoped<IStudentsService, StudentsesService>();
 
-            services.AddScoped<IEnrollmentsService, EnrollmentsService>();
-
             services.AddScoped<ICourseValidator, CourseValidator>();
 
             services.AddScoped<IStudentValidator, StudentValidator>();
-
-            services.AddScoped<IEnrollmentValidator, EnrollmentValidator>();
 
             services.AddSwaggerGen(o =>
             {

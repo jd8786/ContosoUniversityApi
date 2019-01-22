@@ -40,14 +40,14 @@ namespace ContosoUniversity.Api.Test.AutoMappers
             student.FirstMidName.Should().Be(studentEntity.FirstMidName);
             student.OriginCountry.Should().Be(studentEntity.OriginCountry);
             student.EnrollmentDate.Should().Be(studentEntity.EnrollmentDate);
-            student.Enrollments.Should().BeEmpty();
+            student.Courses.Should().BeEmpty();
         }
 
         [Fact]
         public void ShouldMapStudentPropertiesToStudentEntity()
         {
             var student = _autoFixture.Build<Student>()
-                .Without(s => s.Enrollments)
+                .Without(s => s.Courses)
                 .Create();
 
             var studentEntity = _mapper.Map<StudentEntity>(student);
