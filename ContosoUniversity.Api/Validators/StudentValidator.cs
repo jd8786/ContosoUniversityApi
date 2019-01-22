@@ -50,6 +50,8 @@ namespace ContosoUniversity.Api.Validators
             {
                 throw new InvalidStudentException("Student Id cannot be 0");
             }
+
+            Validate(student.StudentId);
         }
     }
 }

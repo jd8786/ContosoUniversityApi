@@ -26,12 +26,7 @@ namespace ContosoUniversity.Data.Repositories
 
         public override void Update(StudentEntity student)
         {
-            var existingStudent = GetAllWithTracking().FirstOrDefault(s => s.StudentId == student.StudentId);
-
-            if (existingStudent == null)
-            {
-                throw new NotFoundException($"Student with Id {student.StudentId} does not exist");
-            }
+            var existingStudent = GetAllWithTracking().First(s => s.StudentId == student.StudentId);
 
             Context.Entry(existingStudent).CurrentValues.SetValues(student);
 
@@ -44,8 +39,10 @@ namespace ContosoUniversity.Data.Repositories
                 {
                     existingStudent.Enrollments.Add(enrollment);
                 }
-
-                existingEnrollment.Grade = enrollment.Grade;
+                else
+                {
+                    existingEnrollment.Grade = enrollment.Grade;
+                }
             }
 
             foreach (var enrollment in existingStudent.Enrollments)
