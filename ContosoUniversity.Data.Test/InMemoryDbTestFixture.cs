@@ -5,13 +5,13 @@ using System.Collections.Generic;
 
 namespace ContosoUniversity.Data.Test
 {
-    public class UnitTestFixture: IDisposable
+    public class InMemoryDbTestFixture: IDisposable
     {
         private readonly DbContextOptions<SchoolContext> _options;
 
         public SchoolContext Context => new SchoolContext(_options);
 
-        public UnitTestFixture()
+        public InMemoryDbTestFixture()
         {
             _options = new DbContextOptionsBuilder<SchoolContext>().UseInMemoryDatabase(Guid.NewGuid().ToString()).Options;
         }
@@ -135,17 +135,15 @@ namespace ContosoUniversity.Data.Test
                 // Enrollments
                 var enrollment1 = new EnrollmentEntity
                 {
-                    EnrollmentId = 1,
-                    Course = course1,
-                    Student = student1,
-                    Grade = Grade.A,
+                    CourseId = 1,
+                    StudentId = 1,
+                    Grade = Grade.A
                 };
 
                 var enrollment2 = new EnrollmentEntity
                 {
-                    EnrollmentId = 2,
-                    Course = course2,
-                    Student = student2,
+                    CourseId = 2,
+                    StudentId = 2
                 };
 
                 var enrollments = new List<EnrollmentEntity> { enrollment1, enrollment2 };

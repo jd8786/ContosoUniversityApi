@@ -15,7 +15,7 @@ namespace ContosoUniversity.Api.AutoMappers
                 .ForMember(dest => dest.Enrollments, opt => opt.MapFrom(src => GetEnrollments(src)));
         }
 
-        private IEnumerable<Course> GetCourses(StudentEntity student)
+        private static IEnumerable<Course> GetCourses(StudentEntity student)
         {
             var courses = new List<Course>();
 
@@ -38,7 +38,7 @@ namespace ContosoUniversity.Api.AutoMappers
             return courses;
         }
 
-        private IEnumerable<EnrollmentEntity> GetEnrollments(Student student)
+        private static IEnumerable<EnrollmentEntity> GetEnrollments(Student student)
         {
             var enrollments = new List<EnrollmentEntity>();
 

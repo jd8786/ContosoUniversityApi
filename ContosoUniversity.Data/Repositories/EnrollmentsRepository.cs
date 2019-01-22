@@ -24,21 +24,5 @@ namespace ContosoUniversity.Data.Repositories
         {
             return GetAll().Where(e => e.StudentId == studentId);
         }
-
-        public void UpdateEnrollmentGrade(int studentId, int courseId, EnrollmentEntity enrollmentEntity)
-        {
-            var existingEnrollment = GetAll().First(e => e.StudentId == studentId && e.CourseId == courseId);
-
-            if (enrollmentEntity.EnrollmentId != existingEnrollment.EnrollmentId)
-            {
-                throw new InvalidEnrollmentException("Enrollment Id is invalid");
-            }
-
-            if (existingEnrollment.Grade == enrollmentEntity.Grade) return;
-
-            existingEnrollment.Grade = enrollmentEntity.Grade;
-
-            Update(existingEnrollment);
-        }
     }
 }

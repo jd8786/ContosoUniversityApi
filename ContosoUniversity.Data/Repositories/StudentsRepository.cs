@@ -21,7 +21,9 @@ namespace ContosoUniversity.Data.Repositories
         {
             return Context.Students
                 .Include(s => s.Enrollments)
-                .ThenInclude(e => e.Course);
+                .ThenInclude(e => e.Course)
+                .Include(s => s.Enrollments)
+                .ThenInclude(s => s.Student);
         }
 
         public override void Update(StudentEntity student)
@@ -30,7 +32,7 @@ namespace ContosoUniversity.Data.Repositories
 
             Context.Entry(existingStudent).CurrentValues.SetValues(student);
 
-            foreach (var enrollment in student.Enrollments)
+            foreach (var enrollment in student.Enrollments ?? new List<EnrollmentEntity>())
             {
                 var existingEnrollment = existingStudent.Enrollments.FirstOrDefault(e =>
                     e.CourseId == enrollment.CourseId && e.StudentId == enrollment.StudentId);
@@ -47,9 +49,9 @@ namespace ContosoUniversity.Data.Repositories
 
             foreach (var enrollment in existingStudent.Enrollments)
             {
-                var isEnrollmentRemoved = !student.Enrollments.Any(e => e.CourseId == enrollment.CourseId && e.StudentId == enrollment.StudentId);
+                var shouldEnrollmentRemoved = !student.Enrollments?.Any(e => e.CourseId == enrollment.CourseId && e.StudentId == enrollment.StudentId);
 
-                if (isEnrollmentRemoved)
+                if (shouldEnrollmentRemoved != false)
                 {
                     Context.Remove(enrollment);
                 }
