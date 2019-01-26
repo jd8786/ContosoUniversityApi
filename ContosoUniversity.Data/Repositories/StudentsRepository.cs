@@ -14,11 +14,6 @@ namespace ContosoUniversity.Data.Repositories
 
         public override IEnumerable<StudentEntity> GetAll()
         {
-            return GetAllWithTracking().AsNoTracking().ToList();
-        }
-
-        public IQueryable<StudentEntity> GetAllWithTracking()
-        {
             return Context.Students
                 .Include(s => s.Enrollments)
                 .ThenInclude(e => e.Course)
@@ -28,7 +23,7 @@ namespace ContosoUniversity.Data.Repositories
 
         public override void Update(StudentEntity student)
         {
-            var existingStudent = GetAllWithTracking().First(s => s.StudentId == student.StudentId);
+            var existingStudent = GetAll().First(s => s.StudentId == student.StudentId);
 
             Context.Entry(existingStudent).CurrentValues.SetValues(student);
 
