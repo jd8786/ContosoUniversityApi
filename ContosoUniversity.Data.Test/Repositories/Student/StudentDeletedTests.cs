@@ -4,6 +4,8 @@ using FluentAssertions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace ContosoUniversity.Data.Test.Repositories.Student
@@ -55,5 +57,19 @@ namespace ContosoUniversity.Data.Test.Repositories.Student
 
             _fixture.Context.Students.Any(s => s.StudentId == 1 || s.StudentId == 2).Should().BeFalse();
         }
+
+        //[Fact]
+        //public void ShouldRemoveEnrollmentsWhenStudentIsRemoved()
+        //{
+
+        //    var student = new StudentEntity { StudentId = 1 };
+
+        //    _repository.Remove(student);
+
+        //    _repository.Save();
+
+        //    _fixture.Context.Students.Any(s => s.StudentId == 1).Should().BeFalse();
+        //    _fixture.Context.Enrollments.Any(e => e.StudentId == 1).Should().BeFalse();
+        //}
     }
 }

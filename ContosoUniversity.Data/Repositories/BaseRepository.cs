@@ -1,7 +1,4 @@
-﻿using ContosoUniversity.Data.Exceptions;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace ContosoUniversity.Data.Repositories
@@ -17,7 +14,7 @@ namespace ContosoUniversity.Data.Repositories
 
         public virtual IEnumerable<T> GetAll()
         {
-            return Context.Set<T>().AsNoTracking().ToList();
+            return Context.Set<T>().ToList();
         }
 
         public void Remove(T entity)

@@ -39,8 +39,8 @@ namespace ContosoUniversity.Data.Test.Repositories.Student
         {
             var students = _repository.GetAll().ToList();
 
-            students[0].Enrollments.Any(e => e.CourseId == 1 && e.StudentId == 1).Should().BeTrue();
-            students[1].Enrollments.Any(e => e.CourseId == 2 && e.StudentId == 2).Should().BeTrue();
+            students[0].Enrollments.Any(e => e.Course.CourseId == 1 && e.StudentId == 1).Should().BeTrue();
+            students[1].Enrollments.Any(e => e.Course.CourseId == 2 && e.StudentId == 2).Should().BeTrue();
         }
     }
 }

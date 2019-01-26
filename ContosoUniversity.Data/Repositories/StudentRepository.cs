@@ -16,9 +16,7 @@ namespace ContosoUniversity.Data.Repositories
         {
             return Context.Students
                 .Include(s => s.Enrollments)
-                .ThenInclude(e => e.Course)
-                .Include(s => s.Enrollments)
-                .ThenInclude(s => s.Student);
+                .ThenInclude(e => e.Course);
         }
 
         public override void Update(StudentEntity student)

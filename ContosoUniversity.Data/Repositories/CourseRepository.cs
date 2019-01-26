@@ -13,9 +13,12 @@ namespace ContosoUniversity.Data.Repositories
 
         public override IEnumerable<CourseEntity> GetAll()
         {
-            return Context.Courses.AsNoTracking()
+            return Context.Courses
                 .Include(c => c.Enrollments)
                 .ThenInclude(c => c.Student)
+                .Include(c => c.Department)
+                .Include(c => c.CourseAssignments)
+                .ThenInclude(ca => ca.Instructor)
                 .ToList();
         }
     }

@@ -41,8 +41,6 @@ namespace ContosoUniversity.Api
 
             services.AddScoped<ICourseRepository, CourseRepository>();
 
-            services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
-
             services.AddScoped<IStudentService, StudentService>();
 
             services.AddScoped<ICourseValidator, CourseValidator>();
