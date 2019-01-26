@@ -8,26 +8,27 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
+using ApiModels = ContosoUniversity.Api.Models;
 
-namespace ContosoUniversity.Api.Test.Controllers.Students
+namespace ContosoUniversity.Api.Test.Controllers.Student
 {
-    [Trait("Category", "Unit Test: Api.Controllers.Students.GetStudents")]
+    [Trait("Category", "Unit Test: Api.Controllers.Student.GetStudents")]
     public class GetStudentsTests
     {
-        private readonly Mock<IStudentsService> _studentService;
+        private readonly Mock<IStudentService> _studentService;
 
-        private readonly StudentsController _controller;
+        private readonly StudentController _controller;
 
         public GetStudentsTests()
         {
-            _studentService = new Mock<IStudentsService>();
-            _controller = new StudentsController(_studentService.Object);
+            _studentService = new Mock<IStudentService>();
+            _controller = new StudentController(_studentService.Object);
         }
 
         [Fact]
         public void ShouldReturnOkResponse()
         {
-            _studentService.Setup(s => s.GetAll()).Returns(new List<Student>());
+            _studentService.Setup(s => s.GetAll()).Returns(new List<ApiModels.Student>());
 
             var response = _controller.GetStudents();
 
@@ -35,7 +36,7 @@ namespace ContosoUniversity.Api.Test.Controllers.Students
 
             okResponse.StatusCode.Should().Be(200);
 
-            var responseObject = (ApiResponse<IEnumerable<Student>>)okResponse.Value;
+            var responseObject = (ApiResponse<IEnumerable<ApiModels.Student>>)okResponse.Value;
 
             responseObject.IsSuccess.Should().BeTrue();
 

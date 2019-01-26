@@ -3,7 +3,7 @@ using ContosoUniversity.Api.Models;
 
 namespace ContosoUniversity.Api.Services
 {
-    public interface IStudentsService
+    public interface IStudentService
     {
         IEnumerable<Student> GetAll();
 

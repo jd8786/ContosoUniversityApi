@@ -37,13 +37,13 @@ namespace ContosoUniversity.Api
             services.AddDbContext<SchoolContext>(options => options
                 .UseSqlServer(schoolDbConnectionString), ServiceLifetime.Transient);
 
-            services.AddScoped<IStudentsRepository, StudentsRepository>();
+            services.AddScoped<IStudentRepository, StudentRepository>();
 
-            services.AddScoped<ICoursesRepository, CoursesRepository>();
+            services.AddScoped<ICourseRepository, CourseRepository>();
 
-            services.AddScoped<IEnrollmentsRepository, EnrollmentsRepository>();
+            services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
 
-            services.AddScoped<IStudentsService, StudentsesService>();
+            services.AddScoped<IStudentService, StudentService>();
 
             services.AddScoped<ICourseValidator, CourseValidator>();
 

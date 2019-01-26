@@ -8,46 +8,47 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using Xunit;
+using ApiModels = ContosoUniversity.Api.Models;
 
-namespace ContosoUniversity.Api.Test.Controllers.Students
+namespace ContosoUniversity.Api.Test.Controllers.Student
 {
-    [Trait("Category", "Unit Test: Api.Controllers.Students.DeleteStudent")]
-    public class DeleteStudentTests
+    [Trait("Category", "Unit Test: Api.Controllers.Student.GetStudentById")]
+    public class GetStudentByIdTests
     {
-        private readonly Mock<IStudentsService> _studentService;
+        private readonly Mock<IStudentService> _studentService;
 
-        private readonly StudentsController _controller;
+        private readonly StudentController _controller;
 
-        public DeleteStudentTests()
+        public GetStudentByIdTests()
         {
-            _studentService = new Mock<IStudentsService>();
-            _controller = new StudentsController(_studentService.Object);
+            _studentService = new Mock<IStudentService>();
+            _controller = new StudentController(_studentService.Object);
         }
 
         [Fact]
         public void ShouldReturnOkResponse()
         {
-            var response = _controller.DeleteStudent(1);
+            _studentService.Setup(s => s.Get(It.IsAny<int>())).Returns(new ApiModels.Student());
 
-            _studentService.Verify(s => s.Remove(1), Times.Exactly(1));
+            var response = _controller.GetStudentById(It.IsAny<int>());
 
             var okResponse = (OkObjectResult)response;
 
             okResponse.StatusCode.Should().Be(200);
 
-            var responseObject = (ApiResponse<bool>)okResponse.Value;
+            var responseObject = (ApiResponse<ApiModels.Student>)okResponse.Value;
 
             responseObject.IsSuccess.Should().BeTrue();
 
-            responseObject.Data.Should().BeTrue();
+            responseObject.Data.Should().BeEquivalentTo(new ApiModels.Student());
         }
 
         [Fact]
         public void ShouldReturnNotFoundWhenThrowingNotFoundException()
         {
-            _studentService.Setup(s => s.Remove(It.IsAny<int>())).Throws(new NotFoundException("some-error-message"));
+            _studentService.Setup(s => s.Get(It.IsAny<int>())).Throws(new NotFoundException("some-error-message"));
 
-            var response = _controller.DeleteStudent(It.IsAny<int>());
+            var response = _controller.GetStudentById(It.IsAny<int>());
 
             var errorResponse = (ObjectResult)response;
 
@@ -63,9 +64,9 @@ namespace ContosoUniversity.Api.Test.Controllers.Students
         [Fact]
         public void ShouldReturnInternalServerErrorWhenThrowingException()
         {
-            _studentService.Setup(s => s.Remove(It.IsAny<int>())).Throws(new Exception("some-error-message"));
+            _studentService.Setup(s => s.Get(It.IsAny<int>())).Throws(new Exception("some-error-message"));
 
-            var response = _controller.DeleteStudent(It.IsAny<int>());
+            var response = _controller.GetStudentById(It.IsAny<int>());
 
             var errorResponse = (ObjectResult)response;
 

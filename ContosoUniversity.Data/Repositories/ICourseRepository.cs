@@ -2,7 +2,7 @@
 
 namespace ContosoUniversity.Data.Repositories
 {
-    public interface ICoursesRepository: IBaseRepository<CourseEntity>
+    public interface ICourseRepository: IBaseRepository<CourseEntity>
     {
     }
 }

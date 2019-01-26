@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ContosoUniversity.Data.Repositories
 {
-    public class CoursesRepository: BaseRepository<CourseEntity>, ICoursesRepository
+    public class CourseRepository: BaseRepository<CourseEntity>, ICourseRepository
     {
-        public CoursesRepository(SchoolContext context) : base(context)
+        public CourseRepository(SchoolContext context) : base(context)
         {
         }
 

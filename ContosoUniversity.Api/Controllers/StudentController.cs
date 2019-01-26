@@ -1,20 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using Castle.Core.Internal;
-using ContosoUniversity.Api.Models;
+﻿using ContosoUniversity.Api.Models;
 using ContosoUniversity.Api.Services;
 using ContosoUniversity.Data.Exceptions;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Net;
 
 namespace ContosoUniversity.Api.Controllers
 {
     [Route("api/students")]
-    public class StudentsController : Controller
+    public class StudentController : Controller
     {
-        private readonly IStudentsService _studentsService;
+        private readonly IStudentService _studentsService;
 
-        public StudentsController(IStudentsService studentsService)
+        public StudentController(IStudentService studentsService)
         {
             _studentsService = studentsService;
         }

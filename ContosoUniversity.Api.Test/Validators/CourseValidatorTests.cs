@@ -13,13 +13,13 @@ namespace ContosoUniversity.Api.Test.Validators
     [Trait("Category", "Unit Test: Api.Validators.Course")]
     public class CourseValidatorTests
     {
-        private readonly Mock<ICoursesRepository> _courseRepository;
+        private readonly Mock<ICourseRepository> _courseRepository;
 
         private readonly ICourseValidator _courseValidator;
 
         public CourseValidatorTests()
         {
-            _courseRepository = new Mock<ICoursesRepository>();
+            _courseRepository = new Mock<ICourseRepository>();
             _courseValidator = new CourseValidator(_courseRepository.Object);
         }
 

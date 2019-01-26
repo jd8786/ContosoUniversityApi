@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ContosoUniversity.Data.Repositories
 {
-    public class EnrollmentsRepository: BaseRepository<EnrollmentEntity>, IEnrollmentsRepository
+    public class EnrollmentRepository: BaseRepository<EnrollmentEntity>, IEnrollmentRepository
     {
-        public EnrollmentsRepository(SchoolContext context) : base(context)
+        public EnrollmentRepository(SchoolContext context) : base(context)
         {
         }
 

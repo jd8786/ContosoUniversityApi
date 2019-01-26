@@ -7,9 +7,9 @@ namespace ContosoUniversity.Api.Validators
 {
     public class StudentValidator: IStudentValidator
     {
-        private readonly IStudentsRepository _studentsRepository;
+        private readonly IStudentRepository _studentsRepository;
 
-        public StudentValidator(IStudentsRepository studentsRepository)
+        public StudentValidator(IStudentRepository studentsRepository)
         {
             _studentsRepository = studentsRepository;
         }

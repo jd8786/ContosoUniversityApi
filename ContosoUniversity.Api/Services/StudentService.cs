@@ -8,9 +8,9 @@ using System.Linq;
 
 namespace ContosoUniversity.Api.Services
 {
-    public class StudentsesService : IStudentsService
+    public class StudentService : IStudentService
     {
-        private readonly IStudentsRepository _studentsRepository;
+        private readonly IStudentRepository _studentsRepository;
 
         private readonly IStudentValidator _studentValidator;
 
@@ -18,7 +18,7 @@ namespace ContosoUniversity.Api.Services
 
         private readonly IMapper _mapper;
 
-        public StudentsesService(IStudentsRepository studentsRepository, IStudentValidator studentValidator, ICourseValidator courseValidator,  IMapper mapper)
+        public StudentService(IStudentRepository studentsRepository, IStudentValidator studentValidator, ICourseValidator courseValidator,  IMapper mapper)
         {
             _studentsRepository = studentsRepository;
 

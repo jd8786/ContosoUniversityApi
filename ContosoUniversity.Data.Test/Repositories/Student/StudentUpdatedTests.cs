@@ -11,7 +11,7 @@ namespace ContosoUniversity.Data.Test.Repositories.Student
     [Trait("Category", "Unit Test: Data.Repositories.Student")]
     public class StudentUpdatedTests : IClassFixture<InMemoryDbTestFixture>, IDisposable
     {
-        private readonly IStudentsRepository _repository;
+        private readonly IStudentRepository _repository;
         private readonly InMemoryDbTestFixture _fixture;
 
         public StudentUpdatedTests(InMemoryDbTestFixture fixture)
@@ -20,7 +20,7 @@ namespace ContosoUniversity.Data.Test.Repositories.Student
 
             _fixture.InitData();
 
-            _repository = new StudentsRepository(_fixture.Context);
+            _repository = new StudentRepository(_fixture.Context);
         }
 
         public void Dispose()
