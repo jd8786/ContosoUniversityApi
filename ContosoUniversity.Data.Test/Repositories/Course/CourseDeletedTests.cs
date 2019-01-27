@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using ContosoUniversity.Data.EntityModels;
-using ContosoUniversity.Data.Repositories;
+﻿using ContosoUniversity.Data.Repositories;
 using ContosoUniversity.Data.Test.Fixtures;
 using FluentAssertions;
+using System;
+using System.Linq;
 using Xunit;
 
 namespace ContosoUniversity.Data.Test.Repositories.Course
@@ -12,7 +10,7 @@ namespace ContosoUniversity.Data.Test.Repositories.Course
     [Trait("Category", "Unit Test: Data.Repositories.Course")]
     public class CourseDeletedTests : IClassFixture<InMemoryDbTestFixture>, IDisposable
     {
-        private readonly ICourseRepository _repository;
+        private readonly CourseRepository _repository;
         private readonly InMemoryDbTestFixture _fixture;
 
         public CourseDeletedTests(InMemoryDbTestFixture fixture)
@@ -32,29 +30,51 @@ namespace ContosoUniversity.Data.Test.Repositories.Course
         [Fact]
         public void ShouldRemoveCourseWhenCallingRemove()
         {
-            var course = new CourseEntity { CourseId = 1 };
+            var course = _repository.Context.Courses.Find(1);
 
             _repository.Remove(course);
 
             _repository.Save();
 
-            _fixture.Context.Courses.Any(s => s.CourseId == 1).Should().BeFalse();
+            _fixture.Context.Courses.Any(c => c.CourseId == 1).Should().BeFalse();
         }
 
         [Fact]
         public void ShouldRemoveAListOfCoursesWhenCallingRemoveArrange()
         {
-            var courses = new List<CourseEntity>
-            {
-                new CourseEntity { CourseId = 1 },
-                new CourseEntity { CourseId = 2 }
-            };
+            var courses = _repository.Context.Courses;
 
             _repository.RemoveRange(courses);
 
             _repository.Save();
 
-            _fixture.Context.Courses.Any(s => s.CourseId == 1 || s.CourseId == 2).Should().BeFalse();
+            _fixture.Context.Courses.Any(c => c.CourseId == 1 || c.CourseId == 2).Should().BeFalse();
+        }
+
+        [Fact]
+        public void ShouldNotRemoveDepartmentWhenRemovingCourse()
+        {
+            var course = _repository.Context.Courses.Find(1);
+
+            _repository.Remove(course);
+
+            _repository.Save();
+
+            _fixture.Context.Courses.Any(c => c.CourseId == 1).Should().BeFalse();
+            _fixture.Context.Departments.Any(d => d.DepartmentId == 1).Should().BeTrue();
+        }
+
+        [Fact]
+        public void ShouldRemoveCourseAssignmentsWhenRemovingCourse()
+        {
+            var course = _repository.Context.Courses.Find(1);
+
+            _repository.Remove(course);
+
+            _repository.Save();
+
+            _fixture.Context.Courses.Any(c => c.CourseId == 1).Should().BeFalse();
+            _fixture.Context.CourseAssignments.Any(c => c.CourseId == 1 && c.InstructorId == 1).Should().BeFalse();
         }
     }
 }

@@ -12,7 +12,7 @@ namespace ContosoUniversity.Data.Test.Repositories.Student
     [Trait("Category", "Unit Test: Data.Repositories.Student")]
     public class StudentDeletedTests : IClassFixture<InMemoryDbTestFixture>, IDisposable
     {
-        private readonly IStudentRepository _repository;
+        private readonly StudentRepository _repository;
         private readonly InMemoryDbTestFixture _fixture;
 
         public StudentDeletedTests(InMemoryDbTestFixture fixture)
@@ -32,7 +32,7 @@ namespace ContosoUniversity.Data.Test.Repositories.Student
         [Fact]
         public void ShouldRemoveStudentWhenCallingRemove()
         {
-            var student = new StudentEntity { StudentId = 1 };
+            var student = _repository.Context.Students.Find(1);
 
             _repository.Remove(student);
 
@@ -44,11 +44,7 @@ namespace ContosoUniversity.Data.Test.Repositories.Student
         [Fact]
         public void ShouldRemoveAListOfStudentsWhenCallingRemoveArrange()
         {
-            var students = new List<StudentEntity>
-            {
-                new StudentEntity { StudentId = 1 },
-                new StudentEntity { StudentId = 2 }
-            };
+            var students = _repository.Context.Students;
 
             _repository.RemoveRange(students);
 
@@ -60,8 +56,7 @@ namespace ContosoUniversity.Data.Test.Repositories.Student
         [Fact]
         public void ShouldRemoveEnrollmentsWhenStudentIsRemoved()
         {
-
-            var student = new StudentEntity { StudentId = 1 };
+            var student = _repository.Context.Students.Find(1);
 
             _repository.Remove(student);
 

@@ -95,6 +95,7 @@ namespace ContosoUniversity.Data.Test.Repositories.Student
             addedStudent.Should().NotBeNull();
 
             addedStudent.Enrollments.Count(e => e.CourseId == 1 && e.StudentId == 3).Should().Be(1);
+            _fixture.Context.Enrollments.Count(e => e.CourseId == 1 && e.StudentId == 3).Should().Be(1);
         }
     }
 }

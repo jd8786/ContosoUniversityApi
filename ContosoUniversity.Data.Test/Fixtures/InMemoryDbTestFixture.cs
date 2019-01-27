@@ -97,14 +97,12 @@ namespace ContosoUniversity.Data.Test.Fixtures
                 // CourseAssignments
                 var courseAssignment1 = new CourseAssignmentEntity
                 {
-                    CourseAssignmentId = 1,
                     CourseId = 1,
                     InstructorId = 1
                 };
 
                 var courseAssignment2 = new CourseAssignmentEntity
                 {
-                    CourseAssignmentId = 2,
                     CourseId = 2,
                     InstructorId = 2
                 };
