@@ -5,14 +5,15 @@ using ContosoUniversity.Data.EntityModels;
 using ContosoUniversity.Data.Repositories;
 using ContosoUniversity.Data.Test.Fixtures;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace ContosoUniversity.Data.Test.Repositories.Course
 {
-    [Trait("Category", "Unit Test: Data.Repositories.Student")]
+    [Trait("Category", "Unit Test: Data.Repositories.Course")]
     public class CourseUpdatedTests : IClassFixture<InMemoryDbTestFixture>, IDisposable
     {
-        private readonly IStudentRepository _repository;
+        private readonly CourseRepository _repository;
         private readonly InMemoryDbTestFixture _fixture;
 
         public CourseUpdatedTests(InMemoryDbTestFixture fixture)
@@ -21,7 +22,7 @@ namespace ContosoUniversity.Data.Test.Repositories.Course
 
             _fixture.InitData();
 
-            _repository = new StudentRepository(_fixture.Context);
+            _repository = new CourseRepository(_fixture.Context);
         }
 
         public void Dispose()
@@ -32,31 +33,27 @@ namespace ContosoUniversity.Data.Test.Repositories.Course
         [Fact]
         public void ShouldUpdatePrimaryPropertiesWhenCallingUpdate()
         {
-            var studentToUpdate = new StudentEntity
+            var courseToUpdate = new CourseEntity
             {
-                StudentId = 1,
-                LastName = "update-last-name",
-                FirstMidName = "update-first-mid-name",
-                OriginCountry = "update-origin-country",
-                EnrollmentDate = new DateTime(2015, 7, 1),
+                CourseId = 1,
+                Title = "new-title",
+                Credits = 8,
                 CreatedBy = "update-user1",
                 CreatedDate = new DateTime(2005, 7, 1),
                 UpdatedBy = "update-user2",
                 UpdatedDate = new DateTime(2010, 7, 1),
             };
 
-            _repository.Update(studentToUpdate);
+            _repository.Update(courseToUpdate);
 
             _repository.Save();
 
-            var updatedStudent = _fixture.Context.Students.FirstOrDefault(s => s.StudentId == 1);
+            var updatedStudent = _fixture.Context.Courses.Find(1);
 
             updatedStudent.Should().NotBeNull();
 
-            updatedStudent.LastName.Should().Be("update-last-name");
-            updatedStudent.FirstMidName.Should().Be("update-first-mid-name");
-            updatedStudent.OriginCountry.Should().Be("update-origin-country");
-            updatedStudent.EnrollmentDate.Should().Be(new DateTime(2015, 7, 1));
+            updatedStudent.Title.Should().Be("new-title");
+            updatedStudent.Credits.Should().Be(8);
             updatedStudent.CreatedBy.Should().Be("update-user1");
             updatedStudent.CreatedDate.Should().Be(new DateTime(2005, 7, 1));
             updatedStudent.UpdatedBy.Should().Be("update-user2");
@@ -64,11 +61,11 @@ namespace ContosoUniversity.Data.Test.Repositories.Course
         }
 
         [Fact]
-        public void ShouldAddEnrollmentToStudentWhenCallingUpdate()
+        public void ShouldAddEnrollmentToCourseWhenCallingUpdate()
         {
-            var studentToUpdate = new StudentEntity
+            var courseToUpdate = new CourseEntity
             {
-                StudentId = 1,
+                CourseId = 1,
                 Enrollments = new List<EnrollmentEntity>
                 {
                     new EnrollmentEntity
@@ -78,22 +75,23 @@ namespace ContosoUniversity.Data.Test.Repositories.Course
                     },
                     new EnrollmentEntity
                     {
-                        CourseId = 2,
-                        StudentId = 1
+                        CourseId = 1,
+                        StudentId = 2
                     }
                 }
             };
 
-            _repository.Update(studentToUpdate);
+            _repository.Update(courseToUpdate);
 
             _repository.Save();
 
-            var updatedStudent = _repository.GetAll().FirstOrDefault(s => s.StudentId == 1);
+            var updatedCourse = _fixture.Context.Courses.Include(c => c.Enrollments).FirstOrDefault(s => s.CourseId == 1);
 
-            updatedStudent.Should().NotBeNull();
+            updatedCourse.Should().NotBeNull();
 
-            updatedStudent.Enrollments.Count.Should().Be(2);
-            updatedStudent.Enrollments.Any(e => e.StudentId == 1 && e.CourseId == 2).Should().BeTrue();
+            updatedCourse.Enrollments.Count.Should().Be(2);
+            updatedCourse.Enrollments.Any(e => e.StudentId == 2 && e.CourseId == 1).Should().BeTrue();
+            _fixture.Context.Enrollments.Count(e => e.StudentId == 2 && e.CourseId == 1).Should().Be(1);
         }
 
         [Fact]

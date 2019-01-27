@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ContosoUniversity.Data.Test.Fixtures;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace ContosoUniversity.Data.Test.Repositories.Student
@@ -49,7 +50,7 @@ namespace ContosoUniversity.Data.Test.Repositories.Student
 
             _repository.Save();
 
-            var updatedStudent = _fixture.Context.Students.FirstOrDefault(s => s.StudentId == 1);
+            var updatedStudent = _fixture.Context.Students.Find(1);
 
             updatedStudent.Should().NotBeNull();
 
@@ -88,13 +89,13 @@ namespace ContosoUniversity.Data.Test.Repositories.Student
 
             _repository.Save();
 
-            var updatedStudent = _repository.GetAll().FirstOrDefault(s => s.StudentId == 1);
+            var updatedStudent = _fixture.Context.Students.Include(s => s.Enrollments).FirstOrDefault(s => s.StudentId == 1);
 
             updatedStudent.Should().NotBeNull();
 
             updatedStudent.Enrollments.Count.Should().Be(2);
             updatedStudent.Enrollments.Any(e => e.StudentId == 1 && e.CourseId == 2).Should().BeTrue();
-            _fixture.Context.Enrollments.Any(e => e.StudentId == 1 && e.CourseId == 2).Should().BeTrue();
+            _fixture.Context.Enrollments.Count(e => e.StudentId == 1 && e.CourseId == 2).Should().Be(1);
         }
 
         [Fact]
@@ -109,7 +110,7 @@ namespace ContosoUniversity.Data.Test.Repositories.Student
 
             _repository.Save();
 
-            var updatedStudent = _repository.GetAll().FirstOrDefault(s => s.StudentId == 1);
+            var updatedStudent = _fixture.Context.Students.Include(s => s.Enrollments).FirstOrDefault(s => s.StudentId == 1);
 
             updatedStudent.Should().NotBeNull();
 
@@ -137,7 +138,7 @@ namespace ContosoUniversity.Data.Test.Repositories.Student
 
             _repository.Save();
 
-            var updatedStudent = _repository.GetAll().FirstOrDefault(s => s.StudentId == 1);
+            var updatedStudent = _fixture.Context.Students.Include(s => s.Enrollments).FirstOrDefault(s => s.StudentId == 1);
 
             updatedStudent.Should().NotBeNull();
 
@@ -166,7 +167,7 @@ namespace ContosoUniversity.Data.Test.Repositories.Student
 
             _repository.Save();
 
-            var updatedStudent = _repository.GetAll().FirstOrDefault(s => s.StudentId == 1);
+            var updatedStudent = _fixture.Context.Students.Include(s => s.Enrollments).FirstOrDefault(s => s.StudentId == 1);
 
             updatedStudent.Should().NotBeNull();
 

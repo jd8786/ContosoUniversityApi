@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using ContosoUniversity.Data.EntityModels;
-using ContosoUniversity.Data.Exceptions;
+﻿using ContosoUniversity.Data.EntityModels;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ContosoUniversity.Data.Repositories
 {
@@ -25,6 +24,11 @@ namespace ContosoUniversity.Data.Repositories
 
             Context.Entry(existingStudent).CurrentValues.SetValues(student);
 
+            UpdateEnrollments(student, existingStudent);
+        }
+
+        private void UpdateEnrollments(StudentEntity student, StudentEntity existingStudent)
+        {
             foreach (var enrollment in student.Enrollments ?? new List<EnrollmentEntity>())
             {
                 var existingEnrollment = existingStudent.Enrollments.FirstOrDefault(e =>
@@ -42,7 +46,8 @@ namespace ContosoUniversity.Data.Repositories
 
             foreach (var enrollment in existingStudent.Enrollments)
             {
-                var shouldEnrollmentRemoved = !student.Enrollments?.Any(e => e.CourseId == enrollment.CourseId && e.StudentId == enrollment.StudentId);
+                var shouldEnrollmentRemoved =
+                    !student.Enrollments?.Any(e => e.CourseId == enrollment.CourseId && e.StudentId == enrollment.StudentId);
 
                 if (shouldEnrollmentRemoved != false)
                 {

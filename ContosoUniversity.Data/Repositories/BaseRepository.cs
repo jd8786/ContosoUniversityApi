@@ -37,9 +37,9 @@ namespace ContosoUniversity.Data.Repositories
             Context.Set<T>().AddRange(entities);
         }
 
-        public virtual void Update(T entity)
+        public virtual void Update(T student)
         {
-            Context.Set<T>().Update(entity);
+            Context.Set<T>().Update(student);
         }
 
         public void Save()

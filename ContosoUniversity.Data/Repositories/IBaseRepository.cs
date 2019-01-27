@@ -14,7 +14,7 @@ namespace ContosoUniversity.Data.Repositories
 
         void AddRange(IEnumerable<T> entities);
 
-        void Update(T entity);
+        void Update(T student);
 
         void Save();
     }
