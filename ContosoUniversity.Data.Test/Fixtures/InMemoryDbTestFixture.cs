@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 
-namespace ContosoUniversity.Data.Test
+namespace ContosoUniversity.Data.Test.Fixtures
 {
     public class InMemoryDbTestFixture: IDisposable
     {

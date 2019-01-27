@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ContosoUniversity.Data.Test.Fixtures;
 using Xunit;
 
 namespace ContosoUniversity.Data.Test.Repositories.Student

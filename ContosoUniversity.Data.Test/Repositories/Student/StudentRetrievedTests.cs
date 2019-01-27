@@ -2,6 +2,7 @@
 using FluentAssertions;
 using System;
 using System.Linq;
+using ContosoUniversity.Data.Test.Fixtures;
 using Xunit;
 
 namespace ContosoUniversity.Data.Test.Repositories.Student
