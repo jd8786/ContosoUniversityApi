@@ -51,7 +51,6 @@ namespace ContosoUniversity.Data.Test.Repositories.Course
             var updatedStudent = _fixture.Context.Courses.Find(1);
 
             updatedStudent.Should().NotBeNull();
-
             updatedStudent.Title.Should().Be("new-title");
             updatedStudent.Credits.Should().Be(8);
             updatedStudent.CreatedBy.Should().Be("update-user1");
@@ -85,87 +84,158 @@ namespace ContosoUniversity.Data.Test.Repositories.Course
 
             _repository.Save();
 
-            var updatedCourse = _fixture.Context.Courses.Include(c => c.Enrollments).FirstOrDefault(s => s.CourseId == 1);
+            var updatedCourse = _fixture.Context.Courses.Include(c => c.Enrollments).FirstOrDefault(c => c.CourseId == 1);
 
             updatedCourse.Should().NotBeNull();
-
             updatedCourse.Enrollments.Count.Should().Be(2);
             updatedCourse.Enrollments.Any(e => e.StudentId == 2 && e.CourseId == 1).Should().BeTrue();
             _fixture.Context.Enrollments.Count(e => e.StudentId == 2 && e.CourseId == 1).Should().Be(1);
         }
 
         [Fact]
-        public void ShouldRemoveEnrollmentFromStudentWhenCallingUpdate()
+        public void ShouldRemoveEnrollmentFromCourseWhenCallingUpdate()
         {
-            var studentToUpdate = new StudentEntity
+            var courseToUpdate = new CourseEntity
             {
-                StudentId = 1,
+                CourseId = 1,
             };
 
-            _repository.Update(studentToUpdate);
+            _repository.Update(courseToUpdate);
 
             _repository.Save();
 
-            var updatedStudent = _repository.GetAll().FirstOrDefault(s => s.StudentId == 1);
+            var updatedCourse = _fixture.Context.Courses.Include(c => c.Enrollments).FirstOrDefault(c => c.CourseId == 1);
 
-            updatedStudent.Should().NotBeNull();
-
-            updatedStudent.Enrollments.Should().BeNullOrEmpty();
+            updatedCourse.Should().NotBeNull();
+            updatedCourse.Enrollments.Should().BeNullOrEmpty();
+            _fixture.Context.Enrollments.Any(e => e.CourseId == 1 && e.StudentId == 1).Should().BeFalse();
         }
 
         [Fact]
-        public void ShouldAddAndRemoveEnrollmentToStudentWhenCallingUpdate()
+        public void ShouldAddAndRemoveEnrollmentToCourseWhenCallingUpdate()
         {
-            var studentToUpdate = new StudentEntity
+            var courseToUpdate = new CourseEntity
             {
-                StudentId = 1,
-                Enrollments = new List<EnrollmentEntity>
-                {
-                    new EnrollmentEntity
-                    {
-                        CourseId = 2,
-                        StudentId = 1
-                    }
-                }
-            };
-
-            _repository.Update(studentToUpdate);
-
-            _repository.Save();
-
-            var updatedStudent = _repository.GetAll().FirstOrDefault(s => s.StudentId == 1);
-
-            updatedStudent.Should().NotBeNull();
-
-            updatedStudent.Enrollments.All(e => e.StudentId == 1 && e.CourseId == 2).Should().BeTrue();
-        }
-
-        [Fact]
-        public void ShouldUpdateGradeWhenCallingUpdate()
-        {
-            var studentToUpdate = new StudentEntity
-            {
-                StudentId = 1,
+                CourseId = 1,
                 Enrollments = new List<EnrollmentEntity>
                 {
                     new EnrollmentEntity
                     {
                         CourseId = 1,
-                        StudentId = 1,
-                        Grade = Grade.C
+                        StudentId = 2
                     }
                 }
             };
 
-            _repository.Update(studentToUpdate);
+            _repository.Update(courseToUpdate);
 
             _repository.Save();
 
-            var updatedStudent = _repository.GetAll().FirstOrDefault(s => s.StudentId == 1);
+            var updatedCourse = _fixture.Context.Courses.Include(c => c.Enrollments).FirstOrDefault(c => c.CourseId == 1);
 
-            updatedStudent.Should().NotBeNull();
+            updatedCourse.Should().NotBeNull();
+            updatedCourse.Enrollments.All(e => e.CourseId == 1 && e.StudentId == 2).Should().BeTrue();
+            _fixture.Context.Enrollments.Any(e => e.CourseId == 1 && e.StudentId != 2).Should().BeFalse();
+        }
 
-            updatedStudent.Enrollments.First(e => e.StudentId == 1 && e.CourseId == 1).Grade.Should().Be(Grade.C);
+        [Fact]
+        public void ShouldAddCourseAssignmentToCourseWhenCallingUpdate()
+        {
+            var courseToUpdate = new CourseEntity
+            {
+                CourseId = 1,
+                CourseAssignments = new List<CourseAssignmentEntity>
+                {
+                    new CourseAssignmentEntity()
+                    {
+                        CourseId = 1,
+                        InstructorId = 1
+                    },
+                    new CourseAssignmentEntity
+                    {
+                        CourseId = 1,
+                        InstructorId = 2
+                    }
+                }
+            };
+
+            _repository.Update(courseToUpdate);
+
+            _repository.Save();
+
+            var updatedCourse = _fixture.Context.Courses.Include(c => c.CourseAssignments).FirstOrDefault(c => c.CourseId == 1);
+
+            updatedCourse.Should().NotBeNull();
+            updatedCourse.CourseAssignments.Count.Should().Be(2);
+            updatedCourse.CourseAssignments.Any(e => e.InstructorId == 2 && e.CourseId == 1).Should().BeTrue();
+            _fixture.Context.CourseAssignments.Count(e => e.InstructorId == 2 && e.CourseId == 1).Should().Be(1);
+        }
+
+        [Fact]
+        public void ShouldRemoveCourseAssignmentFromCourseWhenCallingUpdate()
+        {
+            var courseToUpdate = new CourseEntity
+            {
+                CourseId = 1,
+            };
+
+            _repository.Update(courseToUpdate);
+
+            _repository.Save();
+
+            var updatedCourse = _fixture.Context.Courses.Include(c => c.CourseAssignments).FirstOrDefault(c => c.CourseId == 1);
+
+            updatedCourse.Should().NotBeNull();
+            updatedCourse.CourseAssignments.Should().BeNullOrEmpty();
+            _fixture.Context.CourseAssignments.Any(e => e.CourseId == 1 && e.InstructorId == 1).Should().BeFalse();
+        }
+
+        [Fact]
+        public void ShouldAddAndRemoveCourseAssignmentToCourseWhenCallingUpdate()
+        {
+            var courseToUpdate = new CourseEntity
+            {
+                CourseId = 1,
+                CourseAssignments = new List<CourseAssignmentEntity>
+                {
+                    new CourseAssignmentEntity
+                    {
+                        CourseId = 1,
+                        InstructorId = 2
+                    }
+                }
+            };
+
+            _repository.Update(courseToUpdate);
+
+            _repository.Save();
+
+            var updatedCourse = _fixture.Context.Courses.Include(c => c.CourseAssignments).FirstOrDefault(c => c.CourseId == 1);
+
+            updatedCourse.Should().NotBeNull();
+            updatedCourse.CourseAssignments.All(e => e.CourseId == 1 && e.InstructorId == 2).Should().BeTrue();
+            _fixture.Context.CourseAssignments.Any(e => e.CourseId == 1 && e.InstructorId != 2).Should().BeFalse();
+        }
+
+        [Fact]
+        public void ShouldUpdateDepartmentReferenceWhenCallingUpdate()
+        {
+            var courseToUpdate = new CourseEntity
+            {
+                CourseId = 1,
+                DepartmentId = 2,
+            };
+
+            _repository.Update(courseToUpdate);
+
+            _repository.Save();
+
+            var updatedCourse = _fixture.Context.Courses.Include(c => c.Department).FirstOrDefault(c => c.CourseId == 1);
+
+            updatedCourse.Should().NotBeNull();
+            updatedCourse.DepartmentId.Should().Be(2);
+            updatedCourse.Department.DepartmentId.Should().Be(2);
+            _fixture.Context.Departments.Count().Should().Be(2);
         }
     }
 }

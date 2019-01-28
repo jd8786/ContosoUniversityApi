@@ -53,7 +53,6 @@ namespace ContosoUniversity.Data.Test.Repositories.Student
             var updatedStudent = _fixture.Context.Students.Find(1);
 
             updatedStudent.Should().NotBeNull();
-
             updatedStudent.LastName.Should().Be("update-last-name");
             updatedStudent.FirstMidName.Should().Be("update-first-mid-name");
             updatedStudent.OriginCountry.Should().Be("update-origin-country");
@@ -92,7 +91,6 @@ namespace ContosoUniversity.Data.Test.Repositories.Student
             var updatedStudent = _fixture.Context.Students.Include(s => s.Enrollments).FirstOrDefault(s => s.StudentId == 1);
 
             updatedStudent.Should().NotBeNull();
-
             updatedStudent.Enrollments.Count.Should().Be(2);
             updatedStudent.Enrollments.Any(e => e.StudentId == 1 && e.CourseId == 2).Should().BeTrue();
             _fixture.Context.Enrollments.Count(e => e.StudentId == 1 && e.CourseId == 2).Should().Be(1);
@@ -113,7 +111,6 @@ namespace ContosoUniversity.Data.Test.Repositories.Student
             var updatedStudent = _fixture.Context.Students.Include(s => s.Enrollments).FirstOrDefault(s => s.StudentId == 1);
 
             updatedStudent.Should().NotBeNull();
-
             updatedStudent.Enrollments.Should().BeNullOrEmpty();
             _fixture.Context.Enrollments.Any(e => e.StudentId == 1).Should().BeFalse();
         }
@@ -141,9 +138,8 @@ namespace ContosoUniversity.Data.Test.Repositories.Student
             var updatedStudent = _fixture.Context.Students.Include(s => s.Enrollments).FirstOrDefault(s => s.StudentId == 1);
 
             updatedStudent.Should().NotBeNull();
-
             updatedStudent.Enrollments.All(e => e.StudentId == 1 && e.CourseId == 2).Should().BeTrue();
-            _fixture.Context.Enrollments.Count(e => e.StudentId == 1).Should().Be(1);
+            _fixture.Context.Enrollments.Any(e => e.StudentId == 1 && e.CourseId != 2).Should().BeFalse();
         }
 
         [Fact]
@@ -170,7 +166,6 @@ namespace ContosoUniversity.Data.Test.Repositories.Student
             var updatedStudent = _fixture.Context.Students.Include(s => s.Enrollments).FirstOrDefault(s => s.StudentId == 1);
 
             updatedStudent.Should().NotBeNull();
-
             updatedStudent.Enrollments.First(e => e.StudentId == 1 && e.CourseId == 1).Grade.Should().Be(Grade.C);
             _fixture.Context.Enrollments.First(e => e.StudentId == 1 && e.CourseId == 1).Grade.Should().Be(Grade.C);
         }
