@@ -65,6 +65,19 @@ namespace ContosoUniversity.Data.Test.Repositories.Course
         }
 
         [Fact]
+        public void ShouldRemoveEnrollmentsWhenRemovingCourse()
+        {
+            var course = _repository.Context.Courses.Find(1);
+
+            _repository.Remove(course);
+
+            _repository.Save();
+
+            _fixture.Context.Courses.Any(c => c.CourseId == 1).Should().BeFalse();
+            _fixture.Context.Enrollments.Any(c => c.CourseId == 1 && c.StudentId == 1).Should().BeFalse();
+        }
+
+        [Fact]
         public void ShouldRemoveCourseAssignmentsWhenRemovingCourse()
         {
             var course = _repository.Context.Courses.Find(1);

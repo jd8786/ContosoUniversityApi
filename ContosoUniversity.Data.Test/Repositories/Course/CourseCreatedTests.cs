@@ -124,6 +124,7 @@ namespace ContosoUniversity.Data.Test.Repositories.Course
 
             addedCourse.Should().NotBeNull();
             addedCourse.CourseAssignments.Count(e => e.CourseId == 3 && e.InstructorId == 1).Should().Be(1);
+            _fixture.Context.CourseAssignments.Count(e => e.CourseId == 3 && e.InstructorId == 1).Should().Be(1);
         }
 
         [Fact]

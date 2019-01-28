@@ -36,7 +36,7 @@ namespace ContosoUniversity.Data.Test.Repositories.Course
         }
 
         [Fact]
-        public void ShouldIncludeEnrollmentWhenCallingGetAll()
+        public void ShouldIncludeEnrollmentsWhenCallingGetAll()
         {
             var courses = _repository.GetAll().ToList();
 
@@ -54,7 +54,7 @@ namespace ContosoUniversity.Data.Test.Repositories.Course
         }
 
         [Fact]
-        public void ShouldIncludeCourseAssignmentWhenCallingGetAll()
+        public void ShouldIncludeCourseAssignmentsWhenCallingGetAll()
         {
             var courses = _repository.GetAll().ToList();
 
