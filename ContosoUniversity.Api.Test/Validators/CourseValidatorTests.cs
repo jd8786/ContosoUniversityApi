@@ -13,21 +13,20 @@ namespace ContosoUniversity.Api.Test.Validators
     [Trait("Category", "Unit Test: Api.Validators.Course")]
     public class CourseValidatorTests
     {
-        private readonly Mock<ICourseRepository> _courseRepository;
-
         private readonly ICourseValidator _courseValidator;
 
         public CourseValidatorTests()
         {
-            _courseRepository = new Mock<ICourseRepository>();
-            _courseValidator = new CourseValidator(_courseRepository.Object);
+            var courseRepository = new Mock<ICourseRepository>();
+            _courseValidator = new CourseValidator(courseRepository.Object);
+
+            courseRepository.Setup(cr => cr.GetAll())
+                .Returns(new List<CourseEntity> { new CourseEntity { CourseId = 1 } });
         }
 
         [Fact]
         public void ShouldThrowNotFoundExceptionWhenCourseDoesNotExist()
         {
-            _courseRepository.Setup(c => c.GetAll()).Returns(new List<CourseEntity> { new CourseEntity { CourseId = 1 } });
-
             var exception = Assert.Throws<NotFoundException>(() => _courseValidator.ValidateById(2));
 
             exception.Message.Should().Be("Course provided with Id 2 doesnot exist in the database");
@@ -38,8 +37,6 @@ namespace ContosoUniversity.Api.Test.Validators
         public void ShouldNotThrowNotFoundExceptionWhenCourseExists()
         {
             NotFoundException ex = null;
-
-            _courseRepository.Setup(c => c.GetAll()).Returns(new List<CourseEntity> { new CourseEntity { CourseId = 1 } });
 
             try
             {
@@ -54,7 +51,7 @@ namespace ContosoUniversity.Api.Test.Validators
         }
 
         [Fact]
-        public void ShouldThrowInvalidCourseExceptionWhenCallingValidatePostCourseWithNullCourse()
+        public void ShouldThrowInvalidCourseExceptionWhenPostingCourseWithNullCourse()
         {
             var exception = Assert.Throws<InvalidCourseException>(() => _courseValidator.ValidatePostCourse(null));
 
@@ -62,7 +59,7 @@ namespace ContosoUniversity.Api.Test.Validators
         }
 
         [Fact]
-        public void ShouldThrowInvalidCourseExceptionWhenCallingValidatePostCourseWithNonZeroCourseId()
+        public void ShouldThrowInvalidCourseExceptionWhenPostingCourseWithNonZeroCourseId()
         {
             var exception = Assert.Throws<InvalidCourseException>(() => _courseValidator.ValidatePostCourse(new Course { CourseId = 1 }));
 
@@ -71,7 +68,7 @@ namespace ContosoUniversity.Api.Test.Validators
 
 
         [Fact]
-        public void ShouldNotThrowInvalidCourseExceptionWhenCallingValidatePostCourseWithValidCourse()
+        public void ShouldNotThrowInvalidCourseExceptionWhenPostingCourseWithValidCourse()
         {
             InvalidCourseException ex = null;
 
@@ -88,7 +85,7 @@ namespace ContosoUniversity.Api.Test.Validators
         }
 
         [Fact]
-        public void ShouldThrowInvalidCourseExceptionWhenCallingValidatePutCourseWithNullCourse()
+        public void ShouldThrowInvalidCourseExceptionWhenPuttingCourseWithNullCourse()
         {
             var exception = Assert.Throws<InvalidCourseException>(() => _courseValidator.ValidatePutCourse(null));
 
@@ -96,16 +93,24 @@ namespace ContosoUniversity.Api.Test.Validators
         }
 
         [Fact]
-        public void ShouldThrowInvalidCourseExceptionWhenCallingValidatePutCourseWithZeroCourseId()
+        public void ShouldThrowInvalidCourseExceptionWhenPuttingCourseWithZeroCourseId()
         {
             var exception = Assert.Throws<InvalidCourseException>(() => _courseValidator.ValidatePutCourse(new Course()));
 
             exception.Message.Should().Be("Course Id cannot be 0");
         }
 
+        [Fact]
+        public void ShouldThrowNotFoundExceptionWhenPuttingNonExistingCourse()
+        {
+            var exception = Assert.Throws<NotFoundException>(() => _courseValidator.ValidatePutCourse(new Course { CourseId = 2 }));
+
+            exception.Message.Should().Be("Course provided with Id 2 doesnot exist in the database");
+        }
+
 
         [Fact]
-        public void ShouldNotThrowInvalidCourseExceptionWhenCallingValidatePutCourseWithValidCourse()
+        public void ShouldNotThrowInvalidCourseExceptionWhenPuttingCourseWithValidCourse()
         {
             InvalidCourseException ex = null;
 

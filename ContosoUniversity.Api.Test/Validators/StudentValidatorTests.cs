@@ -13,21 +13,19 @@ namespace ContosoUniversity.Api.Test.Validators
     [Trait("Category", "Unit Test: Api.Validators.Student")]
     public class StudentValidatorTests
     {
-        private readonly Mock<IStudentRepository> _studentRepository;
-
         private readonly IStudentValidator _studentValidator;
 
         public StudentValidatorTests()
         {
-            _studentRepository = new Mock<IStudentRepository>();
-            _studentValidator = new StudentValidator(_studentRepository.Object);
+            var studentRepository = new Mock<IStudentRepository>();
+            _studentValidator = new StudentValidator(studentRepository.Object);
+
+            studentRepository.Setup(c => c.GetAll()).Returns(new List<StudentEntity> { new StudentEntity { StudentId = 1 } });
         }
 
         [Fact]
         public void ShouldThrowNotFoundExceptionWhenStudentDoesNotExist()
         {
-            _studentRepository.Setup(c => c.GetAll()).Returns(new List<StudentEntity> { new StudentEntity { StudentId = 1 } });
-
             var exception = Assert.Throws<NotFoundException>(() => _studentValidator.ValidateById(2));
 
             exception.Message.Should().Be("Student provided with Id 2 doesnot exist in the database");
@@ -38,8 +36,6 @@ namespace ContosoUniversity.Api.Test.Validators
         public void ShouldNotThrowNotFoundExceptionWhenStudentExists()
         {
             NotFoundException ex = null;
-
-            _studentRepository.Setup(c => c.GetAll()).Returns(new List<StudentEntity> { new StudentEntity() { StudentId = 1 } });
 
             try
             {
@@ -54,7 +50,7 @@ namespace ContosoUniversity.Api.Test.Validators
         }
 
         [Fact]
-        public void ShouldThrowInvalidStudentExceptionWhenCallingValidatePostStudentWithNullStudent()
+        public void ShouldThrowInvalidStudentExceptionWhenPostingStudentWithNullStudent()
         {
             var exception = Assert.Throws<InvalidStudentException>(() => _studentValidator.ValidatePostStudent(null));
 
@@ -62,16 +58,16 @@ namespace ContosoUniversity.Api.Test.Validators
         }
 
         [Fact]
-        public void ShouldThrowInvalidStudentExceptionWhenCallingValidatePostStudentWithNonZeroStudentId()
+        public void ShouldThrowInvalidStudentExceptionWhenPostingStudentWithNonZeroStudentId()
         {
-            var exception = Assert.Throws<InvalidStudentException>(() => _studentValidator.ValidatePostStudent(new Student() { StudentId = 1 }));
+            var exception = Assert.Throws<InvalidStudentException>(() => _studentValidator.ValidatePostStudent(new Student { StudentId = 1 }));
 
             exception.Message.Should().Be("Student Id must be 0");
         }
 
 
         [Fact]
-        public void ShouldNotThrowInvalidStudentExceptionWhenCallingValidatePostStudentWithValidStudent()
+        public void ShouldNotThrowInvalidStudentExceptionWhenPostingStudentWithValidStudent()
         {
             InvalidStudentException ex = null;
 
@@ -88,7 +84,7 @@ namespace ContosoUniversity.Api.Test.Validators
         }
 
         [Fact]
-        public void ShouldThrowInvalidStudentExceptionWhenCallingValidatePutStudentWithNullStudent()
+        public void ShouldThrowInvalidStudentExceptionWhenPuttingStudentWithNullStudent()
         {
             var exception = Assert.Throws<InvalidStudentException>(() => _studentValidator.ValidatePutStudent(null));
 
@@ -96,16 +92,23 @@ namespace ContosoUniversity.Api.Test.Validators
         }
 
         [Fact]
-        public void ShouldThrowInvalidStudentExceptionWhenCallingValidatePutStudentWithZeroStudentId()
+        public void ShouldThrowInvalidStudentExceptionWhenPuttingStudentWithZeroStudentId()
         {
             var exception = Assert.Throws<InvalidStudentException>(() => _studentValidator.ValidatePutStudent(new Student()));
 
             exception.Message.Should().Be("Student Id cannot be 0");
         }
 
+        [Fact]
+        public void ShouldThrowNotFoundExceptionWhenPuttingNonExistingStudent()
+        {
+            var exception = Assert.Throws<NotFoundException>(() => _studentValidator.ValidatePutStudent(new Student { StudentId = 2 }));
+
+            exception.Message.Should().Be("Student provided with Id 2 doesnot exist in the database");
+        }
 
         [Fact]
-        public void ShouldNotThrowInvalidStudentExceptionWhenCallingValidatePutStudentWithValidStudent()
+        public void ShouldNotThrowInvalidStudentExceptionWhenPuttingStudentWithValidStudent()
         {
             InvalidStudentException ex = null;
 
