@@ -28,7 +28,7 @@ namespace ContosoUniversity.Api.Test.Validators
         {
             _studentRepository.Setup(c => c.GetAll()).Returns(new List<StudentEntity> { new StudentEntity { StudentId = 1 } });
 
-            var exception = Assert.Throws<NotFoundException>(() => _studentValidator.Validate(2));
+            var exception = Assert.Throws<NotFoundException>(() => _studentValidator.ValidateById(2));
 
             exception.Message.Should().Be("Student provided with Id 2 doesnot exist in the database");
         }
@@ -43,7 +43,7 @@ namespace ContosoUniversity.Api.Test.Validators
 
             try
             {
-                _studentValidator.Validate(1);
+                _studentValidator.ValidateById(1);
             }
             catch (NotFoundException e)
             {

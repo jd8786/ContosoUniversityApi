@@ -28,7 +28,7 @@ namespace ContosoUniversity.Api.Test.Validators
         {
             _courseRepository.Setup(c => c.GetAll()).Returns(new List<CourseEntity> { new CourseEntity { CourseId = 1 } });
 
-            var exception = Assert.Throws<NotFoundException>(() => _courseValidator.Validate(2));
+            var exception = Assert.Throws<NotFoundException>(() => _courseValidator.ValidateById(2));
 
             exception.Message.Should().Be("Course provided with Id 2 doesnot exist in the database");
         }
@@ -43,7 +43,7 @@ namespace ContosoUniversity.Api.Test.Validators
 
             try
             {
-                _courseValidator.Validate(1);
+                _courseValidator.ValidateById(1);
             }
             catch (NotFoundException e)
             {

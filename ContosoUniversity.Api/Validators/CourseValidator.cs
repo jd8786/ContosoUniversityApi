@@ -14,7 +14,7 @@ namespace ContosoUniversity.Api.Validators
             _coursesRepository = coursesRepository;
         }
 
-        public void Validate(int courseId)
+        public void ValidateById(int courseId)
         {
             var courses = _coursesRepository.GetAll().ToList();
 
@@ -51,7 +51,7 @@ namespace ContosoUniversity.Api.Validators
                 throw new InvalidCourseException("Course Id cannot be 0");
             }
 
-            Validate(course.CourseId);
+            ValidateById(course.CourseId);
         }
     }
 }

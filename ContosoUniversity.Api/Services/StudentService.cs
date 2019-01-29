@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace ContosoUniversity.Api.Services
 {
-    public class StudentService : IStudentService
+    public class StudentService : MapperService<StudentEntity, Student>, IStudentService
     {
         private readonly IStudentRepository _studentsRepository;
 
@@ -16,33 +16,29 @@ namespace ContosoUniversity.Api.Services
 
         private readonly ICourseValidator _courseValidator;
 
-        private readonly IMapper _mapper;
-
-        public StudentService(IStudentRepository studentsRepository, IStudentValidator studentValidator, ICourseValidator courseValidator,  IMapper mapper)
+        public StudentService(IStudentRepository studentsRepository, IStudentValidator studentValidator, ICourseValidator courseValidator,  IMapper mapper): base(mapper)
         {
             _studentsRepository = studentsRepository;
 
             _studentValidator = studentValidator;
 
             _courseValidator = courseValidator;
-
-            _mapper = mapper;
         }
 
         public IEnumerable<Student> GetAll()
         {
             var studentEntities = _studentsRepository.GetAll();
 
-            return _mapper.Map<IEnumerable<Student>>(studentEntities);
+            return MapToModels(studentEntities);
         }
 
         public Student Get(int id)
         {
-            _studentValidator.Validate(id);
+            _studentValidator.ValidateById(id);
 
             var studentEntity = _studentsRepository.GetAll().FirstOrDefault(s => s.StudentId == id);
 
-            return _mapper.Map<Student>(studentEntity);
+            return MapToModel(studentEntity);
         }
 
         public Student Add(Student student)
@@ -53,11 +49,11 @@ namespace ContosoUniversity.Api.Services
             {
                 foreach (var course in student.Courses)
                 {
-                    _courseValidator.Validate(course.CourseId);
+                    _courseValidator.ValidateById(course.CourseId);
                 }
             }
 
-            var studentEntity = _mapper.Map<StudentEntity>(student);
+            var studentEntity = MapToEntity(student);
 
             _studentsRepository.Add(studentEntity);
 
@@ -74,11 +70,11 @@ namespace ContosoUniversity.Api.Services
             {
                 foreach (var course in student.Courses)
                 {
-                    _courseValidator.Validate(course.CourseId);
+                    _courseValidator.ValidateById(course.CourseId);
                 }
             }
 
-            var studentEntity = _mapper.Map<StudentEntity>(student);
+            var studentEntity = MapToEntity(student);
 
             _studentsRepository.Update(studentEntity);
 
@@ -91,7 +87,7 @@ namespace ContosoUniversity.Api.Services
         {
             var student = Get(studentId);
 
-            var entityStudent = _mapper.Map<StudentEntity>(student);
+            var entityStudent = MapToEntity(student);
 
             _studentsRepository.Remove(entityStudent);
 

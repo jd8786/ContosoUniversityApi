@@ -14,7 +14,7 @@ namespace ContosoUniversity.Api.Validators
             _studentsRepository = studentsRepository;
         }
 
-        public void Validate(int studentId)
+        public void ValidateById(int studentId)
         {
             var students = _studentsRepository.GetAll().ToList();
 
@@ -51,7 +51,7 @@ namespace ContosoUniversity.Api.Validators
                 throw new InvalidStudentException("Student Id cannot be 0");
             }
 
-            Validate(student.StudentId);
+            ValidateById(student.StudentId);
         }
     }
 }

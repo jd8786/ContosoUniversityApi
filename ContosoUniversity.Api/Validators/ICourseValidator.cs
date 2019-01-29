@@ -4,7 +4,7 @@ namespace ContosoUniversity.Api.Validators
 {
     public interface ICourseValidator
     {
-        void Validate(int id);
+        void ValidateById(int id);
 
         void ValidatePostCourse(Course course);
 
