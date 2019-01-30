@@ -196,6 +196,8 @@ namespace ContosoUniversity.Api.Test.Services
         {
             var isRemoved = _studentService.Remove(1);
 
+            _studentValidator.Verify(sv => sv.ValidateById(1), Times.Exactly(1));
+
             _studentRepository.Verify(sr => sr.Remove(It.Is<StudentEntity>(s => s.StudentId == 1)), Times.Exactly(1));
 
             _studentRepository.Verify(sr => sr.Save(), Times.Exactly(1));

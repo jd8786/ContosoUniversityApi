@@ -1,15 +1,16 @@
 ﻿using System.Linq;
+using System.Net;
 using ContosoUniversity.Api.Acceptance.Test.Fixtures;
 using ContosoUniversity.Api.Models;
 using FluentAssertions;
 using Newtonsoft.Json;
-using System.Net;
 using Xunit;
+using ApiModels = ContosoUniversity.Api.Models;
 
-namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
+namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Student
 {
     [Collection("Sequential")]
-    [Trait("Category", "Acceptance Test: Api.Controllers.Students.GetStudentById")]
+    [Trait("Category", "Acceptance Test: Api.Controllers.Student")]
     public class GetStudentByIdTests
     {
         private readonly AcceptanceTestFixture _fixture;
@@ -33,7 +34,7 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
 
             var content = await apiResponse.Content.ReadAsStringAsync();
 
-            var responseOfStudent = JsonConvert.DeserializeObject<ApiResponse<Student>>(content);
+            var responseOfStudent = JsonConvert.DeserializeObject<ApiResponse<ApiModels.Student>>(content);
 
             responseOfStudent.Data.StudentId.Should().Be(studentId);
             responseOfStudent.Data.LastName.Should().Be("test-last-name1");

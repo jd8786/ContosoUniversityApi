@@ -1,15 +1,15 @@
 ﻿using System.Linq;
+using System.Net;
 using ContosoUniversity.Api.Acceptance.Test.Fixtures;
 using ContosoUniversity.Api.Models;
 using FluentAssertions;
 using Newtonsoft.Json;
-using System.Net;
 using Xunit;
 
-namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
+namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Student
 {
     [Collection("Sequential")]
-    [Trait("Category", "Acceptance Test: Api.Controllers.Students.DeleteStudent")]
+    [Trait("Category", "Acceptance Test: Api.Controllers.Student")]
     public class DeleteStudentTests
     {
         private readonly AcceptanceTestFixture _fixture;
@@ -21,7 +21,7 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
         }
 
         [Fact]
-        public async void ShouldReturnOkWhenDeleteStudent()
+        public async void ShouldReturnOkWhenDeletingStudent()
         {
             var student = _fixture.SchoolContext.Students.First(s => s.LastName == "test-last-name1");
 
@@ -37,9 +37,7 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Students
 
             response.Data.Should().BeTrue();
 
-            var dbStudents = _fixture.SchoolContext.Students.ToList();
-
-            dbStudents.Any(s => s.LastName == "test-last-name1").Should().BeFalse();
+            _fixture.SchoolContext.Students.ToList().Any(s => s.LastName == "test-last-name1").Should().BeFalse();
         }
     }
 }
