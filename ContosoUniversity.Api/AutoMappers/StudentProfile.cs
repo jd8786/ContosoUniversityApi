@@ -5,9 +5,9 @@ using System.Collections.Generic;
 
 namespace ContosoUniversity.Api.AutoMappers
 {
-    public class StudentEntityToStudentProfile : Profile
+    public class StudentProfile : Profile
     {
-        public StudentEntityToStudentProfile()
+        public StudentProfile()
         {
             CreateMap<StudentEntity, Student>()
                 .ForMember(dest => dest.Courses, opt => opt.MapFrom(src => GetCourses(src)))
