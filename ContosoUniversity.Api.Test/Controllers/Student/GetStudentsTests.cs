@@ -12,7 +12,7 @@ using ApiModels = ContosoUniversity.Api.Models;
 
 namespace ContosoUniversity.Api.Test.Controllers.Student
 {
-    [Trait("Category", "Unit Test: Api.Controllers.Student.GetStudents")]
+    [Trait("Category", "Unit Test: Api.Controllers.Student")]
     public class GetStudentsTests
     {
         private readonly Mock<IStudentService> _studentService;
@@ -28,7 +28,7 @@ namespace ContosoUniversity.Api.Test.Controllers.Student
         [Fact]
         public void ShouldReturnOkResponse()
         {
-            _studentService.Setup(s => s.GetAll()).Returns(new List<ApiModels.Student>());
+            _studentService.Setup(s => s.GetAll()).Returns(new List<ApiModels.Student> { new ApiModels.Student() });
 
             var response = _controller.GetStudents();
 
@@ -40,7 +40,7 @@ namespace ContosoUniversity.Api.Test.Controllers.Student
 
             responseObject.IsSuccess.Should().BeTrue();
 
-            responseObject.Data.Count().Should().Be(0);
+            responseObject.Data.Count().Should().Be(1);
         }
 
         [Fact]
@@ -58,7 +58,7 @@ namespace ContosoUniversity.Api.Test.Controllers.Student
 
             responseObject.IsSuccess.Should().BeFalse();
 
-            responseObject.Messages.Should().BeEquivalentTo(new List<string>{"some-error-message"});
+            responseObject.Messages.Should().BeEquivalentTo(new List<string> { "some-error-message" });
         }
     }
 }

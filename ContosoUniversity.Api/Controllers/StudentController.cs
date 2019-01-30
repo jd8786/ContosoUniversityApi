@@ -78,10 +78,6 @@ namespace ContosoUniversity.Api.Controllers
             {
                 return BadRequest(ApiResponse<bool>.Error(ex.Message));
             }
-            catch (InvalidEnrollmentException ex)
-            {
-                return BadRequest(ApiResponse<bool>.Error(ex.Message));
-            }
             catch (NotFoundException ex)
             {
                 return NotFound(ApiResponse<bool>.Error(ex.Message));
@@ -106,10 +102,6 @@ namespace ContosoUniversity.Api.Controllers
                 return Ok(ApiResponse<Student>.Success(updatedStudent));
             }
             catch (InvalidStudentException ex)
-            {
-                return BadRequest(ApiResponse<bool>.Error(ex.Message));
-            }
-            catch (InvalidEnrollmentException ex)
             {
                 return BadRequest(ApiResponse<bool>.Error(ex.Message));
             }
@@ -144,6 +136,5 @@ namespace ContosoUniversity.Api.Controllers
                 return StatusCode((int)HttpStatusCode.InternalServerError, ApiResponse<bool>.Error(ex.Message));
             }
         }
-
     }
 }

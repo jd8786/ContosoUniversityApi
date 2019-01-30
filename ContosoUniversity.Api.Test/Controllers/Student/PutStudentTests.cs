@@ -1,126 +1,100 @@
-﻿//using ContosoUniversity.Api.Controllers;
-//using ContosoUniversity.Api.Models;
-//using ContosoUniversity.Api.Services;
-//using ContosoUniversity.Data.Exceptions;
-//using FluentAssertions;
-//using Microsoft.AspNetCore.Mvc;
-//using Moq;
-//using System;
-//using System.Collections.Generic;
-//using Xunit;
+﻿using ContosoUniversity.Api.Controllers;
+using ContosoUniversity.Api.Models;
+using ContosoUniversity.Api.Services;
+using ContosoUniversity.Data.Exceptions;
+using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
+using Moq;
+using System;
+using System.Collections.Generic;
+using Xunit;
+using ApiModels = ContosoUniversity.Api.Models;
 
-//namespace ContosoUniversity.Api.Test.Controllers.Students
-//{
-//    [Trait("Category", "Unit Test: Api.Controllers.Students.PutStudent")]
-//    public class PutStudentTests
-//    {
-//        private readonly Mock<IStudentsService> _studentService;
+namespace ContosoUniversity.Api.Test.Controllers.Student
+{
+    [Trait("Category", "Unit Test: Api.Controllers.Student")]
+    public class PutStudentTests
+    {
+        private readonly Mock<IStudentService> _studentService;
 
-//        private readonly Mock<IEnrollmentsService> _enrollmentService;
+        private readonly StudentController _controller;
 
-//        private readonly StudentsController _controller;
+        public PutStudentTests()
+        {
+            _studentService = new Mock<IStudentService>();
+            _controller = new StudentController(_studentService.Object);
+        }
 
-//        public PutStudentTests()
-//        {
-//            _studentService = new Mock<IStudentsService>();
-//            _enrollmentService = new Mock<IEnrollmentsService>();
-//            _controller = new StudentsController(_studentService.Object, _enrollmentService.Object);
-//        }
+        [Fact]
+        public void ShouldReturnOkResponseWhenPuttingStudent()
+        {
+            _studentService.Setup(s => s.Update(It.IsAny<ApiModels.Student>())).Returns(new ApiModels.Student { StudentId = 1 });
 
-//        [Fact]
-//        public void ShouldReturnOkResponse()
-//        {
-//            _studentService.Setup(s => s.Update(It.IsAny<Student>())).Returns(new Student { StudentId = 1, LastName = "some-last-name"});
+            var response = _controller.PutStudent(new ApiModels.Student());
 
-//            var response = _controller.PutStudent(new Student { StudentId = 1 });
+            var okResponse = (OkObjectResult)response;
 
-//            var okResponse = (OkObjectResult)response;
+            okResponse.StatusCode.Should().Be(200);
 
-//            okResponse.StatusCode.Should().Be(200);
+            var responseObject = (ApiResponse<ApiModels.Student>)okResponse.Value;
 
-//            _enrollmentService.Verify(s => s.Update(1, null), Times.Exactly(1));
+            responseObject.IsSuccess.Should().BeTrue();
 
-//            var responseObject = (ApiResponse<Student>)okResponse.Value;
+            responseObject.Data.Should().BeEquivalentTo(new ApiModels.Student { StudentId = 1 });
+        }
 
-//            responseObject.IsSuccess.Should().BeTrue();
+        [Fact]
+        public void ShouldReturnBadRequestWhenThrowingInvalidStudentException()
+        {
+            _studentService.Setup(s => s.Update(It.IsAny<ApiModels.Student>())).Throws(new InvalidStudentException("some-error-message"));
 
-//            responseObject.Data.Should().BeEquivalentTo(new Student { StudentId = 1, LastName = "some-last-name"});
-//        }
+            var response = _controller.PutStudent(It.IsAny<ApiModels.Student>());
 
-//        [Fact]
-//        public void ShouldReturnBadRequestWhenThrowingInvalidStudentException()
-//        {
-//            _studentService.Setup(s => s.Update(It.IsAny<Student>())).Throws(new InvalidStudentException("some-error-message"));
+            var errorResponse = (ObjectResult)response;
 
-//            var response = _controller.PutStudent(It.IsAny<Student>());
+            errorResponse.StatusCode.Should().Be(400);
 
-//            var errorResponse = (ObjectResult)response;
+            var responseObject = (ApiResponse<bool>)errorResponse.Value;
 
-//            errorResponse.StatusCode.Should().Be(400);
+            responseObject.IsSuccess.Should().BeFalse();
 
-//            var responseObject = (ApiResponse<bool>)errorResponse.Value;
+            responseObject.Messages.Should().BeEquivalentTo(new List<string> { "some-error-message" });
+        }
 
-//            responseObject.IsSuccess.Should().BeFalse();
+        [Fact]
+        public void ShouldReturnNotFoundWhenThrowingNotFoundException()
+        {
+            _studentService.Setup(s => s.Update(It.IsAny<ApiModels.Student>())).Throws(new NotFoundException("some-error-message"));
 
-//            responseObject.Messages.Should().BeEquivalentTo(new List<string> { "some-error-message" });
-//        }
+            var response = _controller.PutStudent(new ApiModels.Student());
 
-//        [Fact]
-//        public void ShouldReturnBadRequestWhenThrowingInvalidEnrollmentException()
-//        {
-//            var student = new Student();
+            var errorResponse = (ObjectResult)response;
 
-//            _enrollmentService.Setup(s => s.Update(student.StudentId, student.Courses)).Throws(new InvalidEnrollmentException("some-error-message"));
+            errorResponse.StatusCode.Should().Be(404);
 
-//            var response = _controller.PutStudent(student);
+            var responseObject = (ApiResponse<bool>)errorResponse.Value;
 
-//            var errorResponse = (ObjectResult)response;
+            responseObject.IsSuccess.Should().BeFalse();
 
-//            errorResponse.StatusCode.Should().Be(400);
+            responseObject.Messages.Should().BeEquivalentTo(new List<string> { "some-error-message" });
+        }
 
-//            var responseObject = (ApiResponse<bool>)errorResponse.Value;
+        [Fact]
+        public void ShouldReturnInternalServerErrorWhenThrowingException()
+        {
+            _studentService.Setup(s => s.Update(It.IsAny<ApiModels.Student>())).Throws(new Exception("some-error-message"));
 
-//            responseObject.IsSuccess.Should().BeFalse();
+            var response = _controller.PutStudent(It.IsAny<ApiModels.Student>());
 
-//            responseObject.Messages.Should().BeEquivalentTo(new List<string> { "some-error-message" });
-//        }
+            var errorResponse = (ObjectResult)response;
 
-//        [Fact]
-//        public void ShouldReturnNotFoundWhenThrowingNotFoundException()
-//        {
-//            var student = new Student();
+            errorResponse.StatusCode.Should().Be(500);
 
-//            _enrollmentService.Setup(s => s.Update(student.StudentId, student.Courses)).Throws(new NotFoundException("some-error-message"));
+            var responseObject = (ApiResponse<bool>)errorResponse.Value;
 
-//            var response = _controller.PutStudent(student);
+            responseObject.IsSuccess.Should().BeFalse();
 
-//            var errorResponse = (ObjectResult)response;
-
-//            errorResponse.StatusCode.Should().Be(404);
-
-//            var responseObject = (ApiResponse<bool>)errorResponse.Value;
-
-//            responseObject.IsSuccess.Should().BeFalse();
-
-//            responseObject.Messages.Should().BeEquivalentTo(new List<string> { "some-error-message" });
-//        }
-
-//        [Fact]
-//        public void ShouldReturnInternalServerErrorWhenThrowingException()
-//        {
-//            _studentService.Setup(s => s.Update(It.IsAny<Student>())).Throws(new Exception("some-error-message"));
-
-//            var response = _controller.PutStudent(It.IsAny<Student>());
-
-//            var errorResponse = (ObjectResult)response;
-
-//            errorResponse.StatusCode.Should().Be(500);
-
-//            var responseObject = (ApiResponse<bool>)errorResponse.Value;
-
-//            responseObject.IsSuccess.Should().BeFalse();
-
-//            responseObject.Messages.Should().BeEquivalentTo(new List<string> { "some-error-message" });
-//        }
-//    }
-//}
+            responseObject.Messages.Should().BeEquivalentTo(new List<string> { "some-error-message" });
+        }
+    }
+}

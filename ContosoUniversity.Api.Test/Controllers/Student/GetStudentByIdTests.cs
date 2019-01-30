@@ -12,7 +12,7 @@ using ApiModels = ContosoUniversity.Api.Models;
 
 namespace ContosoUniversity.Api.Test.Controllers.Student
 {
-    [Trait("Category", "Unit Test: Api.Controllers.Student.GetStudentById")]
+    [Trait("Category", "Unit Test: Api.Controllers.Student")]
     public class GetStudentByIdTests
     {
         private readonly Mock<IStudentService> _studentService;
@@ -30,7 +30,7 @@ namespace ContosoUniversity.Api.Test.Controllers.Student
         {
             _studentService.Setup(s => s.Get(It.IsAny<int>())).Returns(new ApiModels.Student());
 
-            var response = _controller.GetStudentById(It.IsAny<int>());
+            var response = _controller.GetStudentById(1);
 
             var okResponse = (OkObjectResult)response;
 
@@ -48,7 +48,7 @@ namespace ContosoUniversity.Api.Test.Controllers.Student
         {
             _studentService.Setup(s => s.Get(It.IsAny<int>())).Throws(new NotFoundException("some-error-message"));
 
-            var response = _controller.GetStudentById(It.IsAny<int>());
+            var response = _controller.GetStudentById(1);
 
             var errorResponse = (ObjectResult)response;
 
@@ -66,7 +66,7 @@ namespace ContosoUniversity.Api.Test.Controllers.Student
         {
             _studentService.Setup(s => s.Get(It.IsAny<int>())).Throws(new Exception("some-error-message"));
 
-            var response = _controller.GetStudentById(It.IsAny<int>());
+            var response = _controller.GetStudentById(1);
 
             var errorResponse = (ObjectResult)response;
 

@@ -11,7 +11,7 @@ using Xunit;
 
 namespace ContosoUniversity.Api.Test.Controllers.Student
 {
-    [Trait("Category", "Unit Test: Api.Controllers.Student.DeleteStudent")]
+    [Trait("Category", "Unit Test: Api.Controllers.Student")]
     public class DeleteStudentTests
     {
         private readonly Mock<IStudentService> _studentService;
@@ -47,7 +47,7 @@ namespace ContosoUniversity.Api.Test.Controllers.Student
         {
             _studentService.Setup(s => s.Remove(It.IsAny<int>())).Throws(new NotFoundException("some-error-message"));
 
-            var response = _controller.DeleteStudent(It.IsAny<int>());
+            var response = _controller.DeleteStudent(1);
 
             var errorResponse = (ObjectResult)response;
 
@@ -65,7 +65,7 @@ namespace ContosoUniversity.Api.Test.Controllers.Student
         {
             _studentService.Setup(s => s.Remove(It.IsAny<int>())).Throws(new Exception("some-error-message"));
 
-            var response = _controller.DeleteStudent(It.IsAny<int>());
+            var response = _controller.DeleteStudent(1);
 
             var errorResponse = (ObjectResult)response;
 
