@@ -35,7 +35,7 @@ namespace ContosoUniversity.Api
             var schoolDbConnectionString = Configuration.GetConnectionString("schoolDbConnectionString");
 
             services.AddDbContext<SchoolContext>(options => options
-                .UseSqlServer(schoolDbConnectionString), ServiceLifetime.Transient);
+                .UseSqlServer(schoolDbConnectionString));
 
             services.AddScoped<IStudentRepository, StudentRepository>();
 
