@@ -64,7 +64,7 @@ namespace ContosoUniversity.Data.Test.Repositories.Course
             _fixture.Context.Departments.Any(d => d.DepartmentId == 1).Should().BeTrue();
         }
 
-        [Fact]
+        [Fact(Skip = "InmemoryDb doesn't work for related entity update")]
         public void ShouldRemoveEnrollmentsWhenRemovingCourse()
         {
             var course = _repository.Context.Courses.Find(1);
@@ -77,7 +77,7 @@ namespace ContosoUniversity.Data.Test.Repositories.Course
             _fixture.Context.Enrollments.Any(c => c.CourseId == 1 && c.StudentId == 1).Should().BeFalse();
         }
 
-        [Fact]
+        [Fact(Skip = "InmemoryDb doesn't work for related entity update")]
         public void ShouldRemoveCourseAssignmentsWhenRemovingCourse()
         {
             var course = _repository.Context.Courses.Find(1);
