@@ -1,161 +1,206 @@
-﻿//using AutoFixture;
-//using AutoMapper;
-//using ContosoUniversity.Api.Models;
-//using ContosoUniversity.Api.Services;
-//using ContosoUniversity.Api.Validators;
-//using ContosoUniversity.Data.EntityModels;
-//using ContosoUniversity.Data.Repositories;
-//using FluentAssertions;
-//using Moq;
-//using System.Collections.Generic;
-//using Xunit;
+﻿using AutoMapper;
+using ContosoUniversity.Api.AutoMappers;
+using ContosoUniversity.Api.Models;
+using ContosoUniversity.Api.Services;
+using ContosoUniversity.Api.Validators;
+using ContosoUniversity.Data.EntityModels;
+using ContosoUniversity.Data.Repositories;
+using FluentAssertions;
+using Moq;
+using System.Collections.Generic;
+using System.Linq;
+using Xunit;
 
-//namespace ContosoUniversity.Api.Test.Services
-//{
-//    [Trait("Category", "Uint Test: Api.Services.Students")]
-//    public class StudentsServiceTests
-//    {
-//        private readonly Mock<IStudentsRepository> _studentsRepository;
+namespace ContosoUniversity.Api.Test.Services
+{
+    [Trait("Category", "Uint Test: Api.Services.Student")]
+    public class StudentServiceTests
+    {
+        private readonly Mock<IStudentRepository> _studentRepository;
 
-//        private readonly Mock<IStudentValidator> _studentValidator;
+        private readonly Mock<IStudentValidator> _studentValidator;
 
-//        private readonly Mock<ICourseValidator> _courseValidator;
+        private readonly Mock<ICourseValidator> _courseValidator;
 
-//        private readonly Mock<IMapper> _mapper;
+        private readonly IStudentService _studentService;
 
-//        private readonly IStudentsService _studentsService;
+        private readonly List<StudentEntity> _studentEntities;
 
-//        private readonly List<StudentEntity> _studentEntities;
+        public StudentServiceTests()
+        {
+            _studentRepository = new Mock<IStudentRepository>();
+            _studentValidator = new Mock<IStudentValidator>();
+            _courseValidator = new Mock<ICourseValidator>();
 
-//        private readonly List<Student> _students;
+            var mapperConfig = new MapperConfiguration(ctg => ctg.AddProfile(new StudentProfile()));
 
-//        private readonly Fixture _fixture = new Fixture();
+            var mapper = new Mapper(mapperConfig);
 
-//        public StudentsServiceTests()
-//        {
-//            _studentsRepository = new Mock<IStudentsRepository>();
-//            _studentValidator = new Mock<IStudentValidator>();
-//            _courseValidator = new Mock<ICourseValidator>();
-//            _mapper = new Mock<IMapper>();
+            _studentService = new StudentService(_studentRepository.Object, _studentValidator.Object,
+                _courseValidator.Object, mapper);
 
-//            _studentsService = new StudentsesService(_studentsRepository.Object, _studentValidator.Object,
-//                _courseValidator.Object, _mapper.Object);
+            _studentEntities = new List<StudentEntity>
+            {
+                new StudentEntity {StudentId = 1},
+                new StudentEntity {StudentId = 2}
+            };
 
-//            _studentEntities = new List<StudentEntity>
-//            {
-//                new StudentEntity {StudentId = 1},
-//                new StudentEntity {StudentId = 2}
-//            };
+            _studentRepository.Setup(s => s.GetAll()).Returns(_studentEntities);
+        }
 
-//            _students = new List<Student>
-//            {
-//                new Student {StudentId = 1},
-//                new Student {StudentId = 2}
-//            };
+        [Fact]
+        public void ShouldReturnAllStudentsWhenCallingGetAll()
+        {
+            var students = _studentService.GetAll();
 
-//            _studentsRepository.Setup(s => s.GetAll()).Returns(_studentEntities);
+            _studentRepository.Verify(sr => sr.GetAll(), Times.Exactly(1));
 
-//            _mapper.Setup(m => m.Map<List<Student>>(_studentEntities)).Returns(_students);
+            students.Count().Should().Be(2);
+        }
 
-//            _mapper.Setup(m => m.Map<Student>(_studentEntities[0])).Returns(_students[0]);
+        [Fact]
+        public void ShouldReturnStudentWhenCallingGetStudentById()
+        {
+            var student = _studentService.Get(1);
 
-//            _mapper.Setup(m => m.Map<List<StudentEntity>>(_students)).Returns(_studentEntities);
+            _studentValidator.Verify(s => s.ValidateById(1), Times.Exactly(1));
 
-//            _mapper.Setup(m => m.Map<StudentEntity>(_students[0])).Returns(_studentEntities[0]);
-//        }
+            _studentRepository.Verify(sr => sr.GetAll(), Times.Exactly(1));
 
-//        [Fact]
-//        public void ShouldReturnAllExistingStudentsWhenCallingGetAll()
-//        {
-//            var students = _studentsService.GetAll();
+            student.StudentId.Should().Be(1);
+        }
 
-//            students.Should().AllBeEquivalentTo(_students);
-//        }
+        [Fact]
+        public void ShouldAddStudentWithNullCoursesWhenCallingAdd()
+        {
+            var newStudent = new Student { StudentId = 3 };
 
-//        [Fact]
-//        public void ShouldReturnExistingStudentWhenCallingGetStudentById()
-//        {
-//            var studentEntity = _studentEntities[0];
+            _studentRepository.Setup(sr => sr.Add(It.IsAny<StudentEntity>()))
+                .Callback<StudentEntity>(s => _studentEntities.Add(s));
 
-//            var mappedStudent = _students[0];
+            var addedStudent = _studentService.Add(newStudent);
 
-//            var student = _studentsService.Get(studentEntity.StudentId);
+            _studentValidator.Verify(sv => sv.ValidatePostStudent(newStudent), Times.Exactly(1));
 
-//            _studentValidator.Verify(s => s.Validate(studentEntity.StudentId), Times.Exactly(1));
+            _courseValidator.Verify(cv => cv.ValidateById(It.IsAny<int>()), Times.Never);
 
-//            student.Should().BeEquivalentTo(mappedStudent);
-//        }
+            _studentRepository.Verify(sr => sr.Add(It.Is<StudentEntity>(s => s.StudentId == 3)), Times.Exactly(1));
 
-//        [Fact]
-//        public void ShouldReturnNewStudentWhenCallingAdd()
-//        {
-//            var newStudent = new Student();
+            _studentRepository.Verify(s => s.Save(), Times.Exactly(1));
 
-//            var mappedStudent = new StudentEntity {StudentId = 1, Enrollments = new List<EnrollmentEntity>()};
+            addedStudent.StudentId.Should().Be(3);
+        }
 
-//            _mapper.Setup(m => m.Map<StudentEntity>(newStudent)).Returns(mappedStudent);
+        [Fact]
+        public void ShouldAddStudentWithEmptyCoursesWhenCallingAdd()
+        {
+            var newStudent = new Student { StudentId = 3, Courses = new List<Course>() };
 
-//            var returnedStudent = _studentsService.Add(newStudent);
+            _studentRepository.Setup(sr => sr.Add(It.IsAny<StudentEntity>()))
+                .Callback<StudentEntity>(s => _studentEntities.Add(s));
 
-//            mappedStudent.Enrollments.Should().BeNull();
+            var addedStudent = _studentService.Add(newStudent);
 
-//            _studentValidator.Verify(s => s.ValidatePostStudent(newStudent), Times.Exactly(1));
+            _studentValidator.Verify(sv => sv.ValidatePostStudent(newStudent), Times.Exactly(1));
 
-//            _studentsRepository.Verify(s => s.Add(mappedStudent), Times.Exactly(1));
+            _courseValidator.Verify(cv => cv.ValidateById(It.IsAny<int>()), Times.Never);
 
-//            _studentsRepository.Verify(s => s.Save(), Times.Exactly(1));
+            _studentRepository.Verify(sr => sr.Add(It.Is<StudentEntity>(s => s.StudentId == 3)), Times.Exactly(1));
 
-//            returnedStudent.Should().BeEquivalentTo(_students[0]);
-//        }
+            _studentRepository.Verify(s => s.Save(), Times.Exactly(1));
 
-//        [Fact]
-//        public void ShouldReturnUpdatedStudentWhenCallingUpdate()
-//        {
-//            var updatedStudent = _fixture.Build<Student>()
-//                .With(s => s.StudentId, 1)
-//                .Create();
+            addedStudent.StudentId.Should().Be(3);
+        }
 
-//            var enrollmentEntities = new List<EnrollmentEntity>();
+        [Fact]
+        public void ShouldAddStudentWithCoursesWhenCallingAdd()
+        {
+            var courses = new List<Course> { new Course { CourseId = 1 }, new Course { CourseId = 2 } };
 
-//            _enrollmentsRepository.Setup(e => e.GetByStudentId(updatedStudent.StudentId)).Returns(enrollmentEntities);
+            var newStudent = new Student { StudentId = 3, Courses = courses };
 
-//            _mapper.Setup(m => m.Map<List<Enrollment>>(enrollmentEntities)).Returns(new List<Enrollment>());
+            _studentRepository.Setup(sr => sr.Add(It.IsAny<StudentEntity>()))
+                .Callback<StudentEntity>(s => _studentEntities.Add(s));
 
-//            var existingStudent = _students[0];
+            var addedStudent = _studentService.Add(newStudent);
 
-//            var returnedStudent = _studentsService.Update(updatedStudent);
+            _studentValidator.Verify(sv => sv.ValidatePostStudent(newStudent), Times.Exactly(1));
 
-//            existingStudent.Courses.Should().AllBeEquivalentTo(new List<Enrollment>());
+            _courseValidator.Verify(cv => cv.ValidateById(It.IsAny<int>()), Times.Exactly(2));
 
-//            existingStudent.EnrollmentDate.Should().Be(updatedStudent.EnrollmentDate);
+            _studentRepository.Verify(sr => sr.Add(It.Is<StudentEntity>(s => s.StudentId == 3)), Times.Exactly(1));
 
-//            existingStudent.FirstMidName.Should().Be(updatedStudent.FirstMidName);
+            _studentRepository.Verify(s => s.Save(), Times.Exactly(1));
 
-//            existingStudent.LastName.Should().Be(updatedStudent.LastName);
+            addedStudent.StudentId.Should().Be(3);
+        }
 
-//            existingStudent.OriginCountry.Should().Be(updatedStudent.OriginCountry);
+        [Fact]
+        public void ShouldUpdateStudentWithNullCoursesWhenCallingUpdate()
+        {
+            var studentToUpdate = new Student { StudentId = 1 };
 
-//            _studentValidator.Verify(s => s.ValidatePutStudent(updatedStudent), Times.Exactly(1));
+            var updatedStudent = _studentService.Update(studentToUpdate);
 
-//            _studentsRepository.Verify(s => s.Update(_studentEntities[0]), Times.Exactly(1));
+            _studentValidator.Verify(sv => sv.ValidatePutStudent(studentToUpdate), Times.Exactly(1));
 
-//            _studentsRepository.Verify(s => s.Save(), Times.Exactly(1));
+            _courseValidator.Verify(cv => cv.ValidateById(It.IsAny<int>()), Times.Never);
 
-//            returnedStudent.Should().BeEquivalentTo(_students[0]);
-//        }
+            _studentRepository.Verify(sr => sr.Update(It.Is<StudentEntity>(s => s.StudentId == 1)), Times.Exactly(1));
 
-//        [Fact]
-//        public void ShouldDeleteStudentWhenCallingDelete()
-//        {
-//            var existingStudent = _students[0];
+            _studentRepository.Verify(s => s.Save(), Times.Exactly(1));
 
-//            var isRemoved = _studentsService.Remove(existingStudent.StudentId);
+            updatedStudent.StudentId.Should().Be(1);
+        }
 
-//            _studentsRepository.Verify(s => s.Remove(_studentEntities[0]), Times.Exactly(1));
+        [Fact]
+        public void ShouldUpdateStudentWithEmptyCoursesWhenCallingUpdate()
+        {
+            var studentToUpdate = new Student { StudentId = 1, Courses = new List<Course>() };
 
-//            _studentsRepository.Verify(s => s.Save(), Times.Exactly(1));
+            var updatedStudent = _studentService.Update(studentToUpdate);
 
-//            isRemoved.Should().BeTrue();
-//        }
-//    }
-//}
+            _studentValidator.Verify(sv => sv.ValidatePutStudent(studentToUpdate), Times.Exactly(1));
+
+            _courseValidator.Verify(cv => cv.ValidateById(It.IsAny<int>()), Times.Never);
+
+            _studentRepository.Verify(sr => sr.Update(It.Is<StudentEntity>(s => s.StudentId == 1)), Times.Exactly(1));
+
+            _studentRepository.Verify(s => s.Save(), Times.Exactly(1));
+
+            updatedStudent.StudentId.Should().Be(1);
+        }
+
+        [Fact]
+        public void ShouldUpdateStudentWithCoursesWhenCallingUpdate()
+        {
+            var courses = new List<Course> { new Course { CourseId = 1 }, new Course { CourseId = 2 } };
+
+            var studentToUpdate = new Student { StudentId = 1, Courses = courses };
+
+            var updatedStudent = _studentService.Update(studentToUpdate);
+
+            _studentValidator.Verify(sv => sv.ValidatePutStudent(studentToUpdate), Times.Exactly(1));
+
+            _courseValidator.Verify(cv => cv.ValidateById(It.IsAny<int>()), Times.Exactly(2));
+
+            _studentRepository.Verify(sr => sr.Update(It.Is<StudentEntity>(s => s.StudentId == 1)), Times.Exactly(1));
+
+            _studentRepository.Verify(s => s.Save(), Times.Exactly(1));
+
+            updatedStudent.StudentId.Should().Be(1);
+        }
+
+        [Fact]
+        public void ShouldDeleteStudentWhenCallingDelete()
+        {
+            var isRemoved = _studentService.Remove(1);
+
+            _studentRepository.Verify(sr => sr.Remove(It.Is<StudentEntity>(s => s.StudentId == 1)), Times.Exactly(1));
+
+            _studentRepository.Verify(sr => sr.Save(), Times.Exactly(1));
+
+            isRemoved.Should().BeTrue();
+        }
+    }
+}
