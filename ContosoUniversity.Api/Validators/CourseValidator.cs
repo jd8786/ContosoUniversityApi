@@ -7,16 +7,16 @@ namespace ContosoUniversity.Api.Validators
 {
     public class CourseValidator: ICourseValidator
     {
-        private readonly ICourseRepository _coursesRepository;
+        private readonly ICourseRepository _courseRepository;
 
-        public CourseValidator(ICourseRepository coursesRepository)
+        public CourseValidator(ICourseRepository courseRepository)
         {
-            _coursesRepository = coursesRepository;
+            _courseRepository = courseRepository;
         }
 
         public void ValidateById(int courseId)
         {
-            var courses = _coursesRepository.GetAll().ToList();
+            var courses = _courseRepository.GetAll().ToList();
 
             var isCourseExisting = courses.Any(c => c.CourseId == courseId);
 

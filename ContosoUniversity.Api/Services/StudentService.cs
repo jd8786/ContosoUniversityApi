@@ -10,15 +10,15 @@ namespace ContosoUniversity.Api.Services
 {
     public class StudentService : MapperService<StudentEntity, Student>, IStudentService
     {
-        private readonly IStudentRepository _studentsRepository;
+        private readonly IStudentRepository _studentRepository;
 
         private readonly IStudentValidator _studentValidator;
 
         private readonly ICourseValidator _courseValidator;
 
-        public StudentService(IStudentRepository studentsRepository, IStudentValidator studentValidator, ICourseValidator courseValidator,  IMapper mapper): base(mapper)
+        public StudentService(IStudentRepository studentRepository, IStudentValidator studentValidator, ICourseValidator courseValidator,  IMapper mapper): base(mapper)
         {
-            _studentsRepository = studentsRepository;
+            _studentRepository = studentRepository;
 
             _studentValidator = studentValidator;
 
@@ -27,7 +27,7 @@ namespace ContosoUniversity.Api.Services
 
         public IEnumerable<Student> GetAll()
         {
-            var studentEntities = _studentsRepository.GetAll();
+            var studentEntities = _studentRepository.GetAll();
 
             return MapToModels(studentEntities);
         }
@@ -36,7 +36,7 @@ namespace ContosoUniversity.Api.Services
         {
             _studentValidator.ValidateById(id);
 
-            var studentEntity = _studentsRepository.GetAll().First(s => s.StudentId == id);
+            var studentEntity = _studentRepository.GetAll().First(s => s.StudentId == id);
 
             return MapToModel(studentEntity);
         }
@@ -45,19 +45,17 @@ namespace ContosoUniversity.Api.Services
         {
             _studentValidator.ValidatePostStudent(student);
 
+            // toDo: put the following validation in the validator
             if (student.Courses != null && student.Courses.Any())
             {
-                foreach (var course in student.Courses)
-                {
-                    _courseValidator.ValidateById(course.CourseId);
-                }
+                student.Courses.ToList().ForEach(c => _courseValidator.ValidateById(c.CourseId));
             }
 
             var studentEntity = MapToEntity(student);
 
-            _studentsRepository.Add(studentEntity);
+            _studentRepository.Add(studentEntity);
 
-            _studentsRepository.Save();
+            _studentRepository.Save();
 
             return Get(studentEntity.StudentId);
         }
@@ -66,19 +64,17 @@ namespace ContosoUniversity.Api.Services
         {
             _studentValidator.ValidatePutStudent(student);
 
+            // toDo: put the following validation in the validator
             if (student.Courses != null && student.Courses.Any())
             {
-                foreach (var course in student.Courses)
-                {
-                    _courseValidator.ValidateById(course.CourseId);
-                }
+                student.Courses.ToList().ForEach(c => _courseValidator.ValidateById(c.CourseId));
             }
 
             var studentEntity = MapToEntity(student);
 
-            _studentsRepository.Update(studentEntity);
+            _studentRepository.Update(studentEntity);
 
-            _studentsRepository.Save();
+            _studentRepository.Save();
 
             return Get(studentEntity.StudentId);
         }
@@ -87,11 +83,11 @@ namespace ContosoUniversity.Api.Services
         {
             _studentValidator.ValidateById(studentId);
 
-            var entityStudent = _studentsRepository.GetAll().First(s => s.StudentId == studentId);
+            var entityStudent = _studentRepository.GetAll().First(s => s.StudentId == studentId);
 
-            _studentsRepository.Remove(entityStudent);
+            _studentRepository.Remove(entityStudent);
 
-            _studentsRepository.Save();
+            _studentRepository.Save();
 
             return true;
         }

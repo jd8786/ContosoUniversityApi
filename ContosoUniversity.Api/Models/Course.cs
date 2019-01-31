@@ -12,5 +12,11 @@ namespace ContosoUniversity.Api.Models
         public int Credits { get; set; }
 
         public Grade? Grade { get; set; }
+
+        public IEnumerable<Student> Students { get; set; }
+
+        public IEnumerable<Instructor> Instructors { get; set; }
+
+        public Department Department { get; set; }
     }
 }

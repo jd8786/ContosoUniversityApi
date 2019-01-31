@@ -7,16 +7,16 @@ namespace ContosoUniversity.Api.Validators
 {
     public class StudentValidator: IStudentValidator
     {
-        private readonly IStudentRepository _studentsRepository;
+        private readonly IStudentRepository _studentRepository;
 
-        public StudentValidator(IStudentRepository studentsRepository)
+        public StudentValidator(IStudentRepository studentRepository)
         {
-            _studentsRepository = studentsRepository;
+            _studentRepository = studentRepository;
         }
 
         public void ValidateById(int studentId)
         {
-            var students = _studentsRepository.GetAll().ToList();
+            var students = _studentRepository.GetAll().ToList();
 
             var isStudentExisting = students.Any(s => s.StudentId == studentId);
 
