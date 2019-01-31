@@ -13,7 +13,7 @@ namespace ContosoUniversity.Data.Test.Repositories.Student
     [Trait("Category", "Unit Test: Data.Repositories.Student")]
     public class StudentCreatedTests : IClassFixture<InMemoryDbTestFixture>, IDisposable
     {
-        private readonly IStudentRepository _repository;
+        private readonly StudentRepository _repository;
         private readonly InMemoryDbTestFixture _fixture;
 
         public StudentCreatedTests(InMemoryDbTestFixture fixture)

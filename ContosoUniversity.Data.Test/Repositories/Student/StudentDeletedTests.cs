@@ -1,9 +1,7 @@
-﻿using ContosoUniversity.Data.EntityModels;
-using ContosoUniversity.Data.Repositories;
+﻿using ContosoUniversity.Data.Repositories;
 using ContosoUniversity.Data.Test.Fixtures;
 using FluentAssertions;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 

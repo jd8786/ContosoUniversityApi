@@ -10,7 +10,7 @@ namespace ContosoUniversity.Data.Test.Repositories.Course
     [Trait("Category", "Unit Test: Data.Repositories.Course")]
     public class CourseRetrievedTests : IClassFixture<InMemoryDbTestFixture>, IDisposable
     {
-        private readonly ICourseRepository _repository;
+        private readonly CourseRepository _repository;
         private readonly InMemoryDbTestFixture _fixture;
 
         public CourseRetrievedTests(InMemoryDbTestFixture fixture)

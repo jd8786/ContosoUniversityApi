@@ -10,7 +10,7 @@ namespace ContosoUniversity.Data.Test.Repositories.Student
     [Trait("Category", "Unit Test: Data.Repositories.Student")]
     public class StudentRetrievedTests : IClassFixture<InMemoryDbTestFixture>, IDisposable
     {
-        private readonly IStudentRepository _repository;
+        private readonly StudentRepository _repository;
         private readonly InMemoryDbTestFixture _fixture;
 
         public StudentRetrievedTests(InMemoryDbTestFixture fixture)
@@ -36,7 +36,7 @@ namespace ContosoUniversity.Data.Test.Repositories.Student
         }
 
         [Fact]
-        public void ShouldIncludeAllChildrenWhenCallingGetAll()
+        public void ShouldIncludeEnrollmentsWhenCallingGetAll()
         {
             var students = _repository.GetAll().ToList();
 
