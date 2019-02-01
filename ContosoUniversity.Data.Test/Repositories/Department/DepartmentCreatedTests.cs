@@ -93,9 +93,8 @@ namespace ContosoUniversity.Data.Test.Repositories.Department
         [Fact]
         public void ShouldNotCreateCoursesWhenCallingAdd()
         {
-            var course1 = _repository.Context.Courses.Find(1);
-
-            var course2 = _repository.Context.Courses.Find(2);
+            var course1 = new CourseEntity { Title = "title1" };
+            var course2 = new CourseEntity { Title = "title2" };
 
             var department = new DepartmentEntity
             {
@@ -108,10 +107,10 @@ namespace ContosoUniversity.Data.Test.Repositories.Department
 
             _repository.Save();
 
-            var addedDepartment = _fixture.Context.Departments.Include(d => d.Courses).FirstOrDefault(d => d.DepartmentId == 3);
+            var addedDepartment = _fixture.Context.Departments.FirstOrDefault(d => d.DepartmentId == 3);
 
             addedDepartment.Should().NotBeNull();
-            addedDepartment.Courses.Count.Should().Be(2);
+            addedDepartment.Courses.Should().BeNull();
             _fixture.Context.Courses.Count().Should().Be(2);
         }
     }

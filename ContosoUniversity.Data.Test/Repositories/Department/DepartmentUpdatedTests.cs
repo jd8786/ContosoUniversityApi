@@ -62,79 +62,23 @@ namespace ContosoUniversity.Data.Test.Repositories.Department
         }
 
         [Fact]
-        public void ShouldAddCourseToDepartmentWhenCallingUpdate()
+        public void ShouldNotUpdateCoursesWhenCallingUpdate()
         {
-            var departmentToUpdate = new DepartmentEntity
+            var department = new DepartmentEntity
             {
                 DepartmentId = 1,
-                Courses = new List<CourseEntity>
-                {
-                    new CourseEntity
-                    {
-                        CourseId = 1
-                    },
-                    new CourseEntity
-                    {
-                        CourseId = 2
-                    }
-                }
+                Courses = new List<CourseEntity> { new CourseEntity { CourseId = 2 } }
             };
 
-            _repository.Update(departmentToUpdate);
+            _repository.Update(department);
 
             _repository.Save();
 
-            var updatedDepartment = _fixture.Context.Departments.Include(d => d.Courses).FirstOrDefault(d => d.DepartmentId == 1);
+            var updatedDepartment = _fixture.Context.Departments.Include(d => d.Courses)
+                .FirstOrDefault(d => d.DepartmentId == 1);
 
             updatedDepartment.Should().NotBeNull();
-            updatedDepartment.Courses.Count.Should().Be(2);
-            updatedDepartment.Courses.Any(c => c.CourseId == 2).Should().BeTrue();
-            _fixture.Context.Courses.Count().Should().Be(2);
-        }
-
-        [Fact]
-        public void ShouldRemoveCourseFromDepartmentWhenCallingUpdate()
-        {
-            var departmentToUpdate = new DepartmentEntity
-            {
-                DepartmentId = 1,
-            };
-
-            _repository.Update(departmentToUpdate);
-
-            _repository.Save();
-
-            var updatedDepartment = _fixture.Context.Departments.Include(d => d.Courses).FirstOrDefault(d => d.DepartmentId == 1);
-
-            updatedDepartment.Should().NotBeNull();
-            updatedDepartment.Courses.Should().BeNullOrEmpty();
-            _fixture.Context.Courses.Count().Should().Be(2);
-        }
-
-        [Fact]
-        public void ShouldAddAndRemoveCourseToDepartmentWhenCallingUpdate()
-        {
-            var departmentToUpdate = new DepartmentEntity
-            {
-                DepartmentId = 1,
-                Courses = new List<CourseEntity>
-                {
-                    new CourseEntity
-                    {
-                        CourseId = 2
-                    }
-                }
-            };
-
-            _repository.Update(departmentToUpdate);
-
-            _repository.Save();
-
-            var updatedDepartment = _fixture.Context.Departments.Include(s => s.Courses).FirstOrDefault(d => d.DepartmentId == 1);
-
-            updatedDepartment.Should().NotBeNull();
-            updatedDepartment.Courses.All(e => e.CourseId == 2).Should().BeTrue();
-            _fixture.Context.Courses.Count().Should().Be(2);
+            updatedDepartment.Courses.All(c => c.CourseId == 1).Should().BeTrue();
         }
 
         [Fact]

@@ -23,31 +23,13 @@ namespace ContosoUniversity.Data.Repositories
             var existingDepartment = GetAll().First(d => d.DepartmentId == department.DepartmentId);
 
             Context.Entry(existingDepartment).CurrentValues.SetValues(department);
-
-            UpdateCourses(department, existingDepartment);
         }
 
-        private void UpdateCourses(DepartmentEntity department, DepartmentEntity existingDepartment)
+        public override void Add(DepartmentEntity department)
         {
-            foreach (var course in department.Courses ?? new List<CourseEntity>())
-            {
-                var existingCourse = existingDepartment.Courses.FirstOrDefault(c => c.CourseId == course.CourseId);
+            department.Courses = null;
 
-                if (existingCourse == null)
-                {
-                    existingDepartment.Courses.Add(course);
-                }
-            }
-
-            foreach (var course in existingDepartment.Courses)
-            {
-                var shouldCourseRemoved = !department.Courses?.Any(c => c.CourseId == course.CourseId);
-
-                if (shouldCourseRemoved != false)
-                {
-                    Context.Remove(course);
-                }
-            }
+            Context.Add(department);
         }
     }
 }
