@@ -15,6 +15,6 @@ namespace ContosoUniversity.Api.Models
 
         public IEnumerable<Course> Courses { get; set; }
 
-        public OfficeAssignment OfficeAssignment { get; set; }
+        public string OfficeLocation { get; set; }
     }
 }
