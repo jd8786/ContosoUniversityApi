@@ -141,12 +141,12 @@ namespace ContosoUniversity.Data.Test.Repositories.Instructor
         }
 
         [Fact]
-        public void ShouldNotUpdateOfficeAssignmentWhenCallingUpdate()
+        public void ShouldUpdateOfficeAssignmentLocationPropertyWhenCallingUpdate()
         {
             var instructorToUpdate = new InstructorEntity
             {
                 InstructorId = 1,
-                OfficeAssignment = new OfficeAssignmentEntity { InstructorId = 2 }
+                OfficeAssignment = new OfficeAssignmentEntity { InstructorId = 1, Location = "update-location" }
             };
 
             _repository.Update(instructorToUpdate);
@@ -157,6 +157,37 @@ namespace ContosoUniversity.Data.Test.Repositories.Instructor
 
             updatedInstructor.Should().NotBeNull();
             updatedInstructor.OfficeAssignment.InstructorId.Should().Be(1);
+            updatedInstructor.OfficeAssignment.Location.Should().Be("update-location");
+            _fixture.Context.OfficeAssignments.Find(1).Location.Should().Be("update-location");
+        }
+
+        [Fact]
+        public void ShouldRemoveAndAddOfficeAssignmentWhenCallingUpdate()
+        {
+            var instructorToUpdate = new InstructorEntity
+            {
+                InstructorId = 1,
+            };
+
+            _repository.Update(instructorToUpdate);
+
+            _repository.Save();
+
+            var updatedInstructor1 = _repository.Context.Instructors.Include(i => i.OfficeAssignment).FirstOrDefault(i => i.InstructorId == 1);
+
+            updatedInstructor1.Should().NotBeNull();
+            updatedInstructor1.OfficeAssignment.Should().BeNull();
+            _fixture.Context.OfficeAssignments.Any(o => o.Location == "location1").Should().BeFalse();
+
+            updatedInstructor1.OfficeAssignment = new OfficeAssignmentEntity { Location = "new-location" };
+
+            _repository.Save();
+
+            var updatedInstructor2 = _repository.Context.Instructors.Include(i => i.OfficeAssignment).FirstOrDefault(i => i.InstructorId == 1);
+
+            updatedInstructor2.Should().NotBeNull();
+            updatedInstructor2.OfficeAssignment.InstructorId.Should().Be(1);
+            _fixture.Context.OfficeAssignments.Any(o => o.Location == "new-location").Should().BeTrue();
         }
     }
 }

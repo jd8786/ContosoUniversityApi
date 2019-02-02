@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using ContosoUniversity.Data.EntityModels;
+﻿using ContosoUniversity.Data.EntityModels;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ContosoUniversity.Data.Repositories
 {
@@ -26,6 +26,8 @@ namespace ContosoUniversity.Data.Repositories
             Context.Entry(existingInstructor).CurrentValues.SetValues(instructor);
 
             UpdateCourseAssignment(instructor, existingInstructor);
+
+            existingInstructor.OfficeAssignment = instructor.OfficeAssignment;
         }
 
         private void UpdateCourseAssignment(InstructorEntity instructor, InstructorEntity existingInstructor)
