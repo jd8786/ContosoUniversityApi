@@ -24,12 +24,5 @@ namespace ContosoUniversity.Data.Repositories
 
             Context.Entry(existingDepartment).CurrentValues.SetValues(department);
         }
-
-        public override void Add(DepartmentEntity department)
-        {
-            department.Courses = null;
-
-            Context.Add(department);
-        }
     }
 }

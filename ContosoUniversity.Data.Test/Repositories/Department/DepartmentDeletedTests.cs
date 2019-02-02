@@ -1,69 +1,81 @@
-﻿//using ContosoUniversity.Data.EntityModels;
-//using ContosoUniversity.Data.Repositories;
-//using ContosoUniversity.Data.Test.Fixtures;
-//using FluentAssertions;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using Xunit;
+﻿using System;
+using System.Linq;
+using ContosoUniversity.Data.Repositories;
+using ContosoUniversity.Data.Test.Fixtures;
+using FluentAssertions;
+using Xunit;
 
-//namespace ContosoUniversity.Data.Test.Repositories.Student
-//{
-//    [Trait("Category", "Unit Test: Data.Repositories.Student")]
-//    public class StudentDeletedTests : IClassFixture<InMemoryDbTestFixture>, IDisposable
-//    {
-//        private readonly StudentRepository _repository;
-//        private readonly InMemoryDbTestFixture _fixture;
+namespace ContosoUniversity.Data.Test.Repositories.Department
+{
+    [Trait("Category", "Unit Test: Data.Repositories.Department")]
+    public class DepartmentDeletedTests : IClassFixture<InMemoryDbTestFixture>, IDisposable
+    {
+        private readonly DepartmentRepository _repository;
+        private readonly InMemoryDbTestFixture _fixture;
 
-//        public StudentDeletedTests(InMemoryDbTestFixture fixture)
-//        {
-//            _fixture = fixture;
+        public DepartmentDeletedTests(InMemoryDbTestFixture fixture)
+        {
+            _fixture = fixture;
 
-//            _fixture.InitData();
+            _fixture.InitData();
 
-//            _repository = new StudentRepository(_fixture.Context);
-//        }
+            _repository = new DepartmentRepository(_fixture.Context);
+        }
 
-//        public void Dispose()
-//        {
-//            _fixture.Dispose();
-//        }
+        public void Dispose()
+        {
+            _fixture.Dispose();
+        }
 
-//        [Fact]
-//        public void ShouldRemoveStudentWhenCallingRemove()
-//        {
-//            var student = _repository.Context.Students.Find(1);
+        [Fact]
+        public void ShouldRemoveDepartmentWhenCallingRemove()
+        {
+            var department = _repository.Context.Departments.Find(1);
 
-//            _repository.Remove(student);
+            _repository.Remove(department);
 
-//            _repository.Save();
+            _repository.Save();
 
-//            _fixture.Context.Students.Any(s => s.StudentId == 1).Should().BeFalse();
-//        }
+            _fixture.Context.Departments.Any(d => d.DepartmentId == 1).Should().BeFalse();
+        }
 
-//        [Fact]
-//        public void ShouldRemoveAListOfStudentsWhenCallingRemoveArrange()
-//        {
-//            var students = _repository.Context.Students;
+        [Fact]
+        public void ShouldRemoveAListOfDepartmentsWhenCallingRemoveArrange()
+        {
+            var departments = _repository.Context.Departments;
 
-//            _repository.RemoveRange(students);
+            _repository.RemoveRange(departments);
 
-//            _repository.Save();
+            _repository.Save();
 
-//            _fixture.Context.Students.Any(s => s.StudentId == 1 || s.StudentId == 2).Should().BeFalse();
-//        }
+            _fixture.Context.Departments.Any(d => d.DepartmentId == 1 || d.DepartmentId == 2).Should().BeFalse();
+        }
 
-//        [Fact(Skip = "InmemoryDb doesn't work for related entity update")]
-//        public void ShouldRemoveEnrollmentsWhenStudentIsRemoved()
-//        {
-//            var student = _repository.Context.Students.Find(1);
+        [Fact]
+        public void ShouldNotRemoveAdministratorWhenDepartmentIsRemoved()
+        {
+            var department = _repository.Context.Departments.Find(1);
 
-//            _repository.Remove(student);
+            _repository.Remove(department);
 
-//            _repository.Save();
+            _repository.Save();
 
-//            _fixture.Context.Students.Any(s => s.StudentId == 1).Should().BeFalse();
-//            _fixture.Context.Enrollments.Any(e => e.StudentId == 1).Should().BeFalse();
-//        }
-//    }
-//}
+            _fixture.Context.Departments.Any(d => d.DepartmentId == 1).Should().BeFalse();
+            _fixture.Context.Instructors.Any(i => i.InstructorId == 1).Should().BeTrue();
+        }
+
+        [Fact(Skip = "InmemoryDb doesn't work for related entity update")]
+        public void ShouldRemoveCoursesWhenDepartmentIsRemoved()
+        {
+            var department = _repository.Context.Departments.Find(1);
+
+            _repository.Remove(department);
+
+            _repository.Save();
+
+            _fixture.Context.Departments.Any(d => d.DepartmentId == 1).Should().BeFalse();
+
+            _fixture.Context.Courses.Any(c => c.CourseId == 1).Should().BeFalse();
+        }
+    }
+}

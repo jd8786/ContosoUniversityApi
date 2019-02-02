@@ -91,10 +91,10 @@ namespace ContosoUniversity.Data.Test.Repositories.Department
         }
 
         [Fact]
-        public void ShouldNotCreateCoursesWhenCallingAdd()
+        public void ShouldCreateCoursesWhenCallingAddWithNewCourses()
         {
-            var course1 = new CourseEntity { Title = "title1" };
-            var course2 = new CourseEntity { Title = "title2" };
+            var course1 = new CourseEntity { CourseId = 3, Title = "title3" };
+            var course2 = new CourseEntity { CourseId = 4, Title = "title4" };
 
             var department = new DepartmentEntity
             {
@@ -107,10 +107,34 @@ namespace ContosoUniversity.Data.Test.Repositories.Department
 
             _repository.Save();
 
-            var addedDepartment = _fixture.Context.Departments.FirstOrDefault(d => d.DepartmentId == 3);
+            var addedDepartment = _fixture.Context.Departments.Include(d => d.Courses).FirstOrDefault(d => d.DepartmentId == 3);
 
             addedDepartment.Should().NotBeNull();
-            addedDepartment.Courses.Should().BeNull();
+            addedDepartment.Courses.Count(c => c.CourseId == 3 || c.CourseId == 4).Should().Be(2);
+            _fixture.Context.Courses.Count().Should().Be(4);
+        }
+
+        [Fact]
+        public void ShouldNotCreateCoursesWhenCallingAddWithExistingCourses()
+        {
+            var course1 = _repository.Context.Courses.Find(1);
+            var course2 = _repository.Context.Courses.Find(2);
+
+            var department = new DepartmentEntity
+            {
+                DepartmentId = 3,
+                Name = "some-name",
+                Courses = new List<CourseEntity> { course1, course2 }
+            };
+
+            _repository.Add(department);
+
+            _repository.Save();
+
+            var addedDepartment = _fixture.Context.Departments.Include(d => d.Courses).FirstOrDefault(d => d.DepartmentId == 3);
+
+            addedDepartment.Should().NotBeNull();
+            addedDepartment.Courses.Count(c => c.CourseId == 1 || c.CourseId == 2).Should().Be(2);
             _fixture.Context.Courses.Count().Should().Be(2);
         }
     }
