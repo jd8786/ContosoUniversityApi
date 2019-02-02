@@ -36,7 +36,7 @@ namespace ContosoUniversity.Data.Test.Repositories.Course
             var courseToUpdate = new CourseEntity
             {
                 CourseId = 1,
-                Title = "new-title",
+                Title = "update-title",
                 Credits = 8,
                 CreatedBy = "update-user1",
                 CreatedDate = new DateTime(2005, 7, 1),
@@ -51,7 +51,7 @@ namespace ContosoUniversity.Data.Test.Repositories.Course
             var updatedStudent = _fixture.Context.Courses.Find(1);
 
             updatedStudent.Should().NotBeNull();
-            updatedStudent.Title.Should().Be("new-title");
+            updatedStudent.Title.Should().Be("update-title");
             updatedStudent.Credits.Should().Be(8);
             updatedStudent.CreatedBy.Should().Be("update-user1");
             updatedStudent.CreatedDate.Should().Be(new DateTime(2005, 7, 1));
@@ -167,8 +167,8 @@ namespace ContosoUniversity.Data.Test.Repositories.Course
 
             updatedCourse.Should().NotBeNull();
             updatedCourse.CourseAssignments.Count.Should().Be(2);
-            updatedCourse.CourseAssignments.Any(e => e.InstructorId == 2 && e.CourseId == 1).Should().BeTrue();
-            _fixture.Context.CourseAssignments.Count(e => e.InstructorId == 2 && e.CourseId == 1).Should().Be(1);
+            updatedCourse.CourseAssignments.Any(ca => ca.InstructorId == 2 && ca.CourseId == 1).Should().BeTrue();
+            _fixture.Context.CourseAssignments.Count(ca => ca.InstructorId == 2 && ca.CourseId == 1).Should().Be(1);
         }
 
         [Fact]
@@ -187,7 +187,7 @@ namespace ContosoUniversity.Data.Test.Repositories.Course
 
             updatedCourse.Should().NotBeNull();
             updatedCourse.CourseAssignments.Should().BeNullOrEmpty();
-            _fixture.Context.CourseAssignments.Any(e => e.CourseId == 1 && e.InstructorId == 1).Should().BeFalse();
+            _fixture.Context.CourseAssignments.Any(ca => ca.CourseId == 1 && ca.InstructorId == 1).Should().BeFalse();
         }
 
         [Fact]
@@ -213,8 +213,8 @@ namespace ContosoUniversity.Data.Test.Repositories.Course
             var updatedCourse = _fixture.Context.Courses.Include(c => c.CourseAssignments).FirstOrDefault(c => c.CourseId == 1);
 
             updatedCourse.Should().NotBeNull();
-            updatedCourse.CourseAssignments.All(e => e.CourseId == 1 && e.InstructorId == 2).Should().BeTrue();
-            _fixture.Context.CourseAssignments.Any(e => e.CourseId == 1 && e.InstructorId != 2).Should().BeFalse();
+            updatedCourse.CourseAssignments.All(ca => ca.CourseId == 1 && ca.InstructorId == 2).Should().BeTrue();
+            _fixture.Context.CourseAssignments.Any(ca => ca.CourseId == 1 && ca.InstructorId != 2).Should().BeFalse();
         }
 
         [Fact]

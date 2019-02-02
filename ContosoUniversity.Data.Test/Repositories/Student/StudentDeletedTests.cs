@@ -52,7 +52,7 @@ namespace ContosoUniversity.Data.Test.Repositories.Student
         }
 
         [Fact(Skip = "InmemoryDb doesn't work for related entity update")]
-        public void ShouldRemoveEnrollmentsWhenStudentIsRemoved()
+        public void ShouldRemoveEnrollmentWhenStudentIsRemoved()
         {
             var student = _repository.Context.Students.Find(1);
 

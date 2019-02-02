@@ -65,7 +65,7 @@ namespace ContosoUniversity.Data.Test.Repositories.Course
         }
 
         [Fact(Skip = "InmemoryDb doesn't work for related entity update")]
-        public void ShouldRemoveEnrollmentsWhenRemovingCourse()
+        public void ShouldRemoveEnrollmentWhenRemovingCourse()
         {
             var course = _repository.Context.Courses.Find(1);
 
@@ -78,7 +78,7 @@ namespace ContosoUniversity.Data.Test.Repositories.Course
         }
 
         [Fact(Skip = "InmemoryDb doesn't work for related entity update")]
-        public void ShouldRemoveCourseAssignmentsWhenRemovingCourse()
+        public void ShouldRemoveCourseAssignmentWhenRemovingCourse()
         {
             var course = _repository.Context.Courses.Find(1);
 
