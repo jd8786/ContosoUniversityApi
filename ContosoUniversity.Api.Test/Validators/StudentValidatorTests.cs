@@ -1,4 +1,5 @@
-﻿using ContosoUniversity.Api.Models;
+﻿using System;
+using ContosoUniversity.Api.Models;
 using ContosoUniversity.Api.Validators;
 using ContosoUniversity.Data.EntityModels;
 using ContosoUniversity.Data.Exceptions;
@@ -14,11 +15,15 @@ namespace ContosoUniversity.Api.Test.Validators
     public class StudentValidatorTests
     {
         private readonly IStudentValidator _studentValidator;
+        private readonly Mock<ICourseValidator> _courseValidator;
 
         public StudentValidatorTests()
         {
             var studentRepository = new Mock<IStudentRepository>();
-            _studentValidator = new StudentValidator(studentRepository.Object);
+
+            _courseValidator = new Mock<ICourseValidator>();
+
+            _studentValidator = new StudentValidator(studentRepository.Object, _courseValidator.Object);
 
             studentRepository.Setup(c => c.GetAll()).Returns(new List<StudentEntity> { new StudentEntity { StudentId = 1 } });
         }
@@ -65,6 +70,22 @@ namespace ContosoUniversity.Api.Test.Validators
             exception.Message.Should().Be("Student Id must be 0");
         }
 
+        [Fact]
+        public void ShouldValidateChildrenWhenPostingStudent()
+        {
+            var student = new Student
+            {
+                Courses = new List<Course>
+                {
+                    new Course {CourseId = 1},
+                    new Course {CourseId = 2}
+                }
+            };
+
+            _studentValidator.ValidatePostStudent(student);
+
+            _courseValidator.Verify(cv => cv.ValidateById(It.IsAny<int>()), Times.Exactly(2));
+        }
 
         [Fact]
         public void ShouldNotThrowInvalidStudentExceptionWhenPostingStudentWithValidStudent()
@@ -81,6 +102,7 @@ namespace ContosoUniversity.Api.Test.Validators
             }
 
             ex.Should().BeNull();
+            _courseValidator.Verify(cv => cv.ValidateById(It.IsAny<int>()), Times.Never);
         }
 
         [Fact]
@@ -108,20 +130,43 @@ namespace ContosoUniversity.Api.Test.Validators
         }
 
         [Fact]
-        public void ShouldNotThrowInvalidStudentExceptionWhenPuttingStudentWithValidStudent()
+        public void ShouldValidateChildrenWhenPuttingStudent()
         {
-            InvalidStudentException ex = null;
+            var student = new Student
+            {
+                StudentId = 1,
+                Courses = new List<Course>
+                {
+                    new Course {CourseId = 1},
+                    new Course {CourseId = 2}
+                }
+            };
+
+            _studentValidator.ValidatePutStudent(student);
+
+            _courseValidator.Verify(cv => cv.ValidateById(It.IsAny<int>()), Times.Exactly(2));
+        }
+
+        [Fact]
+        public void ShouldNotThrowExceptionWhenPuttingStudentWithValidStudent()
+        {
+            Exception ex = null;
 
             try
             {
-                _studentValidator.ValidatePutStudent(new Student { StudentId = 1 });
+                _studentValidator.ValidatePutStudent(new Student {StudentId = 1});
             }
             catch (InvalidStudentException e)
             {
                 ex = e;
             }
+            catch (NotFoundException e)
+            {
+                ex = e;
+            }
 
             ex.Should().BeNull();
+            _courseValidator.Verify(cv => cv.ValidateById(It.IsAny<int>()), Times.Never);
         }
     }
 }

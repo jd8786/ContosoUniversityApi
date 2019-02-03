@@ -8,10 +8,12 @@ namespace ContosoUniversity.Api.Validators
     public class StudentValidator: IStudentValidator
     {
         private readonly IStudentRepository _studentRepository;
+        private readonly ICourseValidator _courseValidator;
 
-        public StudentValidator(IStudentRepository studentRepository)
+        public StudentValidator(IStudentRepository studentRepository, ICourseValidator courseValidator)
         {
             _studentRepository = studentRepository;
+            _courseValidator = courseValidator;
         }
 
         public void ValidateById(int studentId)
@@ -37,6 +39,8 @@ namespace ContosoUniversity.Api.Validators
             {
                 throw new InvalidStudentException("Student Id must be 0");
             }
+
+            ValidateChildren(student);
         }
 
         public void ValidatePutStudent(Student student)
@@ -52,6 +56,16 @@ namespace ContosoUniversity.Api.Validators
             }
 
             ValidateById(student.StudentId);
+
+            ValidateChildren(student);
+        }
+
+        private void ValidateChildren(Student student)
+        {
+            if (student.Courses != null && student.Courses.Any())
+            {
+                student.Courses.ToList().ForEach(c => _courseValidator.ValidateById(c.CourseId));
+            }
         }
     }
 }

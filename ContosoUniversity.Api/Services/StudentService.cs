@@ -14,15 +14,11 @@ namespace ContosoUniversity.Api.Services
 
         private readonly IStudentValidator _studentValidator;
 
-        private readonly ICourseValidator _courseValidator;
-
-        public StudentService(IStudentRepository studentRepository, IStudentValidator studentValidator, ICourseValidator courseValidator,  IMapper mapper): base(mapper)
+        public StudentService(IStudentRepository studentRepository, IStudentValidator studentValidator, IMapper mapper): base(mapper)
         {
             _studentRepository = studentRepository;
 
             _studentValidator = studentValidator;
-
-            _courseValidator = courseValidator;
         }
 
         public IEnumerable<Student> GetAll()
@@ -45,12 +41,6 @@ namespace ContosoUniversity.Api.Services
         {
             _studentValidator.ValidatePostStudent(student);
 
-            // toDo: put the following validation in the validator
-            if (student.Courses != null && student.Courses.Any())
-            {
-                student.Courses.ToList().ForEach(c => _courseValidator.ValidateById(c.CourseId));
-            }
-
             var studentEntity = MapToEntity(student);
 
             _studentRepository.Add(studentEntity);
@@ -63,12 +53,6 @@ namespace ContosoUniversity.Api.Services
         public Student Update(Student student)
         {
             _studentValidator.ValidatePutStudent(student);
-
-            // toDo: put the following validation in the validator
-            if (student.Courses != null && student.Courses.Any())
-            {
-                student.Courses.ToList().ForEach(c => _courseValidator.ValidateById(c.CourseId));
-            }
 
             var studentEntity = MapToEntity(student);
 

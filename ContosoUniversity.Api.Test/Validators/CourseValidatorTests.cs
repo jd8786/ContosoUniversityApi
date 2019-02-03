@@ -1,4 +1,5 @@
-﻿using ContosoUniversity.Api.Models;
+﻿using System;
+using ContosoUniversity.Api.Models;
 using ContosoUniversity.Api.Validators;
 using ContosoUniversity.Data.EntityModels;
 using ContosoUniversity.Data.Exceptions;
@@ -14,11 +15,17 @@ namespace ContosoUniversity.Api.Test.Validators
     public class CourseValidatorTests
     {
         private readonly ICourseValidator _courseValidator;
+        private readonly Mock<IStudentValidator> _studentValidator;
+        private readonly Mock<IInstructorValidator> _instructorValidator;
+        private readonly Mock<IDepartmentValidator> _departmentValidator;
 
         public CourseValidatorTests()
         {
             var courseRepository = new Mock<ICourseRepository>();
-            _courseValidator = new CourseValidator(courseRepository.Object);
+            _studentValidator = new Mock<IStudentValidator>();
+            _instructorValidator = new Mock<IInstructorValidator>();
+            _departmentValidator = new Mock<IDepartmentValidator>();
+            _courseValidator = new CourseValidator(courseRepository.Object, _studentValidator.Object, _instructorValidator.Object, _departmentValidator.Object);
 
             courseRepository.Setup(cr => cr.GetAll())
                 .Returns(new List<CourseEntity> { new CourseEntity { CourseId = 1 } });
@@ -31,7 +38,6 @@ namespace ContosoUniversity.Api.Test.Validators
 
             exception.Message.Should().Be("Course provided with Id 2 doesnot exist in the database");
         }
-
 
         [Fact]
         public void ShouldNotThrowNotFoundExceptionWhenCourseExists()
@@ -66,6 +72,29 @@ namespace ContosoUniversity.Api.Test.Validators
             exception.Message.Should().Be("Course Id must be 0");
         }
 
+        [Fact]
+        public void ShouldValidateChildrenWhenPostingCourse()
+        {
+            var course = new Course
+            {
+                Students = new List<Student>
+                {
+                    new Student {StudentId = 1},
+                    new Student {StudentId = 2}
+                },
+                Instructors = new List<Instructor>
+                {
+                    new Instructor {InstructorId = 1}
+                },
+                Department = new Department { DepartmentId = 1 }
+            };
+
+            _courseValidator.ValidatePostCourse(course);
+
+            _studentValidator.Verify(sv => sv.ValidateById(It.IsAny<int>()), Times.Exactly(2));
+            _instructorValidator.Verify(iv => iv.ValidateById(It.IsAny<int>()), Times.Exactly(1));
+            _departmentValidator.Verify(dv => dv.ValidateById(It.IsAny<int>()), Times.Exactly(1));
+        }
 
         [Fact]
         public void ShouldNotThrowInvalidCourseExceptionWhenPostingCourseWithValidCourse()
@@ -82,6 +111,9 @@ namespace ContosoUniversity.Api.Test.Validators
             }
 
             ex.Should().BeNull();
+            _studentValidator.Verify(sv => sv.ValidateById(It.IsAny<int>()), Times.Never);
+            _instructorValidator.Verify(iv => iv.ValidateById(It.IsAny<int>()), Times.Never);
+            _departmentValidator.Verify(dv => dv.ValidateById(It.IsAny<int>()), Times.Never);
         }
 
         [Fact]
@@ -108,22 +140,53 @@ namespace ContosoUniversity.Api.Test.Validators
             exception.Message.Should().Be("Course provided with Id 2 doesnot exist in the database");
         }
 
+        [Fact]
+        public void ShouldValidateChildrenWhenPuttingCourse()
+        {
+            var course = new Course
+            {
+                CourseId = 1,
+                Students = new List<Student>
+                {
+                    new Student {StudentId = 1},
+                    new Student {StudentId = 2}
+                },
+                Instructors = new List<Instructor>
+                {
+                    new Instructor {InstructorId = 1}
+                },
+                Department = new Department { DepartmentId = 1 }
+            };
+
+            _courseValidator.ValidatePutCourse(course);
+
+            _studentValidator.Verify(sv => sv.ValidateById(It.IsAny<int>()), Times.Exactly(2));
+            _instructorValidator.Verify(iv => iv.ValidateById(It.IsAny<int>()), Times.Exactly(1));
+            _departmentValidator.Verify(dv => dv.ValidateById(It.IsAny<int>()), Times.Exactly(1));
+        }
 
         [Fact]
-        public void ShouldNotThrowInvalidCourseExceptionWhenPuttingCourseWithValidCourse()
+        public void ShouldNotThrowExceptionWhenPuttingCourseWithValidCourse()
         {
-            InvalidCourseException ex = null;
+            Exception ex = null;
 
             try
             {
-                _courseValidator.ValidatePutCourse(new Course { CourseId = 1 });
+                _courseValidator.ValidatePutCourse(new Course {CourseId = 1});
             }
             catch (InvalidCourseException e)
             {
                 ex = e;
             }
+            catch (NotFoundException e)
+            {
+                ex = e;
+            }
 
             ex.Should().BeNull();
+            _studentValidator.Verify(sv => sv.ValidateById(It.IsAny<int>()), Times.Never);
+            _instructorValidator.Verify(iv => iv.ValidateById(It.IsAny<int>()), Times.Never);
+            _departmentValidator.Verify(dv => dv.ValidateById(It.IsAny<int>()), Times.Never);
         }
     }
 }

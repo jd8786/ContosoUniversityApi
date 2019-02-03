@@ -11,11 +11,11 @@ namespace ContosoUniversity.Api.Controllers
     [Route("api/students")]
     public class StudentController : Controller
     {
-        private readonly IStudentService _studentsService;
+        private readonly IStudentService _studentService;
 
-        public StudentController(IStudentService studentsService)
+        public StudentController(IStudentService studentService)
         {
-            _studentsService = studentsService;
+            _studentService = studentService;
         }
 
         [HttpGet]
@@ -25,7 +25,7 @@ namespace ContosoUniversity.Api.Controllers
         {
             try
             {
-                var students = _studentsService.GetAll();
+                var students = _studentService.GetAll();
 
                 var apiResponse = ApiResponse<IEnumerable<Student>>.Success(students);
 
@@ -45,7 +45,7 @@ namespace ContosoUniversity.Api.Controllers
         {
             try
             {
-                var student = _studentsService.Get(id);
+                var student = _studentService.Get(id);
 
                 var apiResponse = ApiResponse<Student>.Success(student);
 
@@ -70,7 +70,7 @@ namespace ContosoUniversity.Api.Controllers
         {
             try
             {
-                var newStudent = _studentsService.Add(student);
+                var newStudent = _studentService.Add(student);
 
                 return Ok(ApiResponse<Student>.Success(newStudent));
             }
@@ -97,7 +97,7 @@ namespace ContosoUniversity.Api.Controllers
         {
             try
             {
-                var updatedStudent = _studentsService.Update(student);
+                var updatedStudent = _studentService.Update(student);
 
                 return Ok(ApiResponse<Student>.Success(updatedStudent));
             }
@@ -123,7 +123,7 @@ namespace ContosoUniversity.Api.Controllers
         {
             try
             {
-                _studentsService.Remove(id);
+                _studentService.Remove(id);
 
                 return Ok(ApiResponse<bool>.Success(true));
             }
