@@ -1,9 +1,6 @@
-﻿using System;
-using ContosoUniversity.Api.Models;
+﻿using ContosoUniversity.Api.Models;
 using ContosoUniversity.Api.Validators;
-using ContosoUniversity.Data.EntityModels;
 using ContosoUniversity.Data.Exceptions;
-using ContosoUniversity.Data.Repositories;
 using FluentAssertions;
 using Moq;
 using System.Collections.Generic;
@@ -19,12 +16,8 @@ namespace ContosoUniversity.Api.Test.Validators
 
         public CourseValidatorTests()
         {
-            var courseRepository = new Mock<ICourseRepository>();
             _commonValidator = new Mock<ICommonValidator>();
             _courseValidator = new CourseValidator(_commonValidator.Object);
-
-            courseRepository.Setup(cr => cr.GetAll())
-                .Returns(new List<CourseEntity> { new CourseEntity { CourseId = 1 } });
         }
 
         [Fact]
@@ -44,7 +37,7 @@ namespace ContosoUniversity.Api.Test.Validators
         }
 
         [Fact]
-        public void ShouldValidateChildrenWhenPostingCourse()
+        public void ShouldValidateChildrenWhenPostingCourseWithChildren()
         {
             var course = new Course
             {
@@ -68,20 +61,25 @@ namespace ContosoUniversity.Api.Test.Validators
         }
 
         [Fact]
-        public void ShouldNotThrowInvalidCourseExceptionWhenPostingCourseWithValidCourse()
+        public void ShouldNotValidateChildrenWhenPostingCourseWithNullChildren()
         {
-            InvalidCourseException ex = null;
+            _courseValidator.ValidatePostCourse(new Course());
 
-            try
-            {
-                _courseValidator.ValidatePostCourse(new Course());
-            }
-            catch (InvalidCourseException e)
-            {
-                ex = e;
-            }
+            _commonValidator.Verify(cv => cv.ValidateStudentById(It.IsAny<int>()), Times.Never);
+            _commonValidator.Verify(cv => cv.ValidateInstructorById(It.IsAny<int>()), Times.Never);
+            _commonValidator.Verify(cv => cv.ValidateDepartmentById(It.IsAny<int>()), Times.Never);
+        }
 
-            ex.Should().BeNull();
+        [Fact]
+        public void ShouldNotValidateChildrenWhenPostingCourseWithEmptyChildren()
+        {
+            _courseValidator.ValidatePostCourse(
+                new Course
+                {
+                    Students = new List<Student>(),
+                    Instructors = new List<Instructor>()
+                });
+
             _commonValidator.Verify(cv => cv.ValidateStudentById(It.IsAny<int>()), Times.Never);
             _commonValidator.Verify(cv => cv.ValidateInstructorById(It.IsAny<int>()), Times.Never);
             _commonValidator.Verify(cv => cv.ValidateDepartmentById(It.IsAny<int>()), Times.Never);
@@ -104,15 +102,15 @@ namespace ContosoUniversity.Api.Test.Validators
         }
 
         [Fact]
-        public void ShouldThrowNotFoundExceptionWhenPuttingNonExistingCourse()
+        public void ShouldCallValidateCourseById()
         {
-            var exception = Assert.Throws<NotFoundException>(() => _courseValidator.ValidatePutCourse(new Course { CourseId = 2 }));
+            _courseValidator.ValidatePutCourse(new Course { CourseId = 1 });
 
-            exception.Message.Should().Be("Course provided with Id 2 doesnot exist in the database");
+            _commonValidator.Verify(cv => cv.ValidateCourseById(1), Times.Exactly(1));
         }
 
         [Fact]
-        public void ShouldValidateChildrenWhenPuttingCourse()
+        public void ShouldValidateChildrenWhenPuttingCourseWithChildren()
         {
             var course = new Course
             {
@@ -137,24 +135,25 @@ namespace ContosoUniversity.Api.Test.Validators
         }
 
         [Fact]
-        public void ShouldNotThrowExceptionWhenPuttingCourseWithValidCourse()
+        public void ShouldNotValidateChildrenWhenPuttingCourseWithNullChildren()
         {
-            Exception ex = null;
+            _courseValidator.ValidatePutCourse(new Course { CourseId = 1 });
 
-            try
-            {
-                _courseValidator.ValidatePutCourse(new Course {CourseId = 1});
-            }
-            catch (InvalidCourseException e)
-            {
-                ex = e;
-            }
-            catch (NotFoundException e)
-            {
-                ex = e;
-            }
+            _commonValidator.Verify(cv => cv.ValidateStudentById(It.IsAny<int>()), Times.Never);
+            _commonValidator.Verify(cv => cv.ValidateInstructorById(It.IsAny<int>()), Times.Never);
+            _commonValidator.Verify(cv => cv.ValidateDepartmentById(It.IsAny<int>()), Times.Never);
+        }
 
-            ex.Should().BeNull();
+        [Fact]
+        public void ShouldNotValidateChildrenWhenPuttingCourseWithEmptyChildren()
+        {
+            _courseValidator.ValidatePutCourse(new Course
+            {
+                CourseId = 1,
+                Students = new List<Student>(),
+                Instructors = new List<Instructor>()
+            });
+
             _commonValidator.Verify(cv => cv.ValidateStudentById(It.IsAny<int>()), Times.Never);
             _commonValidator.Verify(cv => cv.ValidateInstructorById(It.IsAny<int>()), Times.Never);
             _commonValidator.Verify(cv => cv.ValidateDepartmentById(It.IsAny<int>()), Times.Never);
