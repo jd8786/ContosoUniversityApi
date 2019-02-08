@@ -41,11 +41,23 @@ namespace ContosoUniversity.Api
 
             services.AddScoped<ICourseRepository, CourseRepository>();
 
+            services.AddScoped<IInstructorRepository, InstructorRepository>();
+
+            services.AddScoped<IDepartmentRepository, DepartmentRepository>();
+
             services.AddScoped<IStudentService, StudentService>();
+
+            services.AddScoped<ICourseService, CourseService>();
 
             services.AddScoped<ICourseValidator, CourseValidator>();
 
             services.AddScoped<IStudentValidator, StudentValidator>();
+
+            services.AddScoped<IDepartmentValidator, DepartmentValidator>();
+
+            services.AddScoped<IInstructorValidator, InstructorValidator>();
+
+            services.AddScoped<ICommonValidator, CommonValidator>();
 
             services.AddSwaggerGen(o =>
             {

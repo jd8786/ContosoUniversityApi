@@ -1,13 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using AutoFixture;
+using ContosoUniversity.Api.Acceptance.Test.Fixtures;
+using FluentAssertions;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using AutoFixture;
-using ContosoUniversity.Api.Acceptance.Test.Fixtures;
-using ContosoUniversity.Api.Models;
-using FluentAssertions;
-using Newtonsoft.Json;
 using Xunit;
 using ApiModels = ContosoUniversity.Api.Models;
 
@@ -60,7 +59,7 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Student
                 .With(s => s.LastName, "some-last-name")
                 .With(s => s.FirstMidName, "some-first-mid-name")
                 .With(s => s.OriginCountry, "some-origin-country")
-                .With(s => s.Courses, new List<Course> { new Course { CourseId = 1050 }, new Course { CourseId = 4022 } })
+                .With(s => s.Courses, new List<ApiModels.Course> { new ApiModels.Course { CourseId = 1050 }, new ApiModels.Course { CourseId = 4022 } })
                 .Create();
 
             var studentJson = JsonConvert.SerializeObject(student);

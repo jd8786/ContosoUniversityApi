@@ -1,35 +1,16 @@
 ﻿using ContosoUniversity.Api.Models;
 using ContosoUniversity.Data.Exceptions;
-using ContosoUniversity.Data.Repositories;
 using System.Linq;
 
 namespace ContosoUniversity.Api.Validators
 {
-    public class CourseValidator: ICourseValidator
+    public class CourseValidator : ICourseValidator
     {
-        private readonly ICourseRepository _courseRepository;
-        private readonly IStudentValidator _studentValidator;
-        private readonly IInstructorValidator _instructorValidator;
-        private readonly IDepartmentValidator _departmentValidator;
+        public ICommonValidator CommonValidator { get; set; }
 
-        public CourseValidator(ICourseRepository courseRepository, IStudentValidator studentValidator, IInstructorValidator instructorValidator, IDepartmentValidator departmentValidator )
+        public CourseValidator(ICommonValidator commonValidator)
         {
-            _courseRepository = courseRepository;
-            _studentValidator = studentValidator;
-            _instructorValidator = instructorValidator;
-            _departmentValidator = departmentValidator;
-        }
-
-        public void ValidateById(int courseId)
-        {
-            var courses = _courseRepository.GetAll().ToList();
-
-            var isCourseExisting = courses.Any(c => c.CourseId == courseId);
-
-            if (!isCourseExisting)
-            {
-                throw new NotFoundException($"Course provided with Id {courseId} doesnot exist in the database");
-            }
+            CommonValidator = commonValidator;
         }
 
         public void ValidatePostCourse(Course course)
@@ -59,7 +40,7 @@ namespace ContosoUniversity.Api.Validators
                 throw new InvalidCourseException("Course Id cannot be 0");
             }
 
-            ValidateById(course.CourseId);
+            CommonValidator.ValidateCourseById(course.CourseId);
 
             ValidateChildren(course);
         }
@@ -68,17 +49,17 @@ namespace ContosoUniversity.Api.Validators
         {
             if (course.Students != null && course.Students.Any())
             {
-                course.Students.ToList().ForEach(s => _studentValidator.ValidateById(s.StudentId));
+                course.Students.ToList().ForEach(s => CommonValidator.ValidateStudentById(s.StudentId));
             }
 
             if (course.Instructors != null && course.Instructors.Any())
             {
-                course.Instructors.ToList().ForEach(i => _instructorValidator.ValidateById(i.InstructorId));
+                course.Instructors.ToList().ForEach(i => CommonValidator.ValidateInstructorById(i.InstructorId));
             }
 
             if (course.Department != null)
             {
-                _departmentValidator.ValidateById(course.Department.DepartmentId);
+                CommonValidator.ValidateDepartmentById(course.Department.DepartmentId);
             }
         }
     }

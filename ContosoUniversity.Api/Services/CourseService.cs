@@ -30,7 +30,7 @@ namespace ContosoUniversity.Api.Services
 
         public Course Get(int id)
         {
-            _courseValidator.ValidateById(id);
+            _courseValidator.CommonValidator.ValidateCourseById(id);
 
             var courseEntity = _courseRepository.GetAll().First(s => s.CourseId == id);
 
@@ -65,7 +65,7 @@ namespace ContosoUniversity.Api.Services
 
         public bool Remove(int courseId)
         {
-            _courseValidator.ValidateById(courseId);
+            _courseValidator.CommonValidator.ValidateCourseById(courseId);
 
             var courseEntity = _courseRepository.GetAll().First(c => c.CourseId == courseId);
 

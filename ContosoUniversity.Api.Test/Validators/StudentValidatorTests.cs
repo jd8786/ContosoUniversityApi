@@ -1,9 +1,6 @@
-﻿using System;
-using ContosoUniversity.Api.Models;
+﻿using ContosoUniversity.Api.Models;
 using ContosoUniversity.Api.Validators;
-using ContosoUniversity.Data.EntityModels;
 using ContosoUniversity.Data.Exceptions;
-using ContosoUniversity.Data.Repositories;
 using FluentAssertions;
 using Moq;
 using System.Collections.Generic;
@@ -15,43 +12,13 @@ namespace ContosoUniversity.Api.Test.Validators
     public class StudentValidatorTests
     {
         private readonly IStudentValidator _studentValidator;
-        private readonly Mock<ICourseValidator> _courseValidator;
+        private readonly Mock<ICommonValidator> _commonValidator;
 
         public StudentValidatorTests()
         {
-            var studentRepository = new Mock<IStudentRepository>();
+            _commonValidator = new Mock<ICommonValidator>();
 
-            _courseValidator = new Mock<ICourseValidator>();
-
-            _studentValidator = new StudentValidator(studentRepository.Object, _courseValidator.Object);
-
-            studentRepository.Setup(c => c.GetAll()).Returns(new List<StudentEntity> { new StudentEntity { StudentId = 1 } });
-        }
-
-        [Fact]
-        public void ShouldThrowNotFoundExceptionWhenStudentDoesNotExist()
-        {
-            var exception = Assert.Throws<NotFoundException>(() => _studentValidator.ValidateById(2));
-
-            exception.Message.Should().Be("Student provided with Id 2 doesnot exist in the database");
-        }
-
-
-        [Fact]
-        public void ShouldNotThrowNotFoundExceptionWhenStudentExists()
-        {
-            NotFoundException ex = null;
-
-            try
-            {
-                _studentValidator.ValidateById(1);
-            }
-            catch (NotFoundException e)
-            {
-                ex = e;
-            }
-
-            ex.Should().BeNull();
+            _studentValidator = new StudentValidator(_commonValidator.Object);
         }
 
         [Fact]
@@ -71,7 +38,7 @@ namespace ContosoUniversity.Api.Test.Validators
         }
 
         [Fact]
-        public void ShouldValidateChildrenWhenPostingStudent()
+        public void ShouldValidateChildrenWhenPostingStudentWithCourses()
         {
             var student = new Student
             {
@@ -84,25 +51,23 @@ namespace ContosoUniversity.Api.Test.Validators
 
             _studentValidator.ValidatePostStudent(student);
 
-            _courseValidator.Verify(cv => cv.ValidateById(It.IsAny<int>()), Times.Exactly(2));
+            _commonValidator.Verify(cv => cv.ValidateCourseById(It.IsAny<int>()), Times.Exactly(2));
         }
 
         [Fact]
-        public void ShouldNotThrowInvalidStudentExceptionWhenPostingStudentWithValidStudent()
+        public void ShouldNotValidateChildrenWhenPostingStudentWithNullCourses()
         {
-            InvalidStudentException ex = null;
+            _studentValidator.ValidatePostStudent(new Student());
 
-            try
-            {
-                _studentValidator.ValidatePostStudent(new Student());
-            }
-            catch (InvalidStudentException e)
-            {
-                ex = e;
-            }
+            _commonValidator.Verify(cv => cv.ValidateCourseById(It.IsAny<int>()), Times.Never);
+        }
 
-            ex.Should().BeNull();
-            _courseValidator.Verify(cv => cv.ValidateById(It.IsAny<int>()), Times.Never);
+        [Fact]
+        public void ShouldNotValidateChildrenWhenPostingStudentWithEmptyCourses()
+        {
+            _studentValidator.ValidatePostStudent(new Student { Courses = new List<Course>() });
+
+            _commonValidator.Verify(cv => cv.ValidateCourseById(It.IsAny<int>()), Times.Never);
         }
 
         [Fact]
@@ -122,15 +87,20 @@ namespace ContosoUniversity.Api.Test.Validators
         }
 
         [Fact]
-        public void ShouldThrowNotFoundExceptionWhenPuttingNonExistingStudent()
+        public void ShouldCallValidateStudentById()
         {
-            var exception = Assert.Throws<NotFoundException>(() => _studentValidator.ValidatePutStudent(new Student { StudentId = 2 }));
+            var student = new Student
+            {
+                StudentId = 1
+            };
 
-            exception.Message.Should().Be("Student provided with Id 2 doesnot exist in the database");
+            _studentValidator.ValidatePutStudent(student);
+
+            _commonValidator.Verify(cv => cv.ValidateStudentById(1), Times.Exactly(1));
         }
 
         [Fact]
-        public void ShouldValidateChildrenWhenPuttingStudent()
+        public void ShouldValidateChildrenWhenPuttingStudentWithCourses()
         {
             var student = new Student
             {
@@ -144,29 +114,23 @@ namespace ContosoUniversity.Api.Test.Validators
 
             _studentValidator.ValidatePutStudent(student);
 
-            _courseValidator.Verify(cv => cv.ValidateById(It.IsAny<int>()), Times.Exactly(2));
+            _commonValidator.Verify(cv => cv.ValidateCourseById(It.IsAny<int>()), Times.Exactly(2));
         }
 
         [Fact]
-        public void ShouldNotThrowExceptionWhenPuttingStudentWithValidStudent()
+        public void ShouldNotValidateChildrenWhenPuttingStudentWithNullCourses()
         {
-            Exception ex = null;
+            _studentValidator.ValidatePutStudent(new Student { StudentId = 1 });
 
-            try
-            {
-                _studentValidator.ValidatePutStudent(new Student {StudentId = 1});
-            }
-            catch (InvalidStudentException e)
-            {
-                ex = e;
-            }
-            catch (NotFoundException e)
-            {
-                ex = e;
-            }
+            _commonValidator.Verify(cv => cv.ValidateCourseById(It.IsAny<int>()), Times.Never);
+        }
 
-            ex.Should().BeNull();
-            _courseValidator.Verify(cv => cv.ValidateById(It.IsAny<int>()), Times.Never);
+        [Fact]
+        public void ShouldNotValidateChildrenWhenPuttingStudentWithEmptyCourses()
+        {
+            _studentValidator.ValidatePutStudent(new Student { StudentId = 1, Courses = new List<Course>() });
+
+            _commonValidator.Verify(cv => cv.ValidateCourseById(It.IsAny<int>()), Times.Never);
         }
     }
 }

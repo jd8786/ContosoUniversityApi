@@ -16,6 +16,8 @@ namespace ContosoUniversity.Data.Repositories
 
         void Update(T student);
 
+        T Find(int id);
+
         void Save();
     }
 }

@@ -15,45 +15,16 @@ namespace ContosoUniversity.Api.Test.Validators
     public class CourseValidatorTests
     {
         private readonly ICourseValidator _courseValidator;
-        private readonly Mock<IStudentValidator> _studentValidator;
-        private readonly Mock<IInstructorValidator> _instructorValidator;
-        private readonly Mock<IDepartmentValidator> _departmentValidator;
+        private readonly Mock<ICommonValidator> _commonValidator;
 
         public CourseValidatorTests()
         {
             var courseRepository = new Mock<ICourseRepository>();
-            _studentValidator = new Mock<IStudentValidator>();
-            _instructorValidator = new Mock<IInstructorValidator>();
-            _departmentValidator = new Mock<IDepartmentValidator>();
-            _courseValidator = new CourseValidator(courseRepository.Object, _studentValidator.Object, _instructorValidator.Object, _departmentValidator.Object);
+            _commonValidator = new Mock<ICommonValidator>();
+            _courseValidator = new CourseValidator(_commonValidator.Object);
 
             courseRepository.Setup(cr => cr.GetAll())
                 .Returns(new List<CourseEntity> { new CourseEntity { CourseId = 1 } });
-        }
-
-        [Fact]
-        public void ShouldThrowNotFoundExceptionWhenCourseDoesNotExist()
-        {
-            var exception = Assert.Throws<NotFoundException>(() => _courseValidator.ValidateById(2));
-
-            exception.Message.Should().Be("Course provided with Id 2 doesnot exist in the database");
-        }
-
-        [Fact]
-        public void ShouldNotThrowNotFoundExceptionWhenCourseExists()
-        {
-            NotFoundException ex = null;
-
-            try
-            {
-                _courseValidator.ValidateById(1);
-            }
-            catch (NotFoundException e)
-            {
-                ex = e;
-            }
-
-            ex.Should().BeNull();
         }
 
         [Fact]
@@ -91,9 +62,9 @@ namespace ContosoUniversity.Api.Test.Validators
 
             _courseValidator.ValidatePostCourse(course);
 
-            _studentValidator.Verify(sv => sv.ValidateById(It.IsAny<int>()), Times.Exactly(2));
-            _instructorValidator.Verify(iv => iv.ValidateById(It.IsAny<int>()), Times.Exactly(1));
-            _departmentValidator.Verify(dv => dv.ValidateById(It.IsAny<int>()), Times.Exactly(1));
+            _commonValidator.Verify(cv => cv.ValidateStudentById(It.IsAny<int>()), Times.Exactly(2));
+            _commonValidator.Verify(cv => cv.ValidateInstructorById(It.IsAny<int>()), Times.Exactly(1));
+            _commonValidator.Verify(cv => cv.ValidateDepartmentById(It.IsAny<int>()), Times.Exactly(1));
         }
 
         [Fact]
@@ -111,9 +82,9 @@ namespace ContosoUniversity.Api.Test.Validators
             }
 
             ex.Should().BeNull();
-            _studentValidator.Verify(sv => sv.ValidateById(It.IsAny<int>()), Times.Never);
-            _instructorValidator.Verify(iv => iv.ValidateById(It.IsAny<int>()), Times.Never);
-            _departmentValidator.Verify(dv => dv.ValidateById(It.IsAny<int>()), Times.Never);
+            _commonValidator.Verify(cv => cv.ValidateStudentById(It.IsAny<int>()), Times.Never);
+            _commonValidator.Verify(cv => cv.ValidateInstructorById(It.IsAny<int>()), Times.Never);
+            _commonValidator.Verify(cv => cv.ValidateDepartmentById(It.IsAny<int>()), Times.Never);
         }
 
         [Fact]
@@ -160,9 +131,9 @@ namespace ContosoUniversity.Api.Test.Validators
 
             _courseValidator.ValidatePutCourse(course);
 
-            _studentValidator.Verify(sv => sv.ValidateById(It.IsAny<int>()), Times.Exactly(2));
-            _instructorValidator.Verify(iv => iv.ValidateById(It.IsAny<int>()), Times.Exactly(1));
-            _departmentValidator.Verify(dv => dv.ValidateById(It.IsAny<int>()), Times.Exactly(1));
+            _commonValidator.Verify(cv => cv.ValidateStudentById(It.IsAny<int>()), Times.Exactly(2));
+            _commonValidator.Verify(cv => cv.ValidateInstructorById(It.IsAny<int>()), Times.Exactly(1));
+            _commonValidator.Verify(cv => cv.ValidateDepartmentById(It.IsAny<int>()), Times.Exactly(1));
         }
 
         [Fact]
@@ -184,9 +155,9 @@ namespace ContosoUniversity.Api.Test.Validators
             }
 
             ex.Should().BeNull();
-            _studentValidator.Verify(sv => sv.ValidateById(It.IsAny<int>()), Times.Never);
-            _instructorValidator.Verify(iv => iv.ValidateById(It.IsAny<int>()), Times.Never);
-            _departmentValidator.Verify(dv => dv.ValidateById(It.IsAny<int>()), Times.Never);
+            _commonValidator.Verify(cv => cv.ValidateStudentById(It.IsAny<int>()), Times.Never);
+            _commonValidator.Verify(cv => cv.ValidateInstructorById(It.IsAny<int>()), Times.Never);
+            _commonValidator.Verify(cv => cv.ValidateDepartmentById(It.IsAny<int>()), Times.Never);
         }
     }
 }

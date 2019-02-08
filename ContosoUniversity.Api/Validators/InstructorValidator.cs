@@ -1,29 +1,15 @@
-﻿using ContosoUniversity.Data.Exceptions;
-using ContosoUniversity.Data.Repositories;
-using System.Linq;
-using ContosoUniversity.Api.Models;
+﻿using ContosoUniversity.Api.Models;
+using ContosoUniversity.Data.Exceptions;
 
 namespace ContosoUniversity.Api.Validators
 {
     public class InstructorValidator: IInstructorValidator
     {
-        private readonly IInstructorRepository _instructorRepository;
+        public ICommonValidator CommonValidator { get; set; }
 
-        public InstructorValidator(IInstructorRepository instructorRepository)
+        public InstructorValidator(ICommonValidator commonValidator)
         {
-            _instructorRepository = instructorRepository;
-        }
-
-        public void ValidateById(int instructorId)
-        {
-            var instructors = _instructorRepository.GetAll().ToList();
-
-            var isInstructorExisting = instructors.Any(i => i.InstructorId == instructorId);
-
-            if (!isInstructorExisting)
-            {
-                throw new NotFoundException($"Instructor provided with Id {instructorId} doesnot exist in the database");
-            }
+            CommonValidator = commonValidator;
         }
 
         public void ValidatePostInstructor(Instructor instructor)
@@ -51,7 +37,7 @@ namespace ContosoUniversity.Api.Validators
                 throw new InvalidInstructorException("Instructor Id cannot be 0");
             }
 
-            ValidateById(instructor.InstructorId);
+            CommonValidator.ValidateInstructorById(instructor.InstructorId);
         }
     }
 }

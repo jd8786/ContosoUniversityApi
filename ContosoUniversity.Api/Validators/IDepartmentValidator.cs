@@ -4,7 +4,7 @@ namespace ContosoUniversity.Api.Validators
 {
     public interface IDepartmentValidator
     {
-        void ValidateById(int departmentId);
+        ICommonValidator CommonValidator { get; set; }
 
         void ValidatePostDepartment(Department department);
 

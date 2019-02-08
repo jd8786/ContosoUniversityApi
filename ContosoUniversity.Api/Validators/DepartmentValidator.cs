@@ -1,29 +1,15 @@
-﻿using ContosoUniversity.Data.Exceptions;
-using ContosoUniversity.Data.Repositories;
-using System.Linq;
-using ContosoUniversity.Api.Models;
+﻿using ContosoUniversity.Api.Models;
+using ContosoUniversity.Data.Exceptions;
 
 namespace ContosoUniversity.Api.Validators
 {
     public class DepartmentValidator : IDepartmentValidator
     {
-        private readonly IDepartmentRepository _departmentRepository;
+        public ICommonValidator CommonValidator { get; set; }
 
-        public DepartmentValidator(IDepartmentRepository departmentRepository)
+        public DepartmentValidator(ICommonValidator commonValidator)
         {
-            _departmentRepository = departmentRepository;
-        }
-
-        public void ValidateById(int departmentId)
-        {
-            var departments = _departmentRepository.GetAll().ToList();
-
-            var isDepartmentExisting = departments.Any(i => i.DepartmentId == departmentId);
-
-            if (!isDepartmentExisting)
-            {
-                throw new NotFoundException($"Department provided with Id {departmentId} doesnot exist in the database");
-            }
+            CommonValidator = commonValidator;
         }
 
         public void ValidatePostDepartment(Department department)
@@ -51,7 +37,7 @@ namespace ContosoUniversity.Api.Validators
                 throw new InvalidDepartmentException("Department Id cannot be 0");
             }
 
-            ValidateById(department.DepartmentId);
+            CommonValidator.ValidateDepartmentById(department.DepartmentId);
         }
     }
 }

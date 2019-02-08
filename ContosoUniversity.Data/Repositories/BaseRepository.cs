@@ -42,6 +42,11 @@ namespace ContosoUniversity.Data.Repositories
             Context.Set<T>().Update(student);
         }
 
+        public T Find(int id)
+        {
+            return Context.Set<T>().Find(id);
+        }
+
         public void Save()
         {
             Context.SaveChanges();

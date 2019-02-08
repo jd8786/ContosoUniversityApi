@@ -1,31 +1,16 @@
-﻿using ContosoUniversity.Data.Exceptions;
-using ContosoUniversity.Data.Repositories;
+﻿using ContosoUniversity.Api.Models;
+using ContosoUniversity.Data.Exceptions;
 using System.Linq;
-using ContosoUniversity.Api.Models;
 
 namespace ContosoUniversity.Api.Validators
 {
-    public class StudentValidator: IStudentValidator
+    public class StudentValidator : IStudentValidator
     {
-        private readonly IStudentRepository _studentRepository;
-        private readonly ICourseValidator _courseValidator;
+        public ICommonValidator CommonValidator { get; set; }
 
-        public StudentValidator(IStudentRepository studentRepository, ICourseValidator courseValidator)
+        public StudentValidator(ICommonValidator commonValidator)
         {
-            _studentRepository = studentRepository;
-            _courseValidator = courseValidator;
-        }
-
-        public void ValidateById(int studentId)
-        {
-            var students = _studentRepository.GetAll().ToList();
-
-            var isStudentExisting = students.Any(s => s.StudentId == studentId);
-
-            if (!isStudentExisting)
-            {
-                throw new NotFoundException($"Student provided with Id {studentId} doesnot exist in the database");
-            }
+            CommonValidator = commonValidator;
         }
 
         public void ValidatePostStudent(Student student)
@@ -55,7 +40,7 @@ namespace ContosoUniversity.Api.Validators
                 throw new InvalidStudentException("Student Id cannot be 0");
             }
 
-            ValidateById(student.StudentId);
+            CommonValidator.ValidateStudentById(student.StudentId);
 
             ValidateChildren(student);
         }
@@ -64,7 +49,7 @@ namespace ContosoUniversity.Api.Validators
         {
             if (student.Courses != null && student.Courses.Any())
             {
-                student.Courses.ToList().ForEach(c => _courseValidator.ValidateById(c.CourseId));
+                student.Courses.ToList().ForEach(c => CommonValidator.ValidateCourseById(c.CourseId));
             }
         }
     }

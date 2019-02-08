@@ -59,7 +59,7 @@ namespace ContosoUniversity.Api.Test.Services
         {
             var student = _studentService.Get(1);
 
-            _studentValidator.Verify(s => s.ValidateById(1), Times.Exactly(1));
+            _studentValidator.Verify(s => s.CommonValidator.ValidateStudentById(1), Times.Exactly(1));
 
             _studentRepository.Verify(sr => sr.GetAll(), Times.Exactly(1));
 
@@ -106,7 +106,7 @@ namespace ContosoUniversity.Api.Test.Services
         {
             var isRemoved = _studentService.Remove(1);
 
-            _studentValidator.Verify(sv => sv.ValidateById(1), Times.Exactly(1));
+            _studentValidator.Verify(sv => sv.CommonValidator.ValidateStudentById(1), Times.Exactly(1));
 
             _studentRepository.Verify(sr => sr.Remove(It.Is<StudentEntity>(s => s.StudentId == 1)), Times.Exactly(1));
 
