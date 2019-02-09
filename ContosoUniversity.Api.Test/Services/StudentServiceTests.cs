@@ -20,6 +20,8 @@ namespace ContosoUniversity.Api.Test.Services
 
         private readonly Mock<IStudentValidator> _studentValidator;
 
+        private readonly Mock<ICommonValidator> _commonValidator;
+
         private readonly IStudentService _studentService;
 
         private readonly List<StudentEntity> _studentEntities;
@@ -28,6 +30,9 @@ namespace ContosoUniversity.Api.Test.Services
         {
             _studentRepository = new Mock<IStudentRepository>();
             _studentValidator = new Mock<IStudentValidator>();
+            _commonValidator = new Mock<ICommonValidator>();
+
+            _studentValidator.Setup(sv => sv.CommonValidator).Returns(_commonValidator.Object);
 
             var mapperConfig = new MapperConfiguration(ctg => ctg.AddProfile(new StudentProfile()));
 
@@ -59,7 +64,7 @@ namespace ContosoUniversity.Api.Test.Services
         {
             var student = _studentService.Get(1);
 
-            _studentValidator.Verify(s => s.CommonValidator.ValidateStudentById(1), Times.Exactly(1));
+            _commonValidator.Verify(cv => cv.ValidateStudentById(1), Times.Exactly(1));
 
             _studentRepository.Verify(sr => sr.GetAll(), Times.Exactly(1));
 
@@ -104,9 +109,13 @@ namespace ContosoUniversity.Api.Test.Services
         [Fact]
         public void ShouldDeleteStudentWhenCallingDelete()
         {
+            _studentRepository.Setup(sr => sr.Find(1)).Returns(new StudentEntity { StudentId = 1 });
+
             var isRemoved = _studentService.Remove(1);
 
-            _studentValidator.Verify(sv => sv.CommonValidator.ValidateStudentById(1), Times.Exactly(1));
+            _commonValidator.Verify(cv => cv.ValidateStudentById(1), Times.Exactly(1));
+
+            _studentRepository.Verify(sv => sv.Find(1), Times.Exactly(1));
 
             _studentRepository.Verify(sr => sr.Remove(It.Is<StudentEntity>(s => s.StudentId == 1)), Times.Exactly(1));
 

@@ -67,7 +67,7 @@ namespace ContosoUniversity.Api.Services
         {
             _studentValidator.CommonValidator.ValidateStudentById(studentId);
 
-            var entityStudent = _studentRepository.GetAll().First(s => s.StudentId == studentId);
+            var entityStudent = _studentRepository.Find(studentId);
 
             _studentRepository.Remove(entityStudent);
 
