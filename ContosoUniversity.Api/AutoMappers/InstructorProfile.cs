@@ -14,8 +14,8 @@ namespace ContosoUniversity.Api.AutoMappers
                 .ForMember(dest => dest.OfficeLocation, opt => opt.MapFrom(src => src.OfficeAssignment.Location))
                 .ReverseMap()
                 .ForMember(dest => dest.CourseAssignments, opt => opt.MapFrom(src => GetCourseAssignments(src)))
-                .ForMember(dest => dest.OfficeAssignment.InstructorId, opt => opt.MapFrom(src => src.InstructorId))
-                .ForMember(dest => dest.OfficeAssignment.Location, opt => opt.MapFrom(src => src.OfficeLocation));
+                .ForPath(dest => dest.OfficeAssignment.InstructorId, opt => opt.MapFrom(src => src.InstructorId))
+                .ForPath(dest => dest.OfficeAssignment.Location, opt => opt.MapFrom(src => src.OfficeLocation));
         }
 
         private static IEnumerable<Course> GetCourses(InstructorEntity instructor)
