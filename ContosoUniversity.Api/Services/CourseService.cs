@@ -67,7 +67,7 @@ namespace ContosoUniversity.Api.Services
         {
             _courseValidator.CommonValidator.ValidateCourseById(courseId);
 
-            var courseEntity = _courseRepository.GetAll().First(c => c.CourseId == courseId);
+            var courseEntity = _courseRepository.Find(courseId);
 
             _courseRepository.Remove(courseEntity);
 
