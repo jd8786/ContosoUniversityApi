@@ -1,10 +1,8 @@
-﻿using System;
-using ContosoUniversity.Data;
+﻿using ContosoUniversity.Data;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace ContosoUniversity.Api
 {

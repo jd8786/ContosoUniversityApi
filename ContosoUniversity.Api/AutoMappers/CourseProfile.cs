@@ -11,8 +11,12 @@ namespace ContosoUniversity.Api.AutoMappers
         {
             CreateMap<CourseEntity, Course>()
                 .ForMember(dest => dest.Students, opt => opt.MapFrom(src => GetStudents(src)))
+                .ForMember(dest => dest.Instructors, opt => opt.MapFrom(src => GetInstructors(src)))
+                .ForMember(dest => dest.Department, opt => opt.MapFrom(src => src.Department))
                 .ReverseMap()
-                .ForMember(dest => dest.Enrollments, opt => opt.MapFrom(src => GetEnrollments(src)));
+                .ForMember(dest => dest.Enrollments, opt => opt.MapFrom(src => GetEnrollments(src)))
+                .ForMember(dest => dest.CourseAssignments, opt => opt.MapFrom(src => GetCourseAssignments(src)))
+                .ForMember(dest => dest.DepartmentId, opt => opt.MapFrom(src => src.Department.DepartmentId));
         }
 
         private static IEnumerable<Student> GetStudents(CourseEntity course)
@@ -23,7 +27,7 @@ namespace ContosoUniversity.Api.AutoMappers
             {
                 var student = new Student
                 {
-                    StudentId = enrollment.CourseId,
+                    StudentId = enrollment.StudentId,
                     EnrollmentDate = enrollment.Student.EnrollmentDate,
                     FirstMidName = enrollment.Student.FirstMidName,
                     LastName = enrollment.Student.LastName,
@@ -48,7 +52,6 @@ namespace ContosoUniversity.Api.AutoMappers
                 var enrollment = new EnrollmentEntity
                 {
                     CourseId = course.CourseId,
-                    Grade = course.Grade,
                     StudentId = student.StudentId
                 };
 
@@ -59,6 +62,51 @@ namespace ContosoUniversity.Api.AutoMappers
             }
 
             return enrollments;
+        }
+
+        private static IEnumerable<Instructor> GetInstructors(CourseEntity course)
+        {
+            var instructors = new List<Instructor>();
+
+            foreach (var courseAssignment in course.CourseAssignments)
+            {
+                var instructor = new Instructor
+                {
+                    InstructorId = courseAssignment.InstructorId,
+                    FirstMidName = courseAssignment.Instructor.FirstMidName,
+                    HireDate = courseAssignment.Instructor.HireDate,
+                    LastName = courseAssignment.Instructor.LastName,
+                    OfficeLocation = courseAssignment.Instructor.OfficeAssignment.Location
+                };
+
+                if (!instructors.Contains(instructor))
+                {
+                    instructors.Add(instructor);
+                }
+            }
+
+            return instructors;
+        }
+
+        private static IEnumerable<CourseAssignmentEntity> GetCourseAssignments(Course course)
+        {
+            var courseAssignments = new List<CourseAssignmentEntity>();
+
+            foreach (var instructor in course.Instructors)
+            {
+                var courseAssignment = new CourseAssignmentEntity
+                {
+                    CourseId = course.CourseId,
+                    InstructorId = instructor.InstructorId
+                };
+
+                if (!courseAssignments.Contains(courseAssignment))
+                {
+                    courseAssignments.Add(courseAssignment);
+                }
+            }
+
+            return courseAssignments;
         }
     }
 }

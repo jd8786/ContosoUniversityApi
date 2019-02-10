@@ -117,12 +117,12 @@ namespace ContosoUniversity.Api.Test.AutoMappers
 
             var studentEntity = _mapper.Map<StudentEntity>(student);
 
-            studentEntity.Enrollments.Count().Should().Be(2);
+            studentEntity.Enrollments.Count.Should().Be(2);
             studentEntity.Enrollments.First().CourseId.Should().Be(1);
             studentEntity.Enrollments.First().StudentId.Should().Be(1);
             studentEntity.Enrollments.First().Grade.Should().Be(Grade.A);
             studentEntity.Enrollments.Last().CourseId.Should().Be(2);
-            studentEntity.Enrollments.First().StudentId.Should().Be(1);
+            studentEntity.Enrollments.Last().StudentId.Should().Be(1);
             studentEntity.Enrollments.Last().Grade.Should().Be(Grade.B);
         }
     }
