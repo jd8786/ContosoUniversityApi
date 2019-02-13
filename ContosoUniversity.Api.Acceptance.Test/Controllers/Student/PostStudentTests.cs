@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 using ApiModels = ContosoUniversity.Api.Models;
 
@@ -46,9 +47,9 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Student
 
             apiResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var dbStudent = _fixture.SchoolContext.Students.First(s => s.LastName == "some-last-name");
+            var dbStudent = _fixture.SchoolContext.Students.FirstOrDefault(s => s.LastName == "some-last-name");
 
-            _fixture.SchoolContext.Enrollments.Any(e => e.StudentId == dbStudent.StudentId).Should().BeFalse();
+            dbStudent.Should().NotBeNull();
         }
 
         [Fact]
@@ -70,9 +71,10 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Student
 
             apiResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var dbStudent = _fixture.SchoolContext.Students.First(s => s.LastName == "some-last-name");
+            var dbStudent = _fixture.SchoolContext.Students.Include(s => s.Enrollments).FirstOrDefault(s => s.LastName == "some-last-name");
 
-            _fixture.SchoolContext.Enrollments.Count(e => e.StudentId == dbStudent.StudentId).Should().Be(2);
+            dbStudent.Should().NotBeNull();
+            dbStudent.Enrollments.Count.Should().Be(2);
         }
     }
 }

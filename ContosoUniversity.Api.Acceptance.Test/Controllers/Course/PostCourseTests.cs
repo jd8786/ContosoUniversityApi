@@ -1,6 +1,7 @@
 ﻿using AutoFixture;
 using ContosoUniversity.Api.Acceptance.Test.Fixtures;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,36 +50,56 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Course
 
             apiResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var dbCourse = _fixture.SchoolContext.Courses.First(c => c.Title == "some-title");
+            var dbCourse = _fixture.SchoolContext.Courses.Include(c => c.Department).FirstOrDefault(c => c.Title == "some-title");
 
             dbCourse.Should().NotBeNull();
-            _fixture.SchoolContext.Enrollments.Any(e => e.CourseId == dbCourse.CourseId).Should().BeFalse();
-            _fixture.SchoolContext.CourseAssignments.Any(ca => ca.CourseId == dbCourse.CourseId).Should().BeFalse();
-            _fixture.SchoolContext.Departments.Any(d => d.Courses.Any(c => c.Title == "some-title")).Should().BeTrue();
+            dbCourse.Department.Name.Should().Be("test-name1");
         }
 
         [Fact]
-        public async void ShouldReturnOkWhenPostingStudentWithCourses()
+        public async void ShouldReturnOkWhenPostingCourseWithChildren()
         {
-            var student = _autoFixture.Build<ApiModels.Student>()
-                .With(s => s.StudentId, 0)
-                .With(s => s.LastName, "some-last-name")
-                .With(s => s.FirstMidName, "some-first-mid-name")
-                .With(s => s.OriginCountry, "some-origin-country")
-                .With(s => s.Courses, new List<ApiModels.Course> { new ApiModels.Course { CourseId = 1050 }, new ApiModels.Course { CourseId = 4022 } })
+            var existingDepartment = _fixture.SchoolContext.Departments.First(d => d.Name == "test-name2");
+
+            var existingStudents = _fixture.SchoolContext.Students.ToList();
+
+            var students = new List<ApiModels.Student>
+            {
+                new ApiModels.Student {StudentId = existingStudents[0].StudentId},
+                new ApiModels.Student {StudentId = existingStudents[1].StudentId}
+            };
+
+            var existingInstructors = _fixture.SchoolContext.Instructors.ToList();
+
+            var instructors = new List<ApiModels.Instructor>
+            {
+                new ApiModels.Instructor {InstructorId = existingInstructors[0].InstructorId},
+                new ApiModels.Instructor {InstructorId = existingInstructors[1].InstructorId}
+            };
+
+            var course = _autoFixture.Build<ApiModels.Course>()
+                .With(c => c.CourseId, 0)
+                .With(c => c.Title, "some-title")
+                .With(c => c.Credits, 6)
+                .With(c => c.Department, new ApiModels.Department { DepartmentId = existingDepartment.DepartmentId })
+                .With(c => c.Instructors, instructors)
+                .With(c => c.Students, students)
                 .Create();
 
-            var studentJson = JsonConvert.SerializeObject(student);
+            var studentJson = JsonConvert.SerializeObject(course);
 
             var content = new StringContent(studentJson, Encoding.UTF8, "application/json");
 
-            var apiResponse = await _fixture.HttpClient.PostAsync("api/students", content);
+            var apiResponse = await _fixture.HttpClient.PostAsync("api/courses", content);
 
             apiResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var dbStudent = _fixture.SchoolContext.Students.First(s => s.LastName == "some-last-name");
+            var dbCourse = _fixture.SchoolContext.Courses.Include(c => c.Enrollments).Include(c => c.CourseAssignments).Include(c => c.Department).FirstOrDefault(c => c.Title == "some-title");
 
-            _fixture.SchoolContext.Enrollments.Count(e => e.StudentId == dbStudent.StudentId).Should().Be(2);
+            dbCourse.Should().NotBeNull();
+            dbCourse.Department.Name.Should().Be("test-name2");
+            dbCourse.CourseAssignments.Count.Should().Be(2);
+            dbCourse.Enrollments.Count.Should().Be(2);
         }
     }
 }
