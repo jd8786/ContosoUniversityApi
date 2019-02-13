@@ -58,8 +58,8 @@ namespace ContosoUniversity.Data.Test.Repositories.Course
         {
             var courses = _repository.GetAll().ToList();
 
-            courses[0].CourseAssignments.Any(ca => ca.Instructor.InstructorId == 1).Should().BeTrue();
-            courses[1].CourseAssignments.Any(ca => ca.Instructor.InstructorId == 2).Should().BeTrue();
+            courses[0].CourseAssignments.Any(ca => ca.Instructor.InstructorId == 1 && ca.Instructor.OfficeAssignment != null).Should().BeTrue();
+            courses[1].CourseAssignments.Any(ca => ca.Instructor.InstructorId == 2 && ca.Instructor.OfficeAssignment != null).Should().BeTrue();
         }
     }
 }

@@ -37,7 +37,7 @@ namespace ContosoUniversity.Api.Validators
                 throw new InvalidDepartmentException("Department Id cannot be 0");
             }
 
-            CommonValidator.ValidateDepartmentById(department.DepartmentId);
+            CommonValidator.IdValidator.ValidateDepartmentById(department.DepartmentId);
         }
     }
 }

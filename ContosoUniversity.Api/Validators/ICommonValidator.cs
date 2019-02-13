@@ -1,13 +1,13 @@
-﻿namespace ContosoUniversity.Api.Validators
+﻿using ContosoUniversity.Api.Models;
+
+namespace ContosoUniversity.Api.Validators
 {
     public interface ICommonValidator
     {
-        void ValidateStudentById(int studentId);
+        IIdValidator IdValidator { get; set; }
 
-        void ValidateCourseById(int courseId);
+        void ValidateCourseChildren(Course course);
 
-        void ValidateDepartmentById(int departmentId);
-
-        void ValidateInstructorById(int instructorId);
+        void ValidateStudentChildren(Student student);
     }
 }

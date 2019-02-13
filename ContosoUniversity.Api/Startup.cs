@@ -59,6 +59,8 @@ namespace ContosoUniversity.Api
 
             services.AddScoped<ICommonValidator, CommonValidator>();
 
+            services.AddScoped<IIdValidator, IdValidator>();
+
             services.AddSwaggerGen(o =>
             {
                 o.SwaggerDoc("v1", new Info

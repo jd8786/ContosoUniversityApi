@@ -20,7 +20,7 @@ namespace ContosoUniversity.Api.Test.Services
 
         private readonly Mock<IStudentValidator> _studentValidator;
 
-        private readonly Mock<ICommonValidator> _commonValidator;
+        private readonly Mock<IIdValidator> _idValidator;
 
         private readonly IStudentService _studentService;
 
@@ -30,9 +30,12 @@ namespace ContosoUniversity.Api.Test.Services
         {
             _studentRepository = new Mock<IStudentRepository>();
             _studentValidator = new Mock<IStudentValidator>();
-            _commonValidator = new Mock<ICommonValidator>();
+            var commonValidator = new Mock<ICommonValidator>();
+            _idValidator = new Mock<IIdValidator>();
 
-            _studentValidator.Setup(sv => sv.CommonValidator).Returns(_commonValidator.Object);
+            commonValidator.Setup(cv => cv.IdValidator).Returns(_idValidator.Object);
+
+            _studentValidator.Setup(sv => sv.CommonValidator).Returns(commonValidator.Object);
 
             var mapperConfig = new MapperConfiguration(ctg => ctg.AddProfile(new StudentProfile()));
 
@@ -64,7 +67,7 @@ namespace ContosoUniversity.Api.Test.Services
         {
             var student = _studentService.Get(1);
 
-            _commonValidator.Verify(cv => cv.ValidateStudentById(1), Times.Exactly(1));
+            _idValidator.Verify(iv => iv.ValidateStudentById(1), Times.Exactly(1));
 
             _studentRepository.Verify(sr => sr.GetAll(), Times.Exactly(1));
 
@@ -113,7 +116,7 @@ namespace ContosoUniversity.Api.Test.Services
 
             var isRemoved = _studentService.Remove(1);
 
-            _commonValidator.Verify(cv => cv.ValidateStudentById(1), Times.Exactly(1));
+            _idValidator.Verify(iv => iv.ValidateStudentById(1), Times.Exactly(1));
 
             _studentRepository.Verify(sv => sv.Find(1), Times.Exactly(1));
 

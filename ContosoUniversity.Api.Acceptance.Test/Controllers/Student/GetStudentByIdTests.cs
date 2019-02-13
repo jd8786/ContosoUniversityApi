@@ -1,9 +1,10 @@
-﻿using System.Linq;
-using System.Net;
-using ContosoUniversity.Api.Acceptance.Test.Fixtures;
+﻿using ContosoUniversity.Api.Acceptance.Test.Fixtures;
 using ContosoUniversity.Api.Models;
 using FluentAssertions;
 using Newtonsoft.Json;
+using System;
+using System.Linq;
+using System.Net;
 using Xunit;
 using ApiModels = ContosoUniversity.Api.Models;
 
@@ -40,6 +41,8 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Student
             responseOfStudent.Data.LastName.Should().Be("test-last-name1");
             responseOfStudent.Data.FirstMidName.Should().Be("test-first-mid-name1");
             responseOfStudent.Data.OriginCountry.Should().Be("test-country1");
+            responseOfStudent.Data.EnrollmentDate.Should().Be(new DateTime(2010, 9, 1));
+            responseOfStudent.Data.Courses.Count().Should().Be(1);
         }
     }
 }

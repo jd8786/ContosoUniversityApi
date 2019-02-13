@@ -76,7 +76,7 @@ namespace ContosoUniversity.Api.AutoMappers
                     FirstMidName = courseAssignment.Instructor.FirstMidName,
                     HireDate = courseAssignment.Instructor.HireDate,
                     LastName = courseAssignment.Instructor.LastName,
-                    OfficeLocation = courseAssignment.Instructor.OfficeAssignment.Location
+                    OfficeLocation = courseAssignment.Instructor.OfficeAssignment?.Location
                 };
 
                 if (!instructors.Contains(instructor))

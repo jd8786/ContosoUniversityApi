@@ -37,7 +37,7 @@ namespace ContosoUniversity.Api.Validators
                 throw new InvalidInstructorException("Instructor Id cannot be 0");
             }
 
-            CommonValidator.ValidateInstructorById(instructor.InstructorId);
+            CommonValidator.IdValidator.ValidateInstructorById(instructor.InstructorId);
         }
     }
 }

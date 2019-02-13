@@ -1,62 +1,60 @@
-﻿using ContosoUniversity.Data.Exceptions;
-using ContosoUniversity.Data.Repositories;
+﻿using ContosoUniversity.Api.Models;
+using ContosoUniversity.Data.Exceptions;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ContosoUniversity.Api.Validators
 {
     public class CommonValidator : ICommonValidator
     {
-        private readonly IStudentRepository _studentRepository;
-        private readonly ICourseRepository _courseRepository;
-        private readonly IDepartmentRepository _departmentRepository;
-        private readonly IInstructorRepository _instructorRepository;
+        public IIdValidator IdValidator { get; set; }
 
-        public CommonValidator(IStudentRepository studentRepository, ICourseRepository courseRepository,
-            IDepartmentRepository departmentRepository, IInstructorRepository instructorRepository)
+        public CommonValidator(IIdValidator idValidator)
         {
-            _studentRepository = studentRepository;
-            _courseRepository = courseRepository;
-            _departmentRepository = departmentRepository;
-            _instructorRepository = instructorRepository;
+            IdValidator = idValidator;
         }
 
-        public void ValidateStudentById(int studentId)
+        public void ValidateCourseChildren(Course course)
         {
-            var existingStudent = _studentRepository.Find(studentId);
-
-            if (existingStudent == null)
+            if (course.Department == null)
             {
-                throw new NotFoundException($"Student provided with Id {studentId} doesnot exist in the database");
+                throw new InvalidCourseException("Department must be provided");
+            }
+
+            IdValidator.ValidateDepartmentById(course.Department.DepartmentId);
+
+            if (course.Students != null && course.Students.Any())
+            {
+                ValidateStudents(course.Students.ToList());
+            }
+
+            if (course.Instructors != null && course.Instructors.Any())
+            {
+                ValidateInstructors(course.Instructors.ToList());
             }
         }
 
-        public void ValidateCourseById(int courseId)
+        public void ValidateStudentChildren(Student student)
         {
-            var existingCourse = _courseRepository.Find(courseId);
-
-            if (existingCourse == null)
+            if (student.Courses != null && student.Courses.Any())
             {
-                throw new NotFoundException($"Course provided with Id {courseId} doesnot exist in the database");
+                ValidateCourses(student.Courses.ToList());
             }
         }
 
-        public void ValidateDepartmentById(int departmentId)
+        private void ValidateStudents(List<Student> students)
         {
-            var existingDepartment = _departmentRepository.Find(departmentId);
-
-            if (existingDepartment == null)
-            {
-                throw new NotFoundException($"Department provided with Id {departmentId} doesnot exist in the database");
-            }
+            students.ForEach(s => IdValidator.ValidateStudentById(s.StudentId));
         }
 
-        public void ValidateInstructorById(int instructorId)
+        private void ValidateCourses(List<Course> courses)
         {
-            var existingInstructor = _instructorRepository.Find(instructorId);
+            courses.ForEach(c => IdValidator.ValidateCourseById(c.CourseId));
+        }
 
-            if (existingInstructor == null)
-            {
-                throw new NotFoundException($"Instructor provided with Id {instructorId} doesnot exist in the database");
-            }
+        private void ValidateInstructors(List<Instructor> instructors)
+        {
+            instructors.ForEach(i => IdValidator.ValidateInstructorById(i.InstructorId));
         }
     }
 }

@@ -1,9 +1,9 @@
-﻿using ContosoUniversity.Api.Validators;
-using ContosoUniversity.Data.EntityModels;
+﻿using ContosoUniversity.Api.Models;
+using ContosoUniversity.Api.Validators;
 using ContosoUniversity.Data.Exceptions;
-using ContosoUniversity.Data.Repositories;
 using FluentAssertions;
 using Moq;
+using System.Collections.Generic;
 using Xunit;
 
 namespace ContosoUniversity.Api.Test.Validators
@@ -11,140 +11,121 @@ namespace ContosoUniversity.Api.Test.Validators
     [Trait("Category", "Unit Test: Api.Validators.Common")]
     public class CommonValidatorTests
     {
-        private readonly Mock<IStudentRepository> _studentRepository;
-        private readonly Mock<ICourseRepository> _courseRepository;
-        private readonly Mock<IDepartmentRepository> _departmentRepository;
-        private readonly Mock<IInstructorRepository> _instructorRepository;
-        private readonly CommonValidator _commonValidator;
+        private readonly Mock<IIdValidator> _idValidator;
+        private readonly ICommonValidator _commonValidator;
 
         public CommonValidatorTests()
         {
-            _studentRepository = new Mock<IStudentRepository>();
-            _courseRepository = new Mock<ICourseRepository>();
-            _departmentRepository = new Mock<IDepartmentRepository>();
-            _instructorRepository = new Mock<IInstructorRepository>();
-
-            _commonValidator = new CommonValidator(_studentRepository.Object, _courseRepository.Object, _departmentRepository.Object, _instructorRepository.Object);
-
-            _studentRepository.Setup(sr => sr.Find(1)).Returns(new StudentEntity { StudentId = 1 });
-
-            _courseRepository.Setup(cr => cr.Find(1)).Returns(new CourseEntity { CourseId = 1 });
-
-            _departmentRepository.Setup(dr => dr.Find(1)).Returns(new DepartmentEntity { DepartmentId = 1 });
-
-            _instructorRepository.Setup(ir => ir.Find(1)).Returns(new InstructorEntity { InstructorId = 1 });
+            _idValidator = new Mock<IIdValidator>();
+            _commonValidator = new CommonValidator(_idValidator.Object);
         }
 
         [Fact]
-        public void ShouldThrowNotFoundExceptionWhenStudentDoesNotExist()
+        public void ShouldThrowInvalidCourseExceptionWhenDepartmentOnCourseIsNull()
         {
-            var exception = Assert.Throws<NotFoundException>(() => _commonValidator.ValidateStudentById(2));
+            var exception = Assert.Throws<InvalidCourseException>(() => _commonValidator.ValidateCourseChildren(new Course()));
 
-            _studentRepository.Verify(sr => sr.Find(2), Times.Exactly(1));
-
-            exception.Message.Should().Be("Student provided with Id 2 doesnot exist in the database");
+            exception.Message.Should().Be("Department must be provided");
         }
 
         [Fact]
-        public void ShouldNotThrowNotFoundExceptionWhenStudentExists()
+        public void ShouldValidateDepartmentWhenDepartmentIsProvidedOnCourse()
         {
-            NotFoundException ex = null;
+            _commonValidator.ValidateCourseChildren(new Course { Department = new Department() });
 
-            try
-            {
-                _commonValidator.ValidateStudentById(1);
-            }
-            catch (NotFoundException e)
-            {
-                ex = e;
-            }
-
-            ex.Should().BeNull();
-            _studentRepository.Verify(sr => sr.Find(1), Times.Exactly(1));
+            _idValidator.Verify(iv => iv.ValidateDepartmentById(It.IsAny<int>()), Times.Exactly(1));
         }
 
         [Fact]
-        public void ShouldThrowNotFoundExceptionWhenCourseDoesNotExist()
+        public void ShouldNotValidateStudentsWhenStudentsAreNullOnCourse()
         {
-            var exception = Assert.Throws<NotFoundException>(() => _commonValidator.ValidateCourseById(2));
+            _commonValidator.ValidateCourseChildren(new Course { Department = new Department() });
 
-            _courseRepository.Verify(cr => cr.Find(2), Times.Exactly(1));
-
-            exception.Message.Should().Be("Course provided with Id 2 doesnot exist in the database");
+            _idValidator.Verify(iv => iv.ValidateStudentById(It.IsAny<int>()), Times.Never);
         }
 
         [Fact]
-        public void ShouldNotThrowNotFoundExceptionWhenCourseExists()
+        public void ShouldNotValidateStudentsWhenStudentsAreEmptyOnCourse()
         {
-            NotFoundException ex = null;
+            _commonValidator.ValidateCourseChildren(
+                new Course
+                {
+                    Students = new List<Student>(),
+                    Department = new Department()
+                });
 
-            try
-            {
-                _commonValidator.ValidateCourseById(1);
-            }
-            catch (NotFoundException e)
-            {
-                ex = e;
-            }
-
-            ex.Should().BeNull();
-            _courseRepository.Verify(cr => cr.Find(1), Times.Exactly(1));
+            _idValidator.Verify(iv => iv.ValidateStudentById(It.IsAny<int>()), Times.Never);
         }
 
         [Fact]
-        public void ShouldThrowNotFoundExceptionWhenDepartmentDoesNotExist()
+        public void ShouldValidateStudentsWhenStudentsAreNotNullOrEmptyOnCourse()
         {
-            var exception = Assert.Throws<NotFoundException>(() => _commonValidator.ValidateDepartmentById(2));
+            _commonValidator.ValidateCourseChildren(
+                new Course
+                {
+                    Students = new List<Student> { new Student(), new Student() },
+                    Department = new Department()
+                });
 
-            _departmentRepository.Verify(dr => dr.Find(2), Times.Exactly(1));
-
-            exception.Message.Should().Be("Department provided with Id 2 doesnot exist in the database");
+            _idValidator.Verify(iv => iv.ValidateStudentById(It.IsAny<int>()), Times.Exactly(2));
         }
 
         [Fact]
-        public void ShouldNotThrowNotFoundExceptionWhenDepartmentExists()
+        public void ShouldNotValidateInstructorsWhenInstructorsAreNullOnCourse()
         {
-            NotFoundException ex = null;
+            _commonValidator.ValidateCourseChildren(new Course {Department = new Department()});
 
-            try
-            {
-                _commonValidator.ValidateDepartmentById(1);
-            }
-            catch (NotFoundException e)
-            {
-                ex = e;
-            }
-
-            ex.Should().BeNull();
-            _departmentRepository.Verify(dr => dr.Find(1), Times.Exactly(1));
+            _idValidator.Verify(iv => iv.ValidateInstructorById(It.IsAny<int>()), Times.Never);
         }
 
         [Fact]
-        public void ShouldThrowNotFoundExceptionWhenInstructorDoesNotExist()
+        public void ShouldNotValidateInstructorsWhenInstructorsAreEmptyOnCourse()
         {
-            var exception = Assert.Throws<NotFoundException>(() => _commonValidator.ValidateInstructorById(2));
+            _commonValidator.ValidateCourseChildren(
+                new Course
+                {
+                    Instructors = new List<Instructor>(),
+                    Department = new Department()
+                });
 
-            _instructorRepository.Verify(ir => ir.Find(2), Times.Exactly(1));
-
-            exception.Message.Should().Be("Instructor provided with Id 2 doesnot exist in the database");
+            _idValidator.Verify(iv => iv.ValidateInstructorById(It.IsAny<int>()), Times.Never);
         }
 
         [Fact]
-        public void ShouldNotThrowNotFoundExceptionWhenInstructorExists()
+        public void ShouldValidateInstructorsWhenInstructorsAreNotNullOrEmptyOnCourse()
         {
-            NotFoundException ex = null;
+            _commonValidator.ValidateCourseChildren(
+                new Course
+                {
+                    Instructors = new List<Instructor> { new Instructor(), new Instructor() },
+                    Department = new Department()
+                });
 
-            try
-            {
-                _commonValidator.ValidateInstructorById(1);
-            }
-            catch (NotFoundException e)
-            {
-                ex = e;
-            }
+            _idValidator.Verify(iv => iv.ValidateInstructorById(It.IsAny<int>()), Times.Exactly(2));
+        }
 
-            ex.Should().BeNull();
-            _instructorRepository.Verify(ir => ir.Find(1), Times.Exactly(1));
+        [Fact]
+        public void ShouldNotValidateCoursesWhenCoursesAreNullOnStudent()
+        {
+            _commonValidator.ValidateStudentChildren(new Student());
+
+            _idValidator.Verify(iv => iv.ValidateCourseById(It.IsAny<int>()), Times.Never);
+        }
+
+        [Fact]
+        public void ShouldNotValidateCoursesWhenCoursesAreEmptyOnStudent()
+        {
+            _commonValidator.ValidateStudentChildren(new Student { Courses = new List<Course>() });
+
+            _idValidator.Verify(iv => iv.ValidateCourseById(It.IsAny<int>()), Times.Never);
+        }
+
+        [Fact]
+        public void ShouldValidateCoursesWhenCoursesAreNotNullOrEmptyOnStudent()
+        {
+            _commonValidator.ValidateStudentChildren(new Student { Courses = new List<Course> { new Course(), new Course() } });
+
+            _idValidator.Verify(iv => iv.ValidateCourseById(It.IsAny<int>()), Times.Exactly(2));
         }
     }
 }

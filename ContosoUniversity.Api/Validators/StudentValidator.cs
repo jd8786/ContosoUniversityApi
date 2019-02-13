@@ -1,6 +1,5 @@
 ﻿using ContosoUniversity.Api.Models;
 using ContosoUniversity.Data.Exceptions;
-using System.Linq;
 
 namespace ContosoUniversity.Api.Validators
 {
@@ -25,7 +24,7 @@ namespace ContosoUniversity.Api.Validators
                 throw new InvalidStudentException("Student Id must be 0");
             }
 
-            ValidateChildren(student);
+            CommonValidator.ValidateStudentChildren(student);
         }
 
         public void ValidatePutStudent(Student student)
@@ -40,17 +39,9 @@ namespace ContosoUniversity.Api.Validators
                 throw new InvalidStudentException("Student Id cannot be 0");
             }
 
-            CommonValidator.ValidateStudentById(student.StudentId);
+            CommonValidator.IdValidator.ValidateStudentById(student.StudentId);
 
-            ValidateChildren(student);
-        }
-
-        private void ValidateChildren(Student student)
-        {
-            if (student.Courses != null && student.Courses.Any())
-            {
-                student.Courses.ToList().ForEach(c => CommonValidator.ValidateCourseById(c.CourseId));
-            }
+            CommonValidator.ValidateStudentChildren(student);
         }
     }
 }

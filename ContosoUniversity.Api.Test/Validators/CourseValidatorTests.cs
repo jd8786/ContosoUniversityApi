@@ -3,7 +3,6 @@ using ContosoUniversity.Api.Validators;
 using ContosoUniversity.Data.Exceptions;
 using FluentAssertions;
 using Moq;
-using System.Collections.Generic;
 using Xunit;
 
 namespace ContosoUniversity.Api.Test.Validators
@@ -13,10 +12,16 @@ namespace ContosoUniversity.Api.Test.Validators
     {
         private readonly ICourseValidator _courseValidator;
         private readonly Mock<ICommonValidator> _commonValidator;
+        private readonly Mock<IIdValidator> _idValidator;
 
         public CourseValidatorTests()
         {
             _commonValidator = new Mock<ICommonValidator>();
+
+            _idValidator = new Mock<IIdValidator>();
+
+            _commonValidator.Setup(cv => cv.IdValidator).Returns(_idValidator.Object);
+
             _courseValidator = new CourseValidator(_commonValidator.Object);
         }
 
@@ -37,52 +42,13 @@ namespace ContosoUniversity.Api.Test.Validators
         }
 
         [Fact]
-        public void ShouldValidateChildrenWhenPostingCourseWithChildren()
+        public void ShouldValidateChildrenWhenPostingCourse()
         {
-            var course = new Course
-            {
-                Students = new List<Student>
-                {
-                    new Student {StudentId = 1},
-                    new Student {StudentId = 2}
-                },
-                Instructors = new List<Instructor>
-                {
-                    new Instructor {InstructorId = 1}
-                },
-                Department = new Department { DepartmentId = 1 }
-            };
+            var course = new Course();
 
             _courseValidator.ValidatePostCourse(course);
 
-            _commonValidator.Verify(cv => cv.ValidateStudentById(It.IsAny<int>()), Times.Exactly(2));
-            _commonValidator.Verify(cv => cv.ValidateInstructorById(It.IsAny<int>()), Times.Exactly(1));
-            _commonValidator.Verify(cv => cv.ValidateDepartmentById(It.IsAny<int>()), Times.Exactly(1));
-        }
-
-        [Fact]
-        public void ShouldNotValidateChildrenWhenPostingCourseWithNullChildren()
-        {
-            _courseValidator.ValidatePostCourse(new Course());
-
-            _commonValidator.Verify(cv => cv.ValidateStudentById(It.IsAny<int>()), Times.Never);
-            _commonValidator.Verify(cv => cv.ValidateInstructorById(It.IsAny<int>()), Times.Never);
-            _commonValidator.Verify(cv => cv.ValidateDepartmentById(It.IsAny<int>()), Times.Never);
-        }
-
-        [Fact]
-        public void ShouldNotValidateChildrenWhenPostingCourseWithEmptyChildren()
-        {
-            _courseValidator.ValidatePostCourse(
-                new Course
-                {
-                    Students = new List<Student>(),
-                    Instructors = new List<Instructor>()
-                });
-
-            _commonValidator.Verify(cv => cv.ValidateStudentById(It.IsAny<int>()), Times.Never);
-            _commonValidator.Verify(cv => cv.ValidateInstructorById(It.IsAny<int>()), Times.Never);
-            _commonValidator.Verify(cv => cv.ValidateDepartmentById(It.IsAny<int>()), Times.Never);
+            _commonValidator.Verify(cv => cv.ValidateCourseChildren(course), Times.Exactly(1));
         }
 
         [Fact]
@@ -102,61 +68,21 @@ namespace ContosoUniversity.Api.Test.Validators
         }
 
         [Fact]
-        public void ShouldCallValidateCourseById()
+        public void ShouldCallValidateCourseByIdWhenPuttingCourse()
         {
             _courseValidator.ValidatePutCourse(new Course { CourseId = 1 });
 
-            _commonValidator.Verify(cv => cv.ValidateCourseById(1), Times.Exactly(1));
+            _idValidator.Verify(iv => iv.ValidateCourseById(1), Times.Exactly(1));
         }
 
         [Fact]
-        public void ShouldValidateChildrenWhenPuttingCourseWithChildren()
+        public void ShouldValidateChildrenWhenPuttingCourse()
         {
-            var course = new Course
-            {
-                CourseId = 1,
-                Students = new List<Student>
-                {
-                    new Student {StudentId = 1},
-                    new Student {StudentId = 2}
-                },
-                Instructors = new List<Instructor>
-                {
-                    new Instructor {InstructorId = 1}
-                },
-                Department = new Department { DepartmentId = 1 }
-            };
+            var course = new Course { CourseId = 1 };
 
             _courseValidator.ValidatePutCourse(course);
 
-            _commonValidator.Verify(cv => cv.ValidateStudentById(It.IsAny<int>()), Times.Exactly(2));
-            _commonValidator.Verify(cv => cv.ValidateInstructorById(It.IsAny<int>()), Times.Exactly(1));
-            _commonValidator.Verify(cv => cv.ValidateDepartmentById(It.IsAny<int>()), Times.Exactly(1));
-        }
-
-        [Fact]
-        public void ShouldNotValidateChildrenWhenPuttingCourseWithNullChildren()
-        {
-            _courseValidator.ValidatePutCourse(new Course { CourseId = 1 });
-
-            _commonValidator.Verify(cv => cv.ValidateStudentById(It.IsAny<int>()), Times.Never);
-            _commonValidator.Verify(cv => cv.ValidateInstructorById(It.IsAny<int>()), Times.Never);
-            _commonValidator.Verify(cv => cv.ValidateDepartmentById(It.IsAny<int>()), Times.Never);
-        }
-
-        [Fact]
-        public void ShouldNotValidateChildrenWhenPuttingCourseWithEmptyChildren()
-        {
-            _courseValidator.ValidatePutCourse(new Course
-            {
-                CourseId = 1,
-                Students = new List<Student>(),
-                Instructors = new List<Instructor>()
-            });
-
-            _commonValidator.Verify(cv => cv.ValidateStudentById(It.IsAny<int>()), Times.Never);
-            _commonValidator.Verify(cv => cv.ValidateInstructorById(It.IsAny<int>()), Times.Never);
-            _commonValidator.Verify(cv => cv.ValidateDepartmentById(It.IsAny<int>()), Times.Never);
+            _commonValidator.Verify(cv => cv.ValidateCourseChildren(course), Times.Exactly(1));
         }
     }
 }

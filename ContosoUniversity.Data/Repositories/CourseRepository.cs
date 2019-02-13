@@ -19,6 +19,7 @@ namespace ContosoUniversity.Data.Repositories
                 .Include(c => c.Department)
                 .Include(c => c.CourseAssignments)
                 .ThenInclude(ca => ca.Instructor)
+                .ThenInclude(i => i.OfficeAssignment)
                 .ToList();
         }
 
