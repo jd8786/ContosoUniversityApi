@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using ContosoUniversity.Api.Acceptance.Test.Fixtures;
+﻿using ContosoUniversity.Api.Acceptance.Test.Fixtures;
 using ContosoUniversity.Api.Models;
 using FluentAssertions;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using Xunit;
 using ApiModels = ContosoUniversity.Api.Models;
 
@@ -31,9 +31,10 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Student
 
             var content = await apiResponse.Content.ReadAsStringAsync();
 
-            var apiResponseOfStudents = JsonConvert.DeserializeObject<ApiResponse<IEnumerable<ApiModels.Student>>>(content);
+            var responseOfStudents = JsonConvert.DeserializeObject<ApiResponse<IEnumerable<ApiModels.Student>>>(content);
 
-            apiResponseOfStudents.Data.Count().Should().Be(2);
+            responseOfStudents.IsSuccess.Should().BeTrue();
+            responseOfStudents.Data.Count().Should().Be(2);
         }
     }
 }

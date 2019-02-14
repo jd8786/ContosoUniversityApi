@@ -1,7 +1,6 @@
 ﻿using AutoFixture;
 using ContosoUniversity.Api.Acceptance.Test.Fixtures;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
@@ -72,13 +71,16 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Course
 
             apiResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var dbCourse = _fixture.SchoolContext.Courses.Include(c => c.Enrollments).Include(c => c.CourseAssignments).Include(c => c.Department).First(c => c.CourseId == courseId);
+            var responseOfContent = await apiResponse.Content.ReadAsStringAsync();
 
-            dbCourse.Title.Should().Be("some-title");
-            dbCourse.Credits.Should().Be(10);
-            dbCourse.Department.Name.Should().Be("test-name2");
-            dbCourse.Enrollments.Count.Should().Be(2);
-            dbCourse.CourseAssignments.Count.Should().Be(2);
+            var responseOfCourse = JsonConvert.DeserializeObject<ApiModels.ApiResponse<ApiModels.Course>>(responseOfContent);
+
+            responseOfCourse.IsSuccess.Should().BeTrue();
+            responseOfCourse.Data.Title.Should().Be("some-title");
+            responseOfCourse.Data.Credits.Should().Be(10);
+            responseOfCourse.Data.Department.Name.Should().Be("test-name2");
+            responseOfCourse.Data.Students.Count().Should().Be(2);
+            responseOfCourse.Data.Instructors.Count().Should().Be(2);
         }
     }
 }

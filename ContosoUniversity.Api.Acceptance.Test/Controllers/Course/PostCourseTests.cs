@@ -1,7 +1,6 @@
 ﻿using AutoFixture;
 using ContosoUniversity.Api.Acceptance.Test.Fixtures;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,10 +49,15 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Course
 
             apiResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var dbCourse = _fixture.SchoolContext.Courses.Include(c => c.Department).FirstOrDefault(c => c.Title == "some-title");
+            var responseOfContent = await apiResponse.Content.ReadAsStringAsync();
 
-            dbCourse.Should().NotBeNull();
-            dbCourse.Department.Name.Should().Be("test-name1");
+            var responseOfCourse = JsonConvert.DeserializeObject<ApiModels.ApiResponse<ApiModels.Course>>(responseOfContent);
+
+            responseOfCourse.IsSuccess.Should().BeTrue();
+            responseOfCourse.Data.Title.Should().Be("some-title");
+            responseOfCourse.Data.Department.Name.Should().Be("test-name1");
+            responseOfCourse.Data.Instructors.Any().Should().BeFalse();
+            responseOfCourse.Data.Students.Any().Should().BeFalse();
         }
 
         [Fact]
@@ -94,12 +98,15 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Course
 
             apiResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var dbCourse = _fixture.SchoolContext.Courses.Include(c => c.Enrollments).Include(c => c.CourseAssignments).Include(c => c.Department).FirstOrDefault(c => c.Title == "some-title");
+            var responseOfContent = await apiResponse.Content.ReadAsStringAsync();
 
-            dbCourse.Should().NotBeNull();
-            dbCourse.Department.Name.Should().Be("test-name2");
-            dbCourse.CourseAssignments.Count.Should().Be(2);
-            dbCourse.Enrollments.Count.Should().Be(2);
+            var responseOfCourse = JsonConvert.DeserializeObject<ApiModels.ApiResponse<ApiModels.Course>>(responseOfContent);
+
+            responseOfCourse.IsSuccess.Should().BeTrue();
+            responseOfCourse.Data.Title.Should().Be("some-title");
+            responseOfCourse.Data.Department.Name.Should().Be("test-name2");
+            responseOfCourse.Data.Instructors.Count().Should().Be(2);
+            responseOfCourse.Data.Students.Count().Should().Be(2);
         }
     }
 }

@@ -1,9 +1,9 @@
-﻿using System.Linq;
-using System.Net;
-using ContosoUniversity.Api.Acceptance.Test.Fixtures;
+﻿using ContosoUniversity.Api.Acceptance.Test.Fixtures;
 using ContosoUniversity.Api.Models;
 using FluentAssertions;
 using Newtonsoft.Json;
+using System.Linq;
+using System.Net;
 using Xunit;
 
 namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Student

@@ -7,7 +7,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using Microsoft.EntityFrameworkCore;
 using Xunit;
 using ApiModels = ContosoUniversity.Api.Models;
 
@@ -47,9 +46,13 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Student
 
             apiResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var dbStudent = _fixture.SchoolContext.Students.FirstOrDefault(s => s.LastName == "some-last-name");
+            var responseOfContent = await apiResponse.Content.ReadAsStringAsync();
 
-            dbStudent.Should().NotBeNull();
+            var responseOfStudent = JsonConvert.DeserializeObject<ApiModels.ApiResponse<ApiModels.Student>>(responseOfContent);
+
+            responseOfStudent.IsSuccess.Should().BeTrue();
+            responseOfStudent.Data.LastName.Should().Be("some-last-name");
+            responseOfStudent.Data.Courses.Any().Should().BeFalse();
         }
 
         [Fact]
@@ -71,10 +74,13 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Student
 
             apiResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var dbStudent = _fixture.SchoolContext.Students.Include(s => s.Enrollments).FirstOrDefault(s => s.LastName == "some-last-name");
+            var responseOfContent = await apiResponse.Content.ReadAsStringAsync();
 
-            dbStudent.Should().NotBeNull();
-            dbStudent.Enrollments.Count.Should().Be(2);
+            var responseOfStudent = JsonConvert.DeserializeObject<ApiModels.ApiResponse<ApiModels.Student>>(responseOfContent);
+
+            responseOfStudent.IsSuccess.Should().BeTrue();
+            responseOfStudent.Data.LastName.Should().Be("some-last-name");
+            responseOfStudent.Data.Courses.Count().Should().Be(2);
         }
     }
 }

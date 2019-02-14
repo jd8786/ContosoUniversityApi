@@ -62,15 +62,17 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Student
 
             apiResponse.StatusCode.Should().Be(HttpStatusCode.OK);
 
-            var dbStudent = _fixture.SchoolContext.Students.Include(s => s.Enrollments).First(s => s.StudentId == studentId);
+            var responseOfContent = await apiResponse.Content.ReadAsStringAsync();
 
-            dbStudent.LastName.Should().Be("some-last-name");
-            dbStudent.FirstMidName.Should().Be("some-first-mid-name");
-            dbStudent.OriginCountry.Should().Be("some-origin-country");
-            dbStudent.EnrollmentDate.Should().Be(new DateTime(2018, 1, 1));
-            dbStudent.Enrollments.Count.Should().Be(2);
-            _fixture.SchoolContext.Enrollments.Count(e => e.StudentId == dbStudent.StudentId && e.CourseId == 4022).Should().Be(1);
-            _fixture.SchoolContext.Enrollments.Single(e => e.StudentId == dbStudent.StudentId && e.CourseId == 1050).Grade.Should().Be(Grade.F);
+            var responseOfStudent = JsonConvert.DeserializeObject<ApiModels.ApiResponse<ApiModels.Student>>(responseOfContent);
+
+            responseOfStudent.IsSuccess.Should().BeTrue();
+            responseOfStudent.Data.LastName.Should().Be("some-last-name");
+            responseOfStudent.Data.FirstMidName.Should().Be("some-first-mid-name");
+            responseOfStudent.Data.OriginCountry.Should().Be("some-origin-country");
+            responseOfStudent.Data.EnrollmentDate.Should().Be(new DateTime(2018, 1, 1));
+            responseOfStudent.Data.Courses.Count().Should().Be(2);
+            _fixture.SchoolContext.Enrollments.Single(e => e.StudentId == studentId && e.CourseId == 1050).Grade.Should().Be(Grade.F);
         }
     }
 }

@@ -37,6 +37,7 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Student
 
             var responseOfStudent = JsonConvert.DeserializeObject<ApiResponse<ApiModels.Student>>(content);
 
+            responseOfStudent.IsSuccess.Should().BeTrue();
             responseOfStudent.Data.StudentId.Should().Be(studentId);
             responseOfStudent.Data.LastName.Should().Be("test-last-name1");
             responseOfStudent.Data.FirstMidName.Should().Be("test-first-mid-name1");

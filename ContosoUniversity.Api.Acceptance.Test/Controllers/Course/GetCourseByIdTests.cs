@@ -36,6 +36,7 @@ namespace ContosoUniversity.Api.Acceptance.Test.Controllers.Course
 
             var responseOfCourse = JsonConvert.DeserializeObject<ApiResponse<ApiModels.Course>>(content);
 
+            responseOfCourse.IsSuccess.Should().BeTrue();
             responseOfCourse.Data.CourseId.Should().Be(courseId);
             responseOfCourse.Data.Credits.Should().Be(3);
             responseOfCourse.Data.Title.Should().Be("test-title1");
